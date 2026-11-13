@@ -22,9 +22,6 @@ When a diagram changes, update the `.drawio` file, export the image again, and c
 | Class diagram, backend services | `class-services.drawio` | `class-services.png` | [uml-diagrams.md](../uml-diagrams.md) |
 | Object diagram | `object.drawio` | `object.png` | [uml-diagrams.md](../uml-diagrams.md) |
 | Component diagram | `component.drawio` | `component.png` | [uml-diagrams.md](../uml-diagrams.md) |
-| Deployment diagram | `deployment.drawio` | `deployment.png` | [uml-diagrams.md](../uml-diagrams.md) |
-| Package diagram | `package.drawio` | `package.png` | [uml-diagrams.md](../uml-diagrams.md) |
-| Composite structure diagram | `composite-structure.drawio` | `composite-structure.png` | [uml-diagrams.md](../uml-diagrams.md) |
 | Profile diagram | `profile.drawio` | `profile.png` | [uml-diagrams.md](../uml-diagrams.md) |
 | Use case diagram | `use-case.drawio` | `use-case.png` | [uml-diagrams.md](../uml-diagrams.md) |
 | Sequence diagram: place an order | `sequence-place-order.drawio` | `sequence-place-order.png` | [uml-diagrams.md](../uml-diagrams.md) |

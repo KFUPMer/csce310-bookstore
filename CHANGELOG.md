@@ -8,7 +8,7 @@ All versions and patches of the project, newest first.
 - Repository structure for process documentation: idea, design, problem log, planning
 - Draft project idea, proposed architecture, database design, and API design
 - Milestone plan and versioning rules
-- UML diagrams of every type: class (apps and services), object, component, deployment, package, composite structure, profile, use case, sequence, activity, state machine
+- UML diagrams: class (apps and services), object, component, profile, use case, sequence, activity, state machine
 - Design diagrams drawn in draw.io, with sources and exported images in `docs/02-design/diagrams`
 
 ### Changed

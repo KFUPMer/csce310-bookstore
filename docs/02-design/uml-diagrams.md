@@ -2,21 +2,18 @@
 
 > Status: **draft**. To be finalized in milestone M2.
 
-Every UML diagram type, applied to the bookstore. All are drawn in draw.io; each image has its source file next to it in [diagrams/](diagrams/README.md).
+The UML diagrams of the bookstore. All are drawn in draw.io; each image has its source file next to it in [diagrams/](diagrams/README.md).
 
 | # | Diagram | Kind | What it shows for this project |
 |---|---|---|---|
 | 1 | [Class](#1-class-diagrams) | Structural | The classes of the two apps and the three services |
 | 2 | [Object](#2-object-diagram) | Structural | One real order at one moment, with actual values |
 | 3 | [Component](#3-component-diagram) | Structural | The apps, services, and databases, and the interfaces between them |
-| 4 | [Deployment](#4-deployment-diagram) | Structural | Which program runs on which machine and port |
-| 5 | [Package](#5-package-diagram) | Structural | How the code is organized into packages |
-| 6 | [Composite structure](#6-composite-structure-diagram) | Structural | What is inside order-service |
-| 7 | [Profile](#7-profile-diagram) | Structural | Our own labels (stereotypes) used across the diagrams |
-| 8 | [Use case](#8-use-case-diagram) | Behavioral | What customers and managers can do |
-| 9 | [Sequence](#9-sequence-diagram) | Behavioral | The messages exchanged when an order is placed |
-| 10 | [Activity](#10-activity-diagram) | Behavioral | The steps a customer follows to place an order |
-| 11 | [State machine](#11-state-machine-diagram) | Behavioral | The states of an order and of a user session |
+| 4 | [Profile](#4-profile-diagram) | Structural | Our own labels (stereotypes) used across the diagrams |
+| 5 | [Use case](#5-use-case-diagram) | Behavioral | What customers and managers can do |
+| 6 | [Sequence](#6-sequence-diagram) | Behavioral | The messages exchanged when an order is placed |
+| 7 | [Activity](#7-activity-diagram) | Behavioral | The steps a customer follows to place an order |
+| 8 | [State machine](#8-state-machine-diagram) | Behavioral | The states of an order and of a user session |
 
 ---
 
@@ -42,25 +39,7 @@ A snapshot of the example used throughout the docs: the customer `alice` has jus
 
 Each service provides one REST interface (the circles). Both apps use all three. order-service and book-service ask user-service to validate the session token, and order-service asks book-service for prices and available copies.
 
-### 4. Deployment diagram
-
-![Deployment diagram](diagrams/deployment.png)
-
-The two apps are separate programs that talk to the server over HTTP. For the course demo everything runs on one computer.
-
-### 5. Package diagram
-
-![Package diagram](diagrams/package.png)
-
-This is also the folder layout of the repository: `clients/` and `services/`. Inside each program, the arrows show which package depends on which.
-
-### 6. Composite structure diagram
-
-![Composite structure diagram of order-service](diagrams/composite-structure.png)
-
-The inside of order-service, the most complex part of the system. The small squares on the border are its ports: one where requests come in, and one for each outside thing it talks to. The dashed part is the optional email feature (FR10).
-
-### 7. Profile diagram
+### 4. Profile diagram
 
 ![Profile diagram](diagrams/profile.png)
 
@@ -80,7 +59,7 @@ Stereotypes are our own labels that extend standard UML. Where each one applies:
 
 ## Behavioral diagrams
 
-### 8. Use case diagram
+### 5. Use case diagram
 
 ![Use case diagram](diagrams/use-case.png)
 
@@ -97,19 +76,19 @@ Stereotypes are our own labels that extend standard UML. Where each one applies:
 | Update payment status | Manager | FR13 |
 | Add book, Update book information | Manager | FR14 |
 
-### 9. Sequence diagram
+### 6. Sequence diagram
 
 ![Sequence diagram for placing an order](diagrams/sequence-place-order.png)
 
 Placing an order is the one flow that touches every part of the system, so it is the one drawn.
 
-### 10. Activity diagram
+### 7. Activity diagram
 
 ![Activity diagram for placing an order](diagrams/activity-place-order.png)
 
 The same flow as the sequence diagram, but from the customer's point of view: the steps and the decisions.
 
-### 11. State machine diagram
+### 8. State machine diagram
 
 ![State machine diagrams](diagrams/state-machine.png)
 

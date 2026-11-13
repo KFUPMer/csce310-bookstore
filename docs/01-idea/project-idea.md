@@ -77,6 +77,13 @@ This is a client/server system, **not a web application**: the clients are deskt
 | N4 | Every endpoint that handles user data or actions requires a valid authentication token | No token, no access |
 | N5 | Users only access their own data; managers cannot do customer actions and customers cannot do manager actions | Each role is limited to its own job |
 
+## Assumptions and dependencies
+
+| From the PRD | What it means for us |
+|---|---|
+| The book database must be initialized (titles, authors, prices) for testing | We write a seed script that loads sample books into MongoDB, plus one customer and one manager account in MySQL so both apps can be tested |
+| No real-time payment processing (no credit card integration); the manager updating the payment status is enough | An order starts as `PENDING` and a manager marks it `PAID` by hand. No payment screen, no payment provider |
+
 ## Not required by the PRD
 
 These were in the first draft of this document and have been removed because the PRD does not ask for them:

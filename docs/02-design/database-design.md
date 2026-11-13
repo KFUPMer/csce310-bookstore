@@ -39,5 +39,6 @@ Collection `books` (FR4, FR5, FR14):
 
 ## Still to do in M2
 
-- [ ] SQL schema script and seed data (at least one customer, one manager, some books)
+- [ ] SQL schema script
+- [ ] Seed script, required by the PRD for testing: sample books (title, author, price, copies) in MongoDB, plus one customer and one manager in MySQL
 - [ ] Index for keyword search on `title` and `author`

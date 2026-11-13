@@ -23,13 +23,13 @@ The live version of this plan is on GitHub: milestones hold the deadlines, issue
 ### M2 — Design (due 2026-11-19)
 
 - [ ] Use case and sequence diagrams
-- [ ] Finalize MySQL schema and MongoDB document model
+- [ ] Finalize MySQL schema and MongoDB document model, and plan the seed data
 - [ ] Finalize REST API specification
 - [ ] UI wireframes for both desktop apps
 
 ### M3 — Backend Services (due 2026-11-26)
 
-- [ ] Set up the three service projects (Java, Python) and local MySQL/MongoDB
+- [ ] Set up the three service projects (Java, Python) and local MySQL/MongoDB, loaded with seed data
 - [ ] user-service in Java HttpServer: login, logout, sessions, roles, bcrypt (FR1, FR2, FR11, N3)
 - [ ] book-service in Python Flask: keyword search, add and update books (FR4, FR5, FR14)
 - [ ] order-service in Python Flask: orders, HTML bill, order list, payment status (FR6–FR9, FR12, FR13)

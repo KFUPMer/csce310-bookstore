@@ -17,6 +17,7 @@ All versions and patches of the project, newest first.
 - Milestone deadlines moved to fit the 2026-12-04 submission deadline
 - Renting rule defined: 10% of the book price for 7 days; rent price is calculated, not stored per book
 - Non-functional requirements recorded (technology, N1–N5)
+- PRD assumptions recorded: seed data is required for testing; no real payment processing
 - Backend stack changed to what the PRD requires: Java HttpServer for user-service, Python Flask for book-service and order-service; `catalog-service` renamed `book-service`
 
 ### Removed

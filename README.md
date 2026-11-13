@@ -1,6 +1,6 @@
 # CSCE310 Project — Bookstore
 
-A bookstore system made of several backend RESTful web services (Java, MySQL, MongoDB) and two client-facing desktop GUI applications (Java).
+An online bookstore: customers search for books and place orders from a desktop app, and managers handle books, orders, and payment status from a second desktop app. Behind them are several RESTful web services (Java) using MySQL and MongoDB.
 
 This repository records the **whole process** of the project, not only the final code: the idea, the design, the problems we hit and how we solved them, and the plan (milestones, tasks, deadlines, versions).
 

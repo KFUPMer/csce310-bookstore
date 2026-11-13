@@ -1,6 +1,6 @@
 # Phase 2 — Database design
 
-> Status: **proposed starting point**. To be finalized in milestone M2.
+> Status: **draft**, based on the official PRD. To be finalized in milestone M2.
 
 ## Diagram
 
@@ -8,37 +8,37 @@
 
 Source: [diagrams/database-er.drawio](diagrams/database-er.drawio)
 
-## MySQL (users and orders)
+## MySQL
 
-Tables `USERS`, `ORDERS`, and `ORDER_ITEMS`, as shown in the diagram. One user places many orders; one order contains one or more items.
+| Table | Purpose | Requirements |
+|---|---|---|
+| `USERS` | Accounts with username, email, hashed password, and role (`CUSTOMER` or `MANAGER`) | FR1, FR3, FR11 |
+| `SESSIONS` | One row per logged-in session; deleted on logout | FR2 |
+| `ORDERS` | One row per order, with total and payment status (`PENDING` or `PAID`) | FR7, FR8, FR12, FR13 |
+| `ORDER_ITEMS` | The books in an order, each with its type (`BUY` or `RENT`) and price | FR6, FR7, FR8 |
 
-## MongoDB (catalog)
+## MongoDB
 
-Collection `books`:
+Collection `books` (FR4, FR5, FR14):
 
 ```json
 {
   "_id": "ObjectId",
-  "isbn": "9780000000000",
   "title": "Example Title",
-  "authors": ["Author Name"],
-  "categories": ["Fiction"],
+  "author": "Author Name",
   "price": 19.99,
-  "stock": 12,
-  "description": "…",
-  "reviews": [
-    { "userId": 5, "rating": 4, "comment": "…", "createdAt": "2026-11-13T00:00:00Z" }
-  ]
+  "rentPrice": 4.99,
+  "copiesAvailable": 12
 }
 ```
 
 ## Notes
 
-- `ORDER_ITEMS.book_id` points to a MongoDB document, so there is no foreign key across databases. The order service must validate the book through the catalog service.
-- `unit_price` is copied into the order so later price changes do not alter past orders.
+- `ORDER_ITEMS.book_id` points to a MongoDB document, so there is no foreign key across databases. order-service checks the book through catalog-service.
+- `title` and `unit_price` are copied into the order item, so the bill stays correct even if the book is changed later.
+- `rentPrice` and the `RENT` type depend on the open question about renting in [project-idea.md](../01-idea/project-idea.md).
 
 ## Still to do in M2
 
-- [ ] Normalization check for the MySQL schema
-- [ ] Indexes (MySQL and MongoDB)
-- [ ] SQL schema script and seed data
+- [ ] SQL schema script and seed data (at least one customer, one manager, some books)
+- [ ] Index for keyword search on `title` and `author`

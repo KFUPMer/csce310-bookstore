@@ -16,8 +16,8 @@ The live version of this plan is on GitHub: milestones hold the deadlines, issue
 
 ### M1 — Idea & Requirements (due 2026-11-15)
 
-- [ ] Review the official project description and list its requirements
-- [ ] Finalize scope and functional requirements
+- [x] Record the requirements from the official PRD (FR1–FR14)
+- [ ] Resolve the open questions and write the non-functional requirements
 
 ### M2 — Design (due 2026-11-19)
 
@@ -29,19 +29,24 @@ The live version of this plan is on GitHub: milestones hold the deadlines, issue
 ### M3 — Backend Services (due 2026-11-26)
 
 - [ ] Set up Maven project structure and local MySQL/MongoDB
-- [ ] Implement user-service
-- [ ] Implement catalog-service
-- [ ] Implement order-service
+- [ ] user-service: login, logout, sessions, roles (FR1, FR2, FR11)
+- [ ] catalog-service: keyword search, add and update books (FR4, FR5, FR14)
+- [ ] order-service: orders, HTML bill, order list, payment status (FR6–FR9, FR12, FR13)
 
 ### M4 — Desktop Clients (due 2026-12-01)
 
-- [ ] Implement customer-app
-- [ ] Implement management-app
+- [ ] customer-app: login, search, select books, place order, see bill
+- [ ] management-app: login, orders list, payment status, add and update books
 
 ### M5 — Testing & Final Release (due 2026-12-04)
 
-- [ ] Test all services and both clients end to end
+- [ ] Test every requirement FR1–FR14 end to end
 - [ ] Final documentation and release v1.0.0
+
+### Optional (extra credit, only if time allows)
+
+- [ ] FR3: user registration (+1%)
+- [ ] FR10: email the bill to the customer (+1%)
 
 ## Progress notes
 
@@ -51,3 +56,4 @@ Add a short dated note whenever a milestone closes or a deadline moves, and say 
 |---|---|
 | 2026-11-13 | Repository created, initial plan drafted. |
 | 2026-11-13 | Deadlines rescheduled to fit the final submission deadline of 2026-12-04. |
+| 2026-11-13 | Official PRD received. Requirements, design docs, diagrams, and tasks corrected to match it. |

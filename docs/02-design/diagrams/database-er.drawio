@@ -4,51 +4,52 @@
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
-
         <mxCell id="lblMy" value="MySQL" style="text;html=1;align=left;verticalAlign=middle;fontStyle=1;fontSize=14;" vertex="1" parent="1">
           <mxGeometry x="40" y="30" width="200" height="30" as="geometry" />
         </mxCell>
-
+        <mxCell id="lblMo" value="MongoDB" style="text;html=1;align=left;verticalAlign=middle;fontStyle=1;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="540" y="400" width="200" height="30" as="geometry" />
+        </mxCell>
         <mxCell id="users" value="USERS" style="swimlane;fontStyle=1;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;collapsible=0;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=13;" vertex="1" parent="1">
-          <mxGeometry x="40" y="80" width="240" height="150" as="geometry" />
+          <mxGeometry x="40" y="80" width="260" height="150" as="geometry" />
         </mxCell>
-        <mxCell id="usersF" value="PK  id : INT&#10;UK  email : VARCHAR&#10;password_hash : VARCHAR&#10;full_name : VARCHAR&#10;role : ENUM(CUSTOMER, STAFF)&#10;created_at : DATETIME" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=8;spacingTop=4;whiteSpace=wrap;fontSize=12;" vertex="1" parent="users">
-          <mxGeometry y="30" width="240" height="120" as="geometry" />
+        <mxCell id="usersF" value="PK  id : INT&#10;UK  username : VARCHAR&#10;UK  email : VARCHAR&#10;password_hash : VARCHAR&#10;role : ENUM(CUSTOMER, MANAGER)&#10;created_at : DATETIME" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=8;spacingTop=4;whiteSpace=wrap;fontSize=12;" vertex="1" parent="users">
+          <mxGeometry y="30" width="260" height="120" as="geometry" />
         </mxCell>
-
+        <mxCell id="sessions" value="SESSIONS" style="swimlane;fontStyle=1;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;collapsible=0;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=13;" vertex="1" parent="1">
+          <mxGeometry x="40" y="360" width="260" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="sessionsF" value="PK  token : VARCHAR&#10;FK  user_id : INT&#10;created_at : DATETIME" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=8;spacingTop=4;whiteSpace=wrap;fontSize=12;" vertex="1" parent="sessions">
+          <mxGeometry y="30" width="260" height="80" as="geometry" />
+        </mxCell>
         <mxCell id="orders" value="ORDERS" style="swimlane;fontStyle=1;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;collapsible=0;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=13;" vertex="1" parent="1">
-          <mxGeometry x="400" y="80" width="300" height="150" as="geometry" />
+          <mxGeometry x="420" y="80" width="280" height="150" as="geometry" />
         </mxCell>
-        <mxCell id="ordersF" value="PK  id : INT&#10;FK  user_id : INT&#10;status : ENUM(PENDING, PAID, SHIPPED, CANCELLED)&#10;total : DECIMAL&#10;created_at : DATETIME" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=8;spacingTop=4;whiteSpace=wrap;fontSize=12;" vertex="1" parent="orders">
-          <mxGeometry y="30" width="300" height="120" as="geometry" />
+        <mxCell id="ordersF" value="PK  id : INT&#10;FK  user_id : INT&#10;payment_status : ENUM(PENDING, PAID)&#10;total : DECIMAL&#10;bill_file : VARCHAR&#10;created_at : DATETIME" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=8;spacingTop=4;whiteSpace=wrap;fontSize=12;" vertex="1" parent="orders">
+          <mxGeometry y="30" width="280" height="120" as="geometry" />
         </mxCell>
-
         <mxCell id="items" value="ORDER_ITEMS" style="swimlane;fontStyle=1;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;collapsible=0;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=13;" vertex="1" parent="1">
-          <mxGeometry x="820" y="80" width="240" height="150" as="geometry" />
+          <mxGeometry x="820" y="80" width="260" height="165" as="geometry" />
         </mxCell>
-        <mxCell id="itemsF" value="PK  id : INT&#10;FK  order_id : INT&#10;book_id : VARCHAR (MongoDB id)&#10;quantity : INT&#10;unit_price : DECIMAL" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=8;spacingTop=4;whiteSpace=wrap;fontSize=12;" vertex="1" parent="items">
-          <mxGeometry y="30" width="240" height="120" as="geometry" />
+        <mxCell id="itemsF" value="PK  id : INT&#10;FK  order_id : INT&#10;book_id : VARCHAR (MongoDB id)&#10;title : VARCHAR&#10;type : ENUM(BUY, RENT)&#10;quantity : INT&#10;unit_price : DECIMAL" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=8;spacingTop=4;whiteSpace=wrap;fontSize=12;" vertex="1" parent="items">
+          <mxGeometry y="30" width="260" height="135" as="geometry" />
         </mxCell>
-
+        <mxCell id="books" value="books (collection)" style="swimlane;fontStyle=1;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;collapsible=0;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=13;" vertex="1" parent="1">
+          <mxGeometry x="820" y="400" width="260" height="150" as="geometry" />
+        </mxCell>
+        <mxCell id="booksF" value="_id : ObjectId&#10;title : String&#10;author : String&#10;price : Number&#10;rentPrice : Number&#10;copiesAvailable : Number" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=8;spacingTop=4;whiteSpace=wrap;fontSize=12;" vertex="1" parent="books">
+          <mxGeometry y="30" width="260" height="120" as="geometry" />
+        </mxCell>
         <mxCell id="r1" value="places" style="edgeStyle=entityRelationEdgeStyle;endArrow=ERzeroToMany;startArrow=ERmandOne;html=1;rounded=0;fontSize=11;" edge="1" parent="1" source="users" target="orders">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="r2" value="contains" style="edgeStyle=entityRelationEdgeStyle;endArrow=ERoneToMany;startArrow=ERmandOne;html=1;rounded=0;fontSize=11;" edge="1" parent="1" source="orders" target="items">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-
-        <mxCell id="lblMo" value="MongoDB" style="text;html=1;align=left;verticalAlign=middle;fontStyle=1;fontSize=14;" vertex="1" parent="1">
-          <mxGeometry x="40" y="320" width="200" height="30" as="geometry" />
+        <mxCell id="r4" value="has" style="endArrow=ERzeroToMany;startArrow=ERmandOne;html=1;rounded=0;fontSize=11;" edge="1" parent="1" source="users" target="sessions">
+          <mxGeometry relative="1" as="geometry" />
         </mxCell>
-
-        <mxCell id="books" value="books (collection)" style="swimlane;fontStyle=1;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;collapsible=0;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=13;" vertex="1" parent="1">
-          <mxGeometry x="820" y="370" width="240" height="200" as="geometry" />
-        </mxCell>
-        <mxCell id="booksF" value="_id : ObjectId&#10;isbn : String&#10;title : String&#10;authors : [String]&#10;categories : [String]&#10;price : Number&#10;stock : Number&#10;description : String&#10;reviews : [ { userId, rating, comment, createdAt } ]" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=8;spacingTop=4;whiteSpace=wrap;fontSize=12;" vertex="1" parent="books">
-          <mxGeometry y="30" width="240" height="170" as="geometry" />
-        </mxCell>
-
-        <mxCell id="r3" value="book_id refers to _id&#10;(no foreign key across databases)" style="endArrow=open;dashed=1;html=1;rounded=0;fontSize=11;" edge="1" parent="1" source="items" target="books">
+        <mxCell id="r3" value="book_id refers to _id&#10;(no foreign key across databases)" style="dashed=1;endArrow=open;startArrow=none;html=1;rounded=0;fontSize=11;" edge="1" parent="1" source="items" target="books">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
       </root>

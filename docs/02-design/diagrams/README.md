@@ -15,15 +15,23 @@ When a diagram changes, update the `.drawio` file, export the image again, and c
 
 | Diagram | Source | Image | Used in |
 |---|---|---|---|
-| System architecture | `architecture.drawio` | `architecture.png` | [architecture.md](../architecture.md) |
+| System architecture (overview) | `architecture.drawio` | `architecture.png` | [architecture.md](../architecture.md) |
 | Database ER / document model | `database-er.drawio` | `database-er.png` | [database-design.md](../database-design.md) |
-| Use case diagram | planned (M2) | — | — |
-| Sequence: place an order | planned (M2) | — | — |
 | Class diagram, customer app | `class-customer-app.drawio` | `class-customer-app.png` | [class-diagrams.md](../class-diagrams.md) |
 | Class diagram, manager app | `class-manager-app.drawio` | `class-manager-app.png` | [class-diagrams.md](../class-diagrams.md) |
-| Class diagrams, backend services | planned (M2) | — | — |
+| Class diagram, backend services | `class-services.drawio` | `class-services.png` | [uml-diagrams.md](../uml-diagrams.md) |
+| Object diagram | `object.drawio` | `object.png` | [uml-diagrams.md](../uml-diagrams.md) |
+| Component diagram | `component.drawio` | `component.png` | [uml-diagrams.md](../uml-diagrams.md) |
+| Deployment diagram | `deployment.drawio` | `deployment.png` | [uml-diagrams.md](../uml-diagrams.md) |
+| Package diagram | `package.drawio` | `package.png` | [uml-diagrams.md](../uml-diagrams.md) |
+| Composite structure diagram | `composite-structure.drawio` | `composite-structure.png` | [uml-diagrams.md](../uml-diagrams.md) |
+| Profile diagram | `profile.drawio` | `profile.png` | [uml-diagrams.md](../uml-diagrams.md) |
+| Use case diagram | `use-case.drawio` | `use-case.png` | [uml-diagrams.md](../uml-diagrams.md) |
+| Sequence diagram: place an order | `sequence-place-order.drawio` | `sequence-place-order.png` | [uml-diagrams.md](../uml-diagrams.md) |
+| Activity diagram: place an order | `activity-place-order.drawio` | `activity-place-order.png` | [uml-diagrams.md](../uml-diagrams.md) |
+| State machine diagrams | `state-machine.drawio` | `state-machine.png` | [uml-diagrams.md](../uml-diagrams.md) |
 | UI wireframes, customer app | planned (M2) | — | — |
-| UI wireframes, management app | planned (M2) | — | — |
+| UI wireframes, manager app | planned (M2) | — | — |
 
 ## Exporting an image
 

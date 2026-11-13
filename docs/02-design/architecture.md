@@ -66,8 +66,7 @@ Manager-only actions are refused unless the session belongs to a manager (FR11).
 
 ## Still to design in M2
 
-- [ ] Use case diagram
-- [ ] Sequence diagram for "place an order"
+- [x] Use case, sequence, activity, state machine, component, deployment, package, object, composite structure, and profile diagrams — see [uml-diagrams.md](uml-diagrams.md)
 - [x] Class diagrams for both clients — see [class-diagrams.md](class-diagrams.md)
-- [ ] Class diagrams for the three services
+- [x] Class diagrams for the three services — see [uml-diagrams.md](uml-diagrams.md)
 - [ ] UI wireframes for both clients

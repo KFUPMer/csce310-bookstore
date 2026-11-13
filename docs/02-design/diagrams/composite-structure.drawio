@@ -1,0 +1,45 @@
+<mxfile host="app.diagrams.net">
+  <diagram id="composite-structure" name="Composite structure: order-service">
+    <mxGraphModel dx="1400" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="1600" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="c1" value="order-service" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;fontStyle=1;fontSize=14;spacingTop=6;fillColor=none;strokeColor=#000000;" vertex="1" parent="1"><mxGeometry x="160" y="40" width="820" height="560" as="geometry" /></mxCell>
+        <mxCell id="c2" value="" style="rounded=0;html=1;fillColor=#ffffff;strokeColor=#000000;" vertex="1" parent="1"><mxGeometry x="150" y="310" width="20" height="20" as="geometry" /></mxCell>
+        <mxCell id="c3" value="REST API&lt;br&gt;port 8083" style="text;html=1;align=right;verticalAlign=middle;fontSize=12;" vertex="1" parent="1"><mxGeometry x="60" y="300" width="85" height="40" as="geometry" /></mxCell>
+        <mxCell id="c4" value="routes : OrderRoutes" style="rounded=0;whiteSpace=wrap;html=1;fontSize=12;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1"><mxGeometry x="220" y="295" width="180" height="50" as="geometry" /></mxCell>
+        <mxCell id="c5" value="service : OrderService" style="rounded=0;whiteSpace=wrap;html=1;fontSize=12;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1"><mxGeometry x="460" y="295" width="200" height="50" as="geometry" /></mxCell>
+        <mxCell id="c6" value="pricing : PriceCalculator" style="rounded=0;whiteSpace=wrap;html=1;fontSize=12;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1"><mxGeometry x="460" y="440" width="200" height="50" as="geometry" /></mxCell>
+        <mxCell id="c7" value="" style="endArrow=none;html=1;rounded=0;fontSize=11;" edge="1" parent="1" source="c2" target="c4"><mxGeometry relative="1" as="geometry"></mxGeometry></mxCell>
+        <mxCell id="c8" value="" style="endArrow=none;html=1;rounded=0;fontSize=11;" edge="1" parent="1" source="c4" target="c5"><mxGeometry relative="1" as="geometry"></mxGeometry></mxCell>
+        <mxCell id="c9" value="" style="endArrow=none;html=1;rounded=0;fontSize=11;" edge="1" parent="1" source="c5" target="c6"><mxGeometry relative="1" as="geometry"></mxGeometry></mxCell>
+        <mxCell id="c10" value="auth : SessionChecker" style="rounded=0;whiteSpace=wrap;html=1;fontSize=12;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1"><mxGeometry x="720" y="90" width="200" height="50" as="geometry" /></mxCell>
+        <mxCell id="c11" value="" style="rounded=0;html=1;fillColor=#ffffff;strokeColor=#000000;" vertex="1" parent="1"><mxGeometry x="970" y="105" width="20" height="20" as="geometry" /></mxCell>
+        <mxCell id="c12" value="to user-service (validate session)" style="text;html=1;align=left;verticalAlign=middle;fontSize=12;" vertex="1" parent="1"><mxGeometry x="1000" y="95" width="240" height="40" as="geometry" /></mxCell>
+        <mxCell id="c13" value="" style="endArrow=none;html=1;rounded=0;fontSize=11;" edge="1" parent="1" source="c10" target="c11"><mxGeometry relative="1" as="geometry"></mxGeometry></mxCell>
+        <mxCell id="c14" value="" style="endArrow=none;html=1;rounded=0;fontSize=11;" edge="1" parent="1" source="c4" target="c10"><mxGeometry relative="1" as="geometry"></mxGeometry></mxCell>
+        <mxCell id="c15" value="books : BookClient" style="rounded=0;whiteSpace=wrap;html=1;fontSize=12;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1"><mxGeometry x="720" y="190" width="200" height="50" as="geometry" /></mxCell>
+        <mxCell id="c16" value="" style="rounded=0;html=1;fillColor=#ffffff;strokeColor=#000000;" vertex="1" parent="1"><mxGeometry x="970" y="205" width="20" height="20" as="geometry" /></mxCell>
+        <mxCell id="c17" value="to book-service (price, copies)" style="text;html=1;align=left;verticalAlign=middle;fontSize=12;" vertex="1" parent="1"><mxGeometry x="1000" y="195" width="240" height="40" as="geometry" /></mxCell>
+        <mxCell id="c18" value="" style="endArrow=none;html=1;rounded=0;fontSize=11;" edge="1" parent="1" source="c15" target="c16"><mxGeometry relative="1" as="geometry"></mxGeometry></mxCell>
+        <mxCell id="c19" value="" style="endArrow=none;html=1;rounded=0;fontSize=11;" edge="1" parent="1" source="c5" target="c15"><mxGeometry relative="1" as="geometry"></mxGeometry></mxCell>
+        <mxCell id="c20" value="repo : OrderRepository" style="rounded=0;whiteSpace=wrap;html=1;fontSize=12;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1"><mxGeometry x="720" y="295" width="200" height="50" as="geometry" /></mxCell>
+        <mxCell id="c21" value="" style="rounded=0;html=1;fillColor=#ffffff;strokeColor=#000000;" vertex="1" parent="1"><mxGeometry x="970" y="310" width="20" height="20" as="geometry" /></mxCell>
+        <mxCell id="c22" value="to MySQL (orders, order_items)" style="text;html=1;align=left;verticalAlign=middle;fontSize=12;" vertex="1" parent="1"><mxGeometry x="1000" y="300" width="240" height="40" as="geometry" /></mxCell>
+        <mxCell id="c23" value="" style="endArrow=none;html=1;rounded=0;fontSize=11;" edge="1" parent="1" source="c20" target="c21"><mxGeometry relative="1" as="geometry"></mxGeometry></mxCell>
+        <mxCell id="c24" value="" style="endArrow=none;html=1;rounded=0;fontSize=11;" edge="1" parent="1" source="c5" target="c20"><mxGeometry relative="1" as="geometry"></mxGeometry></mxCell>
+        <mxCell id="c25" value="bills : BillGenerator" style="rounded=0;whiteSpace=wrap;html=1;fontSize=12;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1"><mxGeometry x="720" y="400" width="200" height="50" as="geometry" /></mxCell>
+        <mxCell id="c26" value="" style="rounded=0;html=1;fillColor=#ffffff;strokeColor=#000000;" vertex="1" parent="1"><mxGeometry x="970" y="415" width="20" height="20" as="geometry" /></mxCell>
+        <mxCell id="c27" value="to bills/ folder (HTML file)" style="text;html=1;align=left;verticalAlign=middle;fontSize=12;" vertex="1" parent="1"><mxGeometry x="1000" y="405" width="240" height="40" as="geometry" /></mxCell>
+        <mxCell id="c28" value="" style="endArrow=none;html=1;rounded=0;fontSize=11;" edge="1" parent="1" source="c25" target="c26"><mxGeometry relative="1" as="geometry"></mxGeometry></mxCell>
+        <mxCell id="c29" value="" style="endArrow=none;html=1;rounded=0;fontSize=11;" edge="1" parent="1" source="c5" target="c25"><mxGeometry relative="1" as="geometry"></mxGeometry></mxCell>
+        <mxCell id="c30" value="mail : EmailSender [0..1]" style="rounded=0;whiteSpace=wrap;html=1;fontSize=12;fillColor=#ffffff;strokeColor=#666666;dashed=1;" vertex="1" parent="1"><mxGeometry x="720" y="500" width="200" height="50" as="geometry" /></mxCell>
+        <mxCell id="c31" value="" style="rounded=0;html=1;fillColor=#ffffff;strokeColor=#000000;" vertex="1" parent="1"><mxGeometry x="970" y="515" width="20" height="20" as="geometry" /></mxCell>
+        <mxCell id="c32" value="to mail server (optional, FR10)" style="text;html=1;align=left;verticalAlign=middle;fontSize=12;" vertex="1" parent="1"><mxGeometry x="1000" y="505" width="240" height="40" as="geometry" /></mxCell>
+        <mxCell id="c33" value="" style="endArrow=none;html=1;rounded=0;fontSize=11;dashed=1;" edge="1" parent="1" source="c30" target="c31"><mxGeometry relative="1" as="geometry"></mxGeometry></mxCell>
+        <mxCell id="c34" value="" style="endArrow=none;html=1;rounded=0;fontSize=11;dashed=1;" edge="1" parent="1" source="c25" target="c30"><mxGeometry relative="1" as="geometry"></mxGeometry></mxCell>
+        <mxCell id="c35" value="Small squares on the border are ports: the points where order-service talks to the outside." style="shape=note;size=14;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingTop=6;fillColor=#ffffff;strokeColor=#999999;fontSize=12;" vertex="1" parent="1"><mxGeometry x="190" y="500" width="240" height="70" as="geometry" /></mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

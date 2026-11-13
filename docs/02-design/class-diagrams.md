@@ -41,6 +41,6 @@ Source: [diagrams/class-manager-app.drawio](diagrams/class-manager-app.drawio)
 | `UserApi`, `OrderApi`, `BookApi` | Calls to user-service, order-service, book-service | N2, N4 |
 | `Order`, `OrderItem`, `Book`, `PaymentStatus` | Data | FR12–FR14 |
 
-## Still to do in M2
+## Backend services
 
-- [ ] Class diagrams for the three backend services
+The class diagram of the three backend services is in [uml-diagrams.md](uml-diagrams.md), together with the other UML diagram types.

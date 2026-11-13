@@ -22,7 +22,7 @@ The live version of this plan is on GitHub: milestones hold the deadlines, issue
 
 ### M2 — Design (due 2026-11-19)
 
-- [ ] Use case and sequence diagrams
+- [x] UML diagrams: class, object, component, deployment, package, composite structure, profile, use case, sequence, activity, state machine
 - [ ] Finalize MySQL schema and MongoDB document model, and plan the seed data
 - [ ] Finalize REST API specification
 - [ ] UI wireframes for both desktop apps
@@ -59,3 +59,4 @@ Add a short dated note whenever a milestone closes or a deadline moves, and say 
 | 2026-11-13 | Deadlines rescheduled to fit the final submission deadline of 2026-12-04. |
 | 2026-11-13 | Official PRD received. Requirements, design docs, diagrams, and tasks corrected to match it. |
 | 2026-11-13 | Non-functional requirements received. Backend stack changed from Spring Boot to Java HttpServer + Python Flask (see problem log P-001). Deadlines unchanged. |
+| 2026-11-13 | All eleven UML diagram types drawn in draw.io (first drafts), ahead of the M2 deadline. |

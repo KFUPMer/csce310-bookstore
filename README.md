@@ -21,7 +21,7 @@ Dates and tasks: [docs/04-planning/milestones.md](docs/04-planning/milestones.md
 | Folder | What is in it |
 |---|---|
 | [docs/01-idea](docs/01-idea/project-idea.md) | What we are building and why; scope and requirements |
-| [docs/02-design](docs/02-design/architecture.md) | Architecture, database design, API design, class diagrams |
+| [docs/02-design](docs/02-design/architecture.md) | Architecture, database design, API design, and [all UML diagrams](docs/02-design/uml-diagrams.md) |
 | [docs/03-problems](docs/03-problems/problem-log.md) | Problems we faced and how we dealt with each one |
 | [docs/04-planning](docs/04-planning/milestones.md) | Milestones, tasks, deadlines, versioning rules |
 | `services/` | Backend RESTful web services |

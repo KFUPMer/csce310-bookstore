@@ -55,6 +55,8 @@ These were in the first draft of this document and have been removed because the
 ## Open questions
 
 - [ ] **Renting:** FR7 says "buy and/or rent", but nothing else in the PRD describes renting (rental price, return, duration). Ask the instructor. Until answered, the design keeps a simple `BUY` / `RENT` type on each ordered book.
+  - Example of what FR7 seems to mean: a customer selects three books and, in **one order**, buys two of them and rents the third. The bill then lists all three with their prices and one total.
+  - What the PRD does not say: how much renting costs compared with buying, how long a rental lasts, and whether a rented book is returned (and its copy becomes available again).
 - [ ] Is the project individual or a team project?
 - [ ] Are the two optional requirements (FR3, FR10) going to be done?
 

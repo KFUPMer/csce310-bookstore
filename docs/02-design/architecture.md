@@ -68,5 +68,6 @@ Manager-only actions are refused unless the session belongs to a manager (FR11).
 
 - [ ] Use case diagram
 - [ ] Sequence diagram for "place an order"
-- [ ] Class diagrams per service
+- [x] Class diagrams for both clients — see [class-diagrams.md](class-diagrams.md)
+- [ ] Class diagrams for the three services
 - [ ] UI wireframes for both clients

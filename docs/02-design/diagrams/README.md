@@ -19,7 +19,9 @@ When a diagram changes, update the `.drawio` file, export the image again, and c
 | Database ER / document model | `database-er.drawio` | `database-er.png` | [database-design.md](../database-design.md) |
 | Use case diagram | planned (M2) | — | — |
 | Sequence: place an order | planned (M2) | — | — |
-| Class diagrams per service | planned (M2) | — | — |
+| Class diagram, customer app | `class-customer-app.drawio` | `class-customer-app.png` | [class-diagrams.md](../class-diagrams.md) |
+| Class diagram, manager app | `class-manager-app.drawio` | `class-manager-app.png` | [class-diagrams.md](../class-diagrams.md) |
+| Class diagrams, backend services | planned (M2) | — | — |
 | UI wireframes, customer app | planned (M2) | — | — |
 | UI wireframes, management app | planned (M2) | — | — |
 

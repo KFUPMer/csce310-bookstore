@@ -22,13 +22,13 @@
           <mxGeometry x="60" y="400" width="200" height="80" as="geometry" />
         </mxCell>
 
-        <mxCell id="us" value="&lt;b&gt;user-service&lt;/b&gt;&lt;br&gt;Spring Boot :8081&lt;br&gt;login, sessions, roles" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=13;" vertex="1" parent="1">
+        <mxCell id="us" value="&lt;b&gt;user-service&lt;/b&gt;&lt;br&gt;Java HttpServer :8081&lt;br&gt;login, sessions, roles" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=13;" vertex="1" parent="1">
           <mxGeometry x="440" y="100" width="200" height="80" as="geometry" />
         </mxCell>
-        <mxCell id="os" value="&lt;b&gt;order-service&lt;/b&gt;&lt;br&gt;Spring Boot :8083&lt;br&gt;orders, bills, payment status" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=13;" vertex="1" parent="1">
+        <mxCell id="os" value="&lt;b&gt;order-service&lt;/b&gt;&lt;br&gt;Python Flask :8083&lt;br&gt;orders, bills, payment status" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=13;" vertex="1" parent="1">
           <mxGeometry x="440" y="280" width="200" height="80" as="geometry" />
         </mxCell>
-        <mxCell id="cs" value="&lt;b&gt;catalog-service&lt;/b&gt;&lt;br&gt;Spring Boot :8082&lt;br&gt;search, add / update books" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=13;" vertex="1" parent="1">
+        <mxCell id="cs" value="&lt;b&gt;book-service&lt;/b&gt;&lt;br&gt;Python Flask :8082&lt;br&gt;search, add / update books" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=13;" vertex="1" parent="1">
           <mxGeometry x="440" y="460" width="200" height="80" as="geometry" />
         </mxCell>
 

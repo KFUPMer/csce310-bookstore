@@ -30,6 +30,6 @@ gh release create v0.3.0 --title "v0.3.0 — Backend services" --notes-file rele
 
 | Type | Pattern | Example |
 |---|---|---|
-| New work | `feature/<issue>-<short-name>` | `feature/8-catalog-service` |
+| New work | `feature/<issue>-<short-name>` | `feature/8-book-service` |
 | Bug fix | `fix/<issue>-<short-name>` | `fix/21-order-total` |
 | Documentation | `docs/<short-name>` | `docs/api-spec` |

@@ -1,6 +1,6 @@
 # CSCE310 Project — Bookstore
 
-An online bookstore: customers search for books and place orders from a desktop app, and managers handle books, orders, and payment status from a second desktop app. Behind them are several RESTful web services (Java) using MySQL and MongoDB.
+An online bookstore: customers search for books and place orders from a desktop app, and managers handle books, orders, and payment status from a second desktop app. Behind them are RESTful web services (Java HttpServer and Python Flask) using MySQL and MongoDB.
 
 This repository records the **whole process** of the project, not only the final code: the idea, the design, the problems we hit and how we solved them, and the plan (milestones, tasks, deadlines, versions).
 
@@ -32,10 +32,12 @@ Dates and tasks: [docs/04-planning/milestones.md](docs/04-planning/milestones.md
 
 | Layer | Choice |
 |---|---|
-| Backend services | Java 21, Spring Boot, Maven |
+| User service | Java (built-in HttpServer), Maven |
+| Book service | Python, Flask |
+| Order and billing service | Python, Flask |
 | Relational database | MySQL |
 | Document database | MongoDB |
-| Desktop clients | Java, JavaFX |
+| Desktop clients (customer, manager) | Java, JavaFX |
 | Version control | Git + GitHub (milestones, issues, releases) |
 
 ## Workflow

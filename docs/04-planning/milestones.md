@@ -17,7 +17,8 @@ The live version of this plan is on GitHub: milestones hold the deadlines, issue
 ### M1 — Idea & Requirements (due 2026-11-15)
 
 - [x] Record the requirements from the official PRD (FR1–FR14)
-- [ ] Resolve the open questions and write the non-functional requirements
+- [x] Record the non-functional requirements (technology, N1–N5)
+- [ ] Resolve the remaining open questions
 
 ### M2 — Design (due 2026-11-19)
 
@@ -28,19 +29,19 @@ The live version of this plan is on GitHub: milestones hold the deadlines, issue
 
 ### M3 — Backend Services (due 2026-11-26)
 
-- [ ] Set up Maven project structure and local MySQL/MongoDB
-- [ ] user-service: login, logout, sessions, roles (FR1, FR2, FR11)
-- [ ] catalog-service: keyword search, add and update books (FR4, FR5, FR14)
-- [ ] order-service: orders, HTML bill, order list, payment status (FR6–FR9, FR12, FR13)
+- [ ] Set up the three service projects (Java, Python) and local MySQL/MongoDB
+- [ ] user-service in Java HttpServer: login, logout, sessions, roles, bcrypt (FR1, FR2, FR11, N3)
+- [ ] book-service in Python Flask: keyword search, add and update books (FR4, FR5, FR14)
+- [ ] order-service in Python Flask: orders, HTML bill, order list, payment status (FR6–FR9, FR12, FR13)
 
 ### M4 — Desktop Clients (due 2026-12-01)
 
-- [ ] customer-app: login, search, select books, place order, see bill
-- [ ] management-app: login, orders list, payment status, add and update books
+- [ ] customer-app in JavaFX, asynchronous calls (N2): login, search, select books, place order, see bill
+- [ ] management-app in JavaFX, asynchronous calls (N2): login, orders list, payment status, add and update books
 
 ### M5 — Testing & Final Release (due 2026-12-04)
 
-- [ ] Test every requirement FR1–FR14 end to end
+- [ ] Test every requirement FR1–FR14 and N1–N5 end to end
 - [ ] Final documentation and release v1.0.0
 
 ### Optional (extra credit, only if time allows)
@@ -57,3 +58,4 @@ Add a short dated note whenever a milestone closes or a deadline moves, and say 
 | 2026-11-13 | Repository created, initial plan drafted. |
 | 2026-11-13 | Deadlines rescheduled to fit the final submission deadline of 2026-12-04. |
 | 2026-11-13 | Official PRD received. Requirements, design docs, diagrams, and tasks corrected to match it. |
+| 2026-11-13 | Non-functional requirements received. Backend stack changed from Spring Boot to Java HttpServer + Python Flask (see problem log P-001). Deadlines unchanged. |

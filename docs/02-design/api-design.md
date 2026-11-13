@@ -4,7 +4,7 @@
 
 All services exchange JSON. Errors use one shape: `{ "error": "message" }` with the matching HTTP status code.
 
-Every endpoint except login and register needs the session token in the `Authorization` header.
+Every endpoint except login and register needs the session token in the `Authorization` header (N4). The "Who" column is enforced by the service (N5): a customer cannot call a manager endpoint and a manager cannot call a customer endpoint.
 
 ## user-service (`:8081`)
 
@@ -15,7 +15,7 @@ Every endpoint except login and register needs the session token in the `Authori
 | GET | `/api/auth/session` | Services | Check a token; returns the user and role | FR2, FR11 |
 | POST | `/api/users/register` | Anyone | Create an account (username, password, email) | FR3 (optional) |
 
-## catalog-service (`:8082`)
+## book-service (`:8082`)
 
 | Method | Path | Who | Description | Requirement |
 |---|---|---|---|---|

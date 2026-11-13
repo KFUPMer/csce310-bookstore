@@ -33,7 +33,7 @@ Collection `books` (FR4, FR5, FR14):
 
 ## Notes
 
-- `ORDER_ITEMS.book_id` points to a MongoDB document, so there is no foreign key across databases. order-service checks the book through catalog-service.
+- `ORDER_ITEMS.book_id` points to a MongoDB document, so there is no foreign key across databases. order-service checks the book through book-service.
 - `title` and `unit_price` are copied into the order item, so the bill stays correct even if the book is changed later.
 - Renting costs 10% of the book price and lasts 7 days. Books have no separate rent price: order-service calculates it, so for a `RENT` item `unit_price` = 10% of the book price and `rent_due_date` = order date + 7 days. For a `BUY` item `rent_due_date` is empty.
 

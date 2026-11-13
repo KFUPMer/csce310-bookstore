@@ -8,9 +8,9 @@ An online business sells books. Customers use a desktop application to find book
 
 The system has:
 
-- Several backend **RESTful API web services** (we use Java)
+- Several backend **RESTful API web services** (Java HttpServer and Python Flask, as the PRD requires)
 - A **MySQL** database and a **MongoDB** database
-- **Two desktop GUI applications** (we use Java)
+- **Two native desktop GUI applications**, not web pages (we use JavaFX)
 
 ## User roles
 
@@ -56,13 +56,32 @@ Handling the return of a rented book is not part of the PRD and is not built.
 
 ## Non-functional requirements
 
-To be written later. They will be kept short and simple.
+### Technology the PRD requires
+
+| Part | Must be built with | Data stored in |
+|---|---|---|
+| User services (login, logout, create user) | Java HttpServer | MySQL |
+| Book services (search, add, update) | Python Flask | MongoDB |
+| Order and billing services (create order, update payment status) | Python Flask | MySQL |
+| Customer app and Manager app (two separate programs) | Native desktop GUI. Default is Java Swing; a modern framework such as JavaFX earns +2% | — |
+
+This is a client/server system, **not a web application**: the clients are desktop programs and do not run in a browser.
+
+### Quality requirements
+
+| ID | Requirement | In simple words |
+|---|---|---|
+| N1 | API endpoints respond to typical requests in under 500 ms | The services must be fast |
+| N2 | The desktop client stays responsive during network operations; calls to the backend are asynchronous | The window must never freeze while waiting for the server |
+| N3 | Passwords are stored with a strong one-way hash (e.g. bcrypt) | Nobody can read a password from the database |
+| N4 | Every endpoint that handles user data or actions requires a valid authentication token | No token, no access |
+| N5 | Users only access their own data; managers cannot do customer actions and customers cannot do manager actions | Each role is limited to its own job |
 
 ## Not required by the PRD
 
 These were in the first draft of this document and have been removed because the PRD does not ask for them:
 
-- Book reviews and ratings
+- Book reviews and ratings (the PRD mentions them only as an example of what a book service could do; no functional requirement asks for them)
 - Customer order history
 - Deleting books
 - Shipping or cancelled order statuses
@@ -77,6 +96,8 @@ These were in the first draft of this document and have been removed because the
 
 | Date | Decision | Reason |
 |---|---|---|
-| 2026-11-13 | Use Java for backend and clients | One language across the whole system; personal preference |
+| 2026-11-13 | Use Java for backend and clients | One language across the whole system; personal preference. **Replaced below.** |
 | 2026-11-13 | Requirements replaced with the official PRD (FR1–FR14) | The first draft was a guess made before the PRD was available |
 | 2026-11-13 | Renting costs 10% of the book price and lasts 7 days | Rule given for FR7, which the PRD leaves undefined |
+| 2026-11-13 | Backend follows PRD section 4.1: Java HttpServer for users, Python Flask for books and for orders | The PRD fixes the technology of each service, so "Java everywhere" is not allowed |
+| 2026-11-13 | Both clients in JavaFX | Still Java, and a modern GUI framework earns +2% over Swing |

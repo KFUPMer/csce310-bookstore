@@ -38,6 +38,22 @@ The system has:
 | FR13 | The manager selects an order and updates its payment status (e.g. Pending → Paid) | Manager | Yes |
 | FR14 | The manager adds new books or updates their information (e.g. number of available copies) | Manager | Yes |
 
+## Renting rule (FR7)
+
+- Renting a book costs **10% of the book's price**.
+- A rental lasts **7 days**.
+
+Example: a customer selects three books and places one order.
+
+| Book | Choice | Book price | Charged |
+|---|---|---|---|
+| Clean Code | Buy | $40.00 | $40.00 |
+| Database Systems | Buy | $55.00 | $55.00 |
+| Java Concurrency | Rent (due back in 7 days) | $80.00 | $8.00 |
+| **Total on the bill** | | | **$103.00** |
+
+Handling the return of a rented book is not part of the PRD and is not built.
+
 ## Non-functional requirements
 
 To be written later. They will be kept short and simple.
@@ -54,9 +70,6 @@ These were in the first draft of this document and have been removed because the
 
 ## Open questions
 
-- [ ] **Renting:** FR7 says "buy and/or rent", but nothing else in the PRD describes renting (rental price, return, duration). Ask the instructor. Until answered, the design keeps a simple `BUY` / `RENT` type on each ordered book.
-  - Example of what FR7 seems to mean: a customer selects three books and, in **one order**, buys two of them and rents the third. The bill then lists all three with their prices and one total.
-  - What the PRD does not say: how much renting costs compared with buying, how long a rental lasts, and whether a rented book is returned (and its copy becomes available again).
 - [ ] Is the project individual or a team project?
 - [ ] Are the two optional requirements (FR3, FR10) going to be done?
 
@@ -66,3 +79,4 @@ These were in the first draft of this document and have been removed because the
 |---|---|---|
 | 2026-11-13 | Use Java for backend and clients | One language across the whole system; personal preference |
 | 2026-11-13 | Requirements replaced with the official PRD (FR1–FR14) | The first draft was a guess made before the PRD was available |
+| 2026-11-13 | Renting costs 10% of the book price and lasts 7 days | Rule given for FR7, which the PRD leaves undefined |

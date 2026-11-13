@@ -33,6 +33,8 @@ Every endpoint except login and register needs the session token in the `Authori
 | GET | `/api/orders` | Manager | List all orders | FR12 |
 | PATCH | `/api/orders/{id}/payment-status` | Manager | Change payment status, e.g. `PENDING` → `PAID` | FR13 |
 
+A rented book is charged at 10% of its price and is due back 7 days after the order; order-service calculates both.
+
 FR10 (optional) adds no endpoint: order-service emails the bill when the order is created.
 
 ## Still to do in M2

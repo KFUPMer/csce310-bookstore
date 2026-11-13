@@ -36,7 +36,7 @@ Manager-only actions are refused unless the session belongs to a manager (FR11).
 ## How an order becomes a bill (FR7–FR9)
 
 1. The customer app sends the selected books to order-service.
-2. order-service gets each book's current price from catalog-service and checks copies are available.
+2. order-service gets each book's current price from catalog-service and checks copies are available. A bought book is charged at full price; a rented book at 10% of the price, due back in 7 days.
 3. order-service saves the order in MySQL with payment status `PENDING`.
 4. order-service writes the bill to `bills/bill-<orderId>.html` and returns it to the customer app.
 

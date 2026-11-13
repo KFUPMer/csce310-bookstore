@@ -15,6 +15,7 @@ All versions and patches of the project, newest first.
 - Roles are now Customer and Manager; login uses username and a session
 - Orders now carry a payment status (Pending/Paid) and produce an HTML bill
 - Milestone deadlines moved to fit the 2026-12-04 submission deadline
+- Renting rule defined: 10% of the book price for 7 days; rent price is calculated, not stored per book
 
 ### Removed
 - Features the PRD does not ask for: reviews, order history, deleting books, shipping statuses, categories

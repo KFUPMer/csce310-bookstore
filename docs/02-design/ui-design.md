@@ -35,7 +35,11 @@ Wireframes show **what is on each screen and where**. They are grey boxes on pur
 - Errors appear as one line of text next to the form, not as pop-up dialogs.
 - "Add to order" is disabled for a book with 0 copies. "Mark as paid" is disabled for an order that is already Paid.
 
-## 2. Visual style (not decided yet)
+## 2. Why Flutter
+
+UI and UX quality is the top priority of this project, so both apps are built with Flutter: it draws every pixel itself, which makes smooth animation and a custom look much easier than in JavaFX or Swing.
+
+## 3. Visual style (not decided yet)
 
 The look of the apps is a separate decision from the layout, and it has not been made. It needs a real reference to aim at, otherwise the result is a generic template.
 
@@ -52,4 +56,4 @@ Constraints already known:
 - These are desktop tools used with a mouse and keyboard, with tables as the main content. They should look like a desktop program, not like a phone app or a marketing web page.
 - The bill is already designed as a plain printed document ([bill-design.md](bill-design.md)); the apps should not clash with it.
 
-Once the style is decided, it is written here as a short style guide and applied through one shared stylesheet used by both apps.
+Once the style is decided, it is written here as a short style guide and applied through one shared Flutter theme used by both apps.

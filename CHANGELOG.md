@@ -19,6 +19,7 @@ All versions and patches of the project, newest first.
 ### Changed
 - Registration (FR3) and emailing the bill (FR10) are no longer optional: every extra-credit item is being done
 - Placing an order now reduces the available copies of each book
+- Desktop apps switched from JavaFX to Flutter, because UI/UX quality is the priority; app class diagrams redrawn
 - Requirements replaced with the official PRD (FR1–FR14); design docs, diagrams, and tasks corrected to match
 - Roles are now Customer and Manager; login uses username and a session
 - Orders now carry a payment status (Pending/Paid) and produce an HTML bill

@@ -10,7 +10,7 @@ The system has:
 
 - Several backend **RESTful API web services** (Java HttpServer and Python Flask, as the PRD requires)
 - A **MySQL** database and a **MongoDB** database
-- **Two native desktop GUI applications**, not web pages (we use JavaFX)
+- **Two native desktop GUI applications**, not web pages (we use Flutter)
 
 ## User roles
 
@@ -62,7 +62,7 @@ All three extra-credit items are part of the project:
 |---|---|---|
 | FR3 — user registration | +1% | Register endpoint in user-service, register screen in the customer app |
 | FR10 — bill emailed to the customer | +1% | order-service sends the bill by email when the order is placed |
-| Modern GUI framework instead of Swing | +2% | Both apps are built with JavaFX |
+| Modern GUI framework instead of Swing | +2% | Both apps are built with Flutter |
 
 ## Non-functional requirements
 
@@ -73,7 +73,7 @@ All three extra-credit items are part of the project:
 | User services (login, logout, create user) | Java HttpServer | MySQL |
 | Book services (search, add, update) | Python Flask | MongoDB |
 | Order and billing services (create order, update payment status) | Python Flask | MySQL |
-| Customer app and Manager app (two separate programs) | Native desktop GUI. Default is Java Swing; a modern framework such as JavaFX earns +2% | — |
+| Customer app and Manager app (two separate programs) | Native desktop GUI. Default is Java Swing; a modern framework such as Flutter earns +2% | — |
 
 This is a client/server system, **not a web application**: the clients are desktop programs and do not run in a browser.
 
@@ -118,5 +118,6 @@ These were in the first draft of this document and have been removed because the
 | 2026-11-13 | Requirements replaced with the official PRD (FR1–FR14) | The first draft was a guess made before the PRD was available |
 | 2026-11-13 | Renting costs 10% of the book price and lasts 7 days | Rule given for FR7, which the PRD leaves undefined |
 | 2026-11-13 | Backend follows PRD section 4.1: Java HttpServer for users, Python Flask for books and for orders | The PRD fixes the technology of each service, so "Java everywhere" is not allowed |
-| 2026-11-13 | Both clients in JavaFX | Still Java, and a modern GUI framework earns +2% over Swing |
+| 2026-11-13 | Both clients in JavaFX | Still Java, and a modern GUI framework earns +2% over Swing. **Replaced below.** |
 | 2026-11-13 | Do every extra-credit item: FR3, FR10, and a modern GUI framework | +4% in total |
+| 2026-11-13 | Both clients in Flutter instead of JavaFX | UI and UX quality is the top priority; Flutter gives smoother animation and easier custom design on Windows desktop, and earns the same +2%. Cost: a third language (Dart) |

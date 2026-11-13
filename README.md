@@ -38,7 +38,7 @@ Dates and tasks: [docs/04-planning/milestones.md](docs/04-planning/milestones.md
 | Order and billing service | Python, Flask |
 | Relational database | MySQL |
 | Document database | MongoDB |
-| Desktop clients (customer, manager) | Java, JavaFX |
+| Desktop clients (customer, manager) | Flutter (Dart), Windows desktop |
 | Version control | Git + GitHub (milestones, issues, releases) |
 
 ## Workflow

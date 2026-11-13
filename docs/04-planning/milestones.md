@@ -39,8 +39,9 @@ The live version of this plan is on GitHub: milestones hold the deadlines, issue
 
 ### M4 — Desktop Clients (due 2026-12-01)
 
-- [ ] customer-app in JavaFX, asynchronous calls (N2): login, search, select books, place order, see bill
-- [ ] management-app in JavaFX, asynchronous calls (N2): login, orders list, payment status, add and update books
+- [ ] Install Flutter and create the two desktop projects
+- [ ] customer-app in Flutter, asynchronous calls (N2): register, login, search, select books, place order, see bill
+- [ ] management-app in Flutter, asynchronous calls (N2): login, orders list, payment status, add and update books
 
 ### M5 — Testing & Final Release (due 2026-12-04)
 
@@ -51,7 +52,7 @@ The live version of this plan is on GitHub: milestones hold the deadlines, issue
 
 - [ ] FR3: user registration (+1%) — with user-service in M3 and the customer app in M4
 - [ ] FR10: email the bill to the customer (+1%) — with order-service in M3
-- [ ] Modern GUI framework (+2%) — both apps in JavaFX, M4
+- [ ] Modern GUI framework (+2%) — both apps in Flutter, M4
 
 ## Progress notes
 
@@ -65,3 +66,4 @@ Add a short dated note whenever a milestone closes or a deadline moves, and say 
 | 2026-11-13 | Non-functional requirements received. Backend stack changed from Spring Boot to Java HttpServer + Python Flask (see problem log P-001). Deadlines unchanged. |
 | 2026-11-13 | UML diagrams drawn in draw.io (first drafts), ahead of the M2 deadline. Deployment, package, and composite structure diagrams were drawn and then dropped as not needed. |
 | 2026-11-13 | Decided to do every extra-credit item. Use case descriptions, more sequence and activity diagrams, database scripts, API specification, wireframes, and bill layout drafted. Visual style of the apps still open. |
+| 2026-11-13 | Client framework changed from JavaFX to Flutter because UI/UX quality is the priority. App class diagrams redrawn. Flutter is not installed yet. |

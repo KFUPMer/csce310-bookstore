@@ -48,7 +48,7 @@ Stereotypes are our own labels that extend standard UML. Where each one applies:
 | Stereotype | Applies to | Used for |
 |---|---|---|
 | `«RestService»` | Component | user-service, book-service, order-service |
-| `«JavaFxScreen»` | Class | The controllers in both apps (`LoginController`, `SearchController`, ...) |
+| `«FlutterScreen»` | Class | The screens in both apps (`LoginScreen`, `SearchScreen`, ...) |
 | `«ApiCall»` | Class | `UserApi`, `BookApi`, `OrderApi` |
 | `«MySqlTable»` | Class | `USERS`, `SESSIONS`, `ORDERS`, `ORDER_ITEMS` |
 | `«MongoCollection»` | Class | `books` |

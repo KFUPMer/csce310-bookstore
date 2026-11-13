@@ -46,7 +46,7 @@ Manager-only actions are refused unless the session belongs to a manager (FR11).
 | ID | How |
 |---|---|
 | N1 (under 500 ms) | Small, simple queries; a search index on book title and author; response times measured during testing |
-| N2 (no freezing) | Every call from a client to a service runs in a JavaFX background `Task`, never on the UI thread |
+| N2 (no freezing) | Every call from a client to a service is a Dart `async` call returning a `Future`; the screen awaits it and shows a loading state, so the UI is never blocked |
 | N3 (hashed passwords) | user-service hashes passwords with bcrypt before saving them |
 | N4 (token required) | Every endpoint except login and register rejects requests without a valid session token |
 | N5 (own data, own role) | Each endpoint checks the role: only customers place orders, only managers list all orders, change payment status, or add and update books. A customer can only open their own bill |
@@ -61,7 +61,7 @@ Manager-only actions are refused unless the session belongs to a manager (FR11).
 | # | Date | Decision | Alternatives considered | Reason |
 |---|---|---|---|---|
 | 1 | 2026-11-13 | Java HttpServer for user-service; Python Flask for book-service and order-service | Spring Boot for all three (first draft) | Required by PRD section 4.1 |
-| 2 | 2026-11-13 | JavaFX for both clients | Swing (the default) | Modern GUI framework earns +2%; layout is separate from logic |
+| 2 | 2026-11-13 | Flutter for both clients | Swing (the default), JavaFX (first choice), React Native | UI and UX quality is the priority: Flutter draws its own pixels, so animation is smooth and custom design is easy on Windows desktop. Earns +2%. React Native has weaker Windows desktop support |
 | 3 | 2026-11-13 | Session token stored in MySQL | JWT | Simple to explain, and logout really ends the session (FR2) |
 | 4 | 2026-11-13 | order-service generates the bill | A separate billing service | The bill is made at the moment the order is created; one less service |
 | 5 | 2026-11-13 | order-service reduces book copies through a service-only endpoint protected by a shared key | Let customers call the manager endpoint; skip stock changes | Stock must go down when a book is ordered, but customers must not be able to change stock themselves (N5) |

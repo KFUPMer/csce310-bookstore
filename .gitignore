@@ -30,3 +30,10 @@ venv/
 
 # Generated bills
 bills/
+
+# Flutter / Dart
+.dart_tool/
+build/
+.flutter-plugins
+.flutter-plugins-dependencies
+*.g.dart

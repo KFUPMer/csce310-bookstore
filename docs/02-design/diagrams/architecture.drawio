@@ -15,10 +15,10 @@
           <mxGeometry x="840" y="40" width="160" height="30" as="geometry" />
         </mxCell>
 
-        <mxCell id="c1" value="&lt;b&gt;Customer app&lt;/b&gt;&lt;br&gt;JavaFX&lt;br&gt;search, select, order" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=13;" vertex="1" parent="1">
+        <mxCell id="c1" value="&lt;b&gt;Customer app&lt;/b&gt;&lt;br&gt;Flutter&lt;br&gt;search, select, order" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=13;" vertex="1" parent="1">
           <mxGeometry x="60" y="160" width="200" height="80" as="geometry" />
         </mxCell>
-        <mxCell id="c2" value="&lt;b&gt;Management app&lt;/b&gt;&lt;br&gt;JavaFX&lt;br&gt;orders, payments, books" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=13;" vertex="1" parent="1">
+        <mxCell id="c2" value="&lt;b&gt;Management app&lt;/b&gt;&lt;br&gt;Flutter&lt;br&gt;orders, payments, books" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=13;" vertex="1" parent="1">
           <mxGeometry x="60" y="400" width="200" height="80" as="geometry" />
         </mxCell>
 

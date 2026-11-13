@@ -2,36 +2,15 @@
 
 > Status: **proposed starting point**. To be finalized in milestone M2.
 
+## Diagram
+
+![Database ER and document model](diagrams/database-er.png)
+
+Source: [diagrams/database-er.drawio](diagrams/database-er.drawio)
+
 ## MySQL (users and orders)
 
-```mermaid
-erDiagram
-    USERS ||--o{ ORDERS : places
-    ORDERS ||--|{ ORDER_ITEMS : contains
-
-    USERS {
-        int id PK
-        varchar email UK
-        varchar password_hash
-        varchar full_name
-        enum role "CUSTOMER or STAFF"
-        datetime created_at
-    }
-    ORDERS {
-        int id PK
-        int user_id FK
-        enum status "PENDING, PAID, SHIPPED, CANCELLED"
-        decimal total
-        datetime created_at
-    }
-    ORDER_ITEMS {
-        int id PK
-        int order_id FK
-        varchar book_id "MongoDB book id"
-        int quantity
-        decimal unit_price "price at time of order"
-    }
-```
+Tables `USERS`, `ORDERS`, and `ORDER_ITEMS`, as shown in the diagram. One user places many orders; one order contains one or more items.
 
 ## MongoDB (catalog)
 

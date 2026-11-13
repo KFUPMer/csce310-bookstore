@@ -1,0 +1,76 @@
+<mxfile host="app.diagrams.net">
+  <diagram id="architecture" name="Architecture">
+    <mxGraphModel dx="1200" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1100" pageHeight="700" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <mxCell id="lblClients" value="Desktop clients" style="text;html=1;align=center;verticalAlign=middle;fontStyle=1;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="60" y="40" width="200" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="lblServices" value="RESTful web services" style="text;html=1;align=center;verticalAlign=middle;fontStyle=1;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="440" y="40" width="200" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="lblDbs" value="Databases" style="text;html=1;align=center;verticalAlign=middle;fontStyle=1;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="840" y="40" width="160" height="30" as="geometry" />
+        </mxCell>
+
+        <mxCell id="c1" value="&lt;b&gt;Customer app&lt;/b&gt;&lt;br&gt;JavaFX" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=13;" vertex="1" parent="1">
+          <mxGeometry x="60" y="160" width="200" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="c2" value="&lt;b&gt;Management app&lt;/b&gt;&lt;br&gt;JavaFX" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=13;" vertex="1" parent="1">
+          <mxGeometry x="60" y="400" width="200" height="80" as="geometry" />
+        </mxCell>
+
+        <mxCell id="us" value="&lt;b&gt;user-service&lt;/b&gt;&lt;br&gt;Spring Boot :8081&lt;br&gt;accounts, login, roles" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=13;" vertex="1" parent="1">
+          <mxGeometry x="440" y="100" width="200" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="os" value="&lt;b&gt;order-service&lt;/b&gt;&lt;br&gt;Spring Boot :8083&lt;br&gt;orders, order status" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=13;" vertex="1" parent="1">
+          <mxGeometry x="440" y="280" width="200" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="cs" value="&lt;b&gt;catalog-service&lt;/b&gt;&lt;br&gt;Spring Boot :8082&lt;br&gt;books, stock, reviews" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=13;" vertex="1" parent="1">
+          <mxGeometry x="440" y="460" width="200" height="80" as="geometry" />
+        </mxCell>
+
+        <mxCell id="my" value="&lt;b&gt;MySQL&lt;/b&gt;&lt;br&gt;users, orders" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;size=15;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=13;" vertex="1" parent="1">
+          <mxGeometry x="850" y="170" width="140" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="mo" value="&lt;b&gt;MongoDB&lt;/b&gt;&lt;br&gt;books" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;size=15;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=13;" vertex="1" parent="1">
+          <mxGeometry x="850" y="445" width="140" height="110" as="geometry" />
+        </mxCell>
+
+        <mxCell id="e1" value="HTTP / JSON" style="endArrow=classic;html=1;rounded=0;fontSize=11;" edge="1" parent="1" source="c1" target="us">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e2" style="endArrow=classic;html=1;rounded=0;" edge="1" parent="1" source="c1" target="os">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e3" style="endArrow=classic;html=1;rounded=0;" edge="1" parent="1" source="c1" target="cs">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e4" style="endArrow=classic;html=1;rounded=0;" edge="1" parent="1" source="c2" target="us">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e5" style="endArrow=classic;html=1;rounded=0;" edge="1" parent="1" source="c2" target="os">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e6" value="HTTP / JSON" style="endArrow=classic;html=1;rounded=0;fontSize=11;" edge="1" parent="1" source="c2" target="cs">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="e7" style="endArrow=classic;html=1;rounded=0;" edge="1" parent="1" source="us" target="my">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e8" style="endArrow=classic;html=1;rounded=0;" edge="1" parent="1" source="os" target="my">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e9" style="endArrow=classic;html=1;rounded=0;" edge="1" parent="1" source="cs" target="mo">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e10" value="checks stock / price" style="endArrow=classic;html=1;rounded=0;dashed=1;fontSize=11;" edge="1" parent="1" source="os" target="cs">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

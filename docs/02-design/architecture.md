@@ -4,20 +4,9 @@
 
 ## Overview
 
-```mermaid
-flowchart LR
-    C1[Customer app<br/>JavaFX] --> US
-    C1 --> CS
-    C1 --> OS
-    C2[Management app<br/>JavaFX] --> US
-    C2 --> CS
-    C2 --> OS
+![System architecture](diagrams/architecture.png)
 
-    US[User service<br/>Spring Boot] --> MY[(MySQL)]
-    OS[Order service<br/>Spring Boot] --> MY
-    CS[Catalog service<br/>Spring Boot] --> MO[(MongoDB)]
-    OS -. checks stock / price .-> CS
-```
+Source: [diagrams/architecture.drawio](diagrams/architecture.drawio)
 
 ## Services (proposed)
 

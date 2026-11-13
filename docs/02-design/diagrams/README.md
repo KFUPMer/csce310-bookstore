@@ -23,12 +23,17 @@ When a diagram changes, update the `.drawio` file, export the image again, and c
 | Object diagram | `object.drawio` | `object.png` | [uml-diagrams.md](../uml-diagrams.md) |
 | Component diagram | `component.drawio` | `component.png` | [uml-diagrams.md](../uml-diagrams.md) |
 | Profile diagram | `profile.drawio` | `profile.png` | [uml-diagrams.md](../uml-diagrams.md) |
-| Use case diagram | `use-case.drawio` | `use-case.png` | [uml-diagrams.md](../uml-diagrams.md) |
+| Use case diagram | `use-case.drawio` | `use-case.png` | [use-cases.md](../use-cases.md) |
 | Sequence diagram: place an order | `sequence-place-order.drawio` | `sequence-place-order.png` | [uml-diagrams.md](../uml-diagrams.md) |
 | Activity diagram: place an order | `activity-place-order.drawio` | `activity-place-order.png` | [uml-diagrams.md](../uml-diagrams.md) |
 | State machine diagrams | `state-machine.drawio` | `state-machine.png` | [uml-diagrams.md](../uml-diagrams.md) |
-| UI wireframes, customer app | planned (M2) | — | — |
-| UI wireframes, manager app | planned (M2) | — | — |
+| Sequence diagram: log in | `sequence-login.drawio` | `sequence-login.png` | [uml-diagrams.md](../uml-diagrams.md) |
+| Sequence diagram: register | `sequence-register.drawio` | `sequence-register.png` | [uml-diagrams.md](../uml-diagrams.md) |
+| Sequence diagram: update payment status | `sequence-update-payment.drawio` | `sequence-update-payment.png` | [uml-diagrams.md](../uml-diagrams.md) |
+| Activity diagram: log in and register | `activity-login.drawio` | `activity-login.png` | [uml-diagrams.md](../uml-diagrams.md) |
+| Activity diagram: manager updates payment | `activity-manager-payment.drawio` | `activity-manager-payment.png` | [uml-diagrams.md](../uml-diagrams.md) |
+| UI wireframes, customer app | `wireframes-customer-app.drawio` | `wireframes-customer-app.png` | [ui-design.md](../ui-design.md) |
+| UI wireframes, manager app | `wireframes-manager-app.drawio` | `wireframes-manager-app.png` | [ui-design.md](../ui-design.md) |
 
 ## Exporting an image
 

@@ -25,14 +25,14 @@ The system has:
 |---|---|---|---|
 | FR1 | A registered user logs in with username and password; the system authenticates them and starts a session | Accounts | Yes |
 | FR2 | The user stays logged in until they log out; every protected action is tied to their session | Accounts | Yes |
-| FR3 | A new user can create an account with username, password, and a valid email; passwords are hashed on the backend | Accounts | Optional (+1%) |
+| FR3 | A new user can create an account with username, password, and a valid email; passwords are hashed on the backend | Accounts | Extra credit (+1%) — **doing it** |
 | FR4 | A logged-in user searches books by a keyword, matched against both title and author | Catalog | Yes |
 | FR5 | Search results are shown as a clear list with at least title, author, and price | Catalog | Yes |
 | FR6 | A logged-in user selects one or more books from the search results | Ordering | Yes |
 | FR7 | The user finalizes the selection, to buy and/or rent, in a single transaction that creates an order | Ordering | Yes |
 | FR8 | Placing an order generates a detailed bill: unique order ID, list of items, individual prices, total amount due | Billing | Yes |
 | FR9 | The bill is automatically saved as an HTML file (the manager can print it and post it to the customer) | Billing | Yes |
-| FR10 | The bill is automatically emailed to the customer | Billing | Optional (+1%) |
+| FR10 | The bill is automatically emailed to the customer | Billing | Extra credit (+1%) — **doing it** |
 | FR11 | Managers have a separate, secure management interface, distinct from the customer role | Manager | Yes |
 | FR12 | A logged-in manager views a list of all purchase orders | Manager | Yes |
 | FR13 | The manager selects an order and updates its payment status (e.g. Pending → Paid) | Manager | Yes |
@@ -53,6 +53,16 @@ Example: a customer selects three books and places one order.
 | **Total on the bill** | | | **$103.00** |
 
 Handling the return of a rented book is not part of the PRD and is not built.
+
+## Extra credit
+
+All three extra-credit items are part of the project:
+
+| Item | Worth | What it needs |
+|---|---|---|
+| FR3 — user registration | +1% | Register endpoint in user-service, register screen in the customer app |
+| FR10 — bill emailed to the customer | +1% | order-service sends the bill by email when the order is placed |
+| Modern GUI framework instead of Swing | +2% | Both apps are built with JavaFX |
 
 ## Non-functional requirements
 
@@ -96,8 +106,9 @@ These were in the first draft of this document and have been removed because the
 
 ## Open questions
 
+- [ ] Which mail server does order-service use to send bills (FR10)? Needs an account or a local test mail server.
+- [ ] Visual style of the two apps — see [ui-design.md](../02-design/ui-design.md).
 - [ ] Is the project individual or a team project?
-- [ ] Are the two optional requirements (FR3, FR10) going to be done?
 
 ## Decisions made in this phase
 
@@ -108,3 +119,4 @@ These were in the first draft of this document and have been removed because the
 | 2026-11-13 | Renting costs 10% of the book price and lasts 7 days | Rule given for FR7, which the PRD leaves undefined |
 | 2026-11-13 | Backend follows PRD section 4.1: Java HttpServer for users, Python Flask for books and for orders | The PRD fixes the technology of each service, so "Java everywhere" is not allowed |
 | 2026-11-13 | Both clients in JavaFX | Still Java, and a modern GUI framework earns +2% over Swing |
+| 2026-11-13 | Do every extra-credit item: FR3, FR10, and a modern GUI framework | +4% in total |

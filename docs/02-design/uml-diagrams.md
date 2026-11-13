@@ -10,9 +10,9 @@ The UML diagrams of the bookstore. All are drawn in draw.io; each image has its 
 | 2 | [Object](#2-object-diagram) | Structural | One real order at one moment, with actual values |
 | 3 | [Component](#3-component-diagram) | Structural | The apps, services, and databases, and the interfaces between them |
 | 4 | [Profile](#4-profile-diagram) | Structural | Our own labels (stereotypes) used across the diagrams |
-| 5 | [Use case](#5-use-case-diagram) | Behavioral | What customers and managers can do |
-| 6 | [Sequence](#6-sequence-diagram) | Behavioral | The messages exchanged when an order is placed |
-| 7 | [Activity](#7-activity-diagram) | Behavioral | The steps a customer follows to place an order |
+| 5 | [Use case](#5-use-case-diagram) | Behavioral | What customers and managers can do, with [written descriptions](use-cases.md) |
+| 6 | [Sequence](#6-sequence-diagrams) | Behavioral | The messages exchanged for login, register, placing an order, and updating payment |
+| 7 | [Activity](#7-activity-diagrams) | Behavioral | The steps and decisions for login, placing an order, and updating payment |
 | 8 | [State machine](#8-state-machine-diagram) | Behavioral | The states of an order and of a user session |
 
 ---
@@ -63,30 +63,43 @@ Stereotypes are our own labels that extend standard UML. Where each one applies:
 
 ![Use case diagram](diagrams/use-case.png)
 
-| Use case | Actor | Requirement |
-|---|---|---|
-| Log in, Log out | Customer, Manager | FR1, FR2, FR11 |
-| Search books by keyword | Customer, Manager | FR4, FR5 |
-| Select books | Customer | FR6 |
-| Place order (buy and/or rent) | Customer | FR7 |
-| Generate bill, Save bill as HTML file, View bill | Customer | FR8, FR9 |
-| Register | Customer | FR3 (optional) |
-| Email bill | — | FR10 (optional) |
-| View all orders | Manager | FR12 |
-| Update payment status | Manager | FR13 |
-| Add book, Update book information | Manager | FR14 |
+The written description of every use case (actor, steps, other flows, result) is in [use-cases.md](use-cases.md).
 
-### 6. Sequence diagram
+### 6. Sequence diagrams
 
-![Sequence diagram for placing an order](diagrams/sequence-place-order.png)
+One per main flow. All calls from the apps are asynchronous (N2).
 
-Placing an order is the one flow that touches every part of the system, so it is the one drawn.
+**Log in** (FR1, FR2, FR11)
 
-### 7. Activity diagram
+![Sequence diagram: log in](diagrams/sequence-login.png)
 
-![Activity diagram for placing an order](diagrams/activity-place-order.png)
+**Register** (FR3)
 
-The same flow as the sequence diagram, but from the customer's point of view: the steps and the decisions.
+![Sequence diagram: register](diagrams/sequence-register.png)
+
+**Place an order** (FR6–FR10)
+
+![Sequence diagram: place an order](diagrams/sequence-place-order.png)
+
+**Manager updates payment status** (FR12, FR13)
+
+![Sequence diagram: update payment status](diagrams/sequence-update-payment.png)
+
+### 7. Activity diagrams
+
+The same flows from the user's point of view: the steps and the decisions.
+
+**Log in and register**
+
+![Activity diagram: log in and register](diagrams/activity-login.png)
+
+**Customer places an order**
+
+![Activity diagram: place an order](diagrams/activity-place-order.png)
+
+**Manager updates payment status**
+
+![Activity diagram: manager updates payment status](diagrams/activity-manager-payment.png)
 
 ### 8. State machine diagram
 

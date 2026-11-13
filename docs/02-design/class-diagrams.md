@@ -20,7 +20,7 @@ Source: [diagrams/class-customer-app.drawio](diagrams/class-customer-app.drawio)
 
 | Class | Purpose | Requirements |
 |---|---|---|
-| `LoginController` | Log in (and optionally register) | FR1, FR3 |
+| `LoginController` | Log in and register | FR1, FR3 |
 | `SearchController` | Search by keyword, show title/author/price, pick books, log out | FR2, FR4, FR5, FR6 |
 | `OrderController` | Hold the selected books, choose buy or rent for each, place the order | FR6, FR7 |
 | `BillController` | Show the bill returned for the order | FR8 |

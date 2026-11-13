@@ -39,6 +39,7 @@ Collection `books` (FR4, FR5, FR14):
 
 ## Still to do in M2
 
-- [ ] SQL schema script
-- [ ] Seed script, required by the PRD for testing: sample books (title, author, price, copies) in MongoDB, plus one customer and one manager in MySQL
-- [ ] Index for keyword search on `title` and `author`
+- [x] SQL schema script — [database/mysql/schema.sql](../../database/mysql/schema.sql)
+- [x] Seed data, required by the PRD for testing — [database/seed.py](../../database/seed.py) and [books.json](../../database/mongodb/books.json): 15 books, one customer, one manager
+- [x] Indexes on `title` and `author` — created by the seed script
+- [ ] Run the scripts against real databases (M3, when MySQL and MongoDB are installed)

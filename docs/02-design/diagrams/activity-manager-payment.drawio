@@ -1,0 +1,35 @@
+<mxfile host="app.diagrams.net">
+  <diagram id="activity-manager-payment" name="Activity: manager updates payment status">
+    <mxGraphModel dx="1400" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="1600" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="c1" value="" style="ellipse;html=1;fillColor=#000000;strokeColor=#000000;" vertex="1" parent="1"><mxGeometry x="385" y="20" width="30" height="30" as="geometry" /></mxCell>
+        <mxCell id="c2" value="Log in to the manager app" style="rounded=1;arcSize=40;whiteSpace=wrap;html=1;fontSize=12;fillColor=#ffffff;strokeColor=#333333;" vertex="1" parent="1"><mxGeometry x="300" y="80" width="200" height="44" as="geometry" /></mxCell>
+        <mxCell id="c3" value="View the list of all orders" style="rounded=1;arcSize=40;whiteSpace=wrap;html=1;fontSize=12;fillColor=#ffffff;strokeColor=#333333;" vertex="1" parent="1"><mxGeometry x="300" y="160" width="200" height="44" as="geometry" /></mxCell>
+        <mxCell id="c4" value="Select an order" style="rounded=1;arcSize=40;whiteSpace=wrap;html=1;fontSize=12;fillColor=#ffffff;strokeColor=#333333;" vertex="1" parent="1"><mxGeometry x="300" y="240" width="200" height="44" as="geometry" /></mxCell>
+        <mxCell id="c5" value="View its bill (optional step)" style="rounded=1;arcSize=40;whiteSpace=wrap;html=1;fontSize=12;fillColor=#ffffff;strokeColor=#333333;" vertex="1" parent="1"><mxGeometry x="300" y="320" width="200" height="44" as="geometry" /></mxCell>
+        <mxCell id="c6" value="Payment received?" style="rhombus;whiteSpace=wrap;html=1;fontSize=12;fillColor=#ffffff;strokeColor=#333333;" vertex="1" parent="1"><mxGeometry x="300" y="400" width="200" height="70" as="geometry" /></mxCell>
+        <mxCell id="c7" value="Click &quot;Mark as paid&quot;" style="rounded=1;arcSize=40;whiteSpace=wrap;html=1;fontSize=12;fillColor=#ffffff;strokeColor=#333333;" vertex="1" parent="1"><mxGeometry x="300" y="510" width="200" height="44" as="geometry" /></mxCell>
+        <mxCell id="c8" value="Payment status changes from Pending to Paid" style="rounded=1;arcSize=40;whiteSpace=wrap;html=1;fontSize=12;fillColor=#ffffff;strokeColor=#333333;" vertex="1" parent="1"><mxGeometry x="300" y="590" width="200" height="44" as="geometry" /></mxCell>
+        <mxCell id="c9" value="More orders to handle?" style="rhombus;whiteSpace=wrap;html=1;fontSize=12;fillColor=#ffffff;strokeColor=#333333;" vertex="1" parent="1"><mxGeometry x="300" y="670" width="200" height="70" as="geometry" /></mxCell>
+        <mxCell id="c10" value="Log out" style="rounded=1;arcSize=40;whiteSpace=wrap;html=1;fontSize=12;fillColor=#ffffff;strokeColor=#333333;" vertex="1" parent="1"><mxGeometry x="300" y="780" width="200" height="44" as="geometry" /></mxCell>
+        <mxCell id="c11" value="" style="ellipse;html=1;shape=endState;fillColor=#000000;strokeColor=#000000;" vertex="1" parent="1"><mxGeometry x="385" y="860" width="30" height="30" as="geometry" /></mxCell>
+        <mxCell id="c12" value="Leave the order as Pending" style="rounded=1;arcSize=40;whiteSpace=wrap;html=1;fontSize=12;fillColor=#ffffff;strokeColor=#333333;" vertex="1" parent="1"><mxGeometry x="640" y="413" width="200" height="44" as="geometry" /></mxCell>
+        <mxCell id="c13" value="" style="endArrow=block;endFill=1;html=1;rounded=0;edgeStyle=orthogonalEdgeStyle;fontSize=11;" edge="1" parent="1" source="c1" target="c2"><mxGeometry relative="1" as="geometry"></mxGeometry></mxCell>
+        <mxCell id="c14" value="" style="endArrow=block;endFill=1;html=1;rounded=0;edgeStyle=orthogonalEdgeStyle;fontSize=11;" edge="1" parent="1" source="c2" target="c3"><mxGeometry relative="1" as="geometry"></mxGeometry></mxCell>
+        <mxCell id="c15" value="" style="endArrow=block;endFill=1;html=1;rounded=0;edgeStyle=orthogonalEdgeStyle;fontSize=11;" edge="1" parent="1" source="c3" target="c4"><mxGeometry relative="1" as="geometry"></mxGeometry></mxCell>
+        <mxCell id="c16" value="" style="endArrow=block;endFill=1;html=1;rounded=0;edgeStyle=orthogonalEdgeStyle;fontSize=11;" edge="1" parent="1" source="c4" target="c5"><mxGeometry relative="1" as="geometry"></mxGeometry></mxCell>
+        <mxCell id="c17" value="" style="endArrow=block;endFill=1;html=1;rounded=0;edgeStyle=orthogonalEdgeStyle;fontSize=11;" edge="1" parent="1" source="c5" target="c6"><mxGeometry relative="1" as="geometry"></mxGeometry></mxCell>
+        <mxCell id="c18" value="yes" style="endArrow=block;endFill=1;html=1;rounded=0;edgeStyle=orthogonalEdgeStyle;fontSize=11;" edge="1" parent="1" source="c6" target="c7"><mxGeometry relative="1" as="geometry"></mxGeometry></mxCell>
+        <mxCell id="c19" value="" style="endArrow=block;endFill=1;html=1;rounded=0;edgeStyle=orthogonalEdgeStyle;fontSize=11;" edge="1" parent="1" source="c7" target="c8"><mxGeometry relative="1" as="geometry"></mxGeometry></mxCell>
+        <mxCell id="c20" value="" style="endArrow=block;endFill=1;html=1;rounded=0;edgeStyle=orthogonalEdgeStyle;fontSize=11;" edge="1" parent="1" source="c8" target="c9"><mxGeometry relative="1" as="geometry"></mxGeometry></mxCell>
+        <mxCell id="c21" value="no" style="endArrow=block;endFill=1;html=1;rounded=0;edgeStyle=orthogonalEdgeStyle;fontSize=11;" edge="1" parent="1" source="c9" target="c10"><mxGeometry relative="1" as="geometry"></mxGeometry></mxCell>
+        <mxCell id="c22" value="" style="endArrow=block;endFill=1;html=1;rounded=0;edgeStyle=orthogonalEdgeStyle;fontSize=11;" edge="1" parent="1" source="c10" target="c11"><mxGeometry relative="1" as="geometry"></mxGeometry></mxCell>
+        <mxCell id="c23" value="no" style="endArrow=block;endFill=1;html=1;rounded=0;edgeStyle=orthogonalEdgeStyle;fontSize=11;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" edge="1" parent="1" source="c6" target="c12"><mxGeometry relative="1" as="geometry"></mxGeometry></mxCell>
+        <mxCell id="c24" value="" style="endArrow=block;endFill=1;html=1;rounded=0;edgeStyle=orthogonalEdgeStyle;fontSize=11;exitX=0.5;exitY=1;entryX=1;entryY=0.5;" edge="1" parent="1" source="c12" target="c9"><mxGeometry relative="1" as="geometry"></mxGeometry></mxCell>
+        <mxCell id="c25" value="yes" style="endArrow=block;endFill=1;html=1;rounded=0;edgeStyle=orthogonalEdgeStyle;fontSize=11;exitX=0;exitY=0.5;entryX=0;entryY=0.5;" edge="1" parent="1" source="c9" target="c4"><mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="230" y="705" /><mxPoint x="230" y="262" /></Array></mxGeometry></mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

@@ -9,7 +9,7 @@ This repository records the **whole process** of the project, not only the final
 | Phase | Milestone | Version | Status |
 |---|---|---|---|
 | 1. Idea & requirements | M1 | v0.1.0 | In progress |
-| 2. Design | M2 | v0.2.0 | Not started |
+| 2. Design | M2 | v0.2.0 | In progress |
 | 3. Backend services | M3 | v0.3.0 | Not started |
 | 4. Desktop clients | M4 | v0.4.0 | Not started |
 | 5. Testing & final release | M5 | v1.0.0 | Not started |
@@ -21,7 +21,8 @@ Dates and tasks: [docs/04-planning/milestones.md](docs/04-planning/milestones.md
 | Folder | What is in it |
 |---|---|
 | [docs/01-idea](docs/01-idea/project-idea.md) | What we are building and why; scope and requirements |
-| [docs/02-design](docs/02-design/architecture.md) | Architecture, database design, API design, and [all UML diagrams](docs/02-design/uml-diagrams.md) |
+| [docs/02-design](docs/02-design/architecture.md) | [Architecture](docs/02-design/architecture.md), [use cases](docs/02-design/use-cases.md), [UML diagrams](docs/02-design/uml-diagrams.md), [database](docs/02-design/database-design.md), [API](docs/02-design/api-design.md), [UI](docs/02-design/ui-design.md), [bill](docs/02-design/bill-design.md) |
+| [database/](database/README.md) | MySQL schema, sample books, and the seed script |
 | [docs/03-problems](docs/03-problems/problem-log.md) | Problems we faced and how we dealt with each one |
 | [docs/04-planning](docs/04-planning/milestones.md) | Milestones, tasks, deadlines, versioning rules |
 | `services/` | Backend RESTful web services |

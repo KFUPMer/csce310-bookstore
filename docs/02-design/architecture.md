@@ -12,9 +12,9 @@ Source: [diagrams/architecture.drawio](diagrams/architecture.drawio)
 
 | Service | Built with | Responsibility | Requirements | Database | Port |
 |---|---|---|---|---|---|
-| user-service | Java HttpServer | Login, logout, sessions, roles, (optional) registration | FR1, FR2, FR3, FR11 | MySQL | 8081 |
+| user-service | Java HttpServer | Login, logout, sessions, roles, registration | FR1, FR2, FR3, FR11 | MySQL | 8081 |
 | book-service | Python Flask | Search books, add books, update book information | FR4, FR5, FR14 | MongoDB | 8082 |
-| order-service | Python Flask | Create orders, generate and save the HTML bill, list orders, update payment status, (optional) email the bill | FR6–FR10, FR12, FR13 | MySQL | 8083 |
+| order-service | Python Flask | Create orders, generate and save the HTML bill, list orders, update payment status, email the bill | FR6–FR10, FR12, FR13 | MySQL | 8083 |
 
 ## Clients
 
@@ -38,7 +38,8 @@ Manager-only actions are refused unless the session belongs to a manager (FR11).
 1. The customer app sends the selected books to order-service.
 2. order-service gets each book's current price from book-service and checks copies are available. A bought book is charged at full price; a rented book at 10% of the price, due back in 7 days.
 3. order-service saves the order in MySQL with payment status `PENDING`.
-4. order-service writes the bill to `bills/bill-<orderId>.html` and returns it to the customer app.
+4. order-service reduces the available copies of each book through book-service.
+5. order-service writes the bill to `bills/bill-<orderId>.html`, emails it to the customer, and returns it to the customer app.
 
 ## How the non-functional requirements are met
 
@@ -63,10 +64,15 @@ Manager-only actions are refused unless the session belongs to a manager (FR11).
 | 2 | 2026-11-13 | JavaFX for both clients | Swing (the default) | Modern GUI framework earns +2%; layout is separate from logic |
 | 3 | 2026-11-13 | Session token stored in MySQL | JWT | Simple to explain, and logout really ends the session (FR2) |
 | 4 | 2026-11-13 | order-service generates the bill | A separate billing service | The bill is made at the moment the order is created; one less service |
+| 5 | 2026-11-13 | order-service reduces book copies through a service-only endpoint protected by a shared key | Let customers call the manager endpoint; skip stock changes | Stock must go down when a book is ordered, but customers must not be able to change stock themselves (N5) |
+| 6 | 2026-11-13 | If the bill email fails, the order still succeeds | Fail the whole order | The bill file is the required part (FR9); the email is a copy |
 
 ## Still to design in M2
 
 - [x] Use case, sequence, activity, state machine, component, object, and profile diagrams — see [uml-diagrams.md](uml-diagrams.md)
 - [x] Class diagrams for both clients — see [class-diagrams.md](class-diagrams.md)
 - [x] Class diagrams for the three services — see [uml-diagrams.md](uml-diagrams.md)
-- [ ] UI wireframes for both clients
+- [x] Use case descriptions — see [use-cases.md](use-cases.md)
+- [x] UI wireframes for both clients — see [ui-design.md](ui-design.md)
+- [x] Bill layout — see [bill-design.md](bill-design.md)
+- [ ] Visual style of the apps — see [ui-design.md](ui-design.md)

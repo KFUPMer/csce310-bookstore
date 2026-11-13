@@ -18,14 +18,17 @@ The live version of this plan is on GitHub: milestones hold the deadlines, issue
 
 - [x] Record the requirements from the official PRD (FR1–FR14)
 - [x] Record the non-functional requirements (technology, N1–N5)
-- [ ] Resolve the remaining open questions
+- [ ] Resolve the remaining open questions (mail server, individual or team)
 
 ### M2 — Design (due 2026-11-19)
 
 - [x] UML diagrams: class, object, component, profile, use case, sequence, activity, state machine
-- [ ] Finalize MySQL schema and MongoDB document model, and plan the seed data
-- [ ] Finalize REST API specification
-- [ ] UI wireframes for both desktop apps
+- [x] Use case descriptions for all 14 use cases
+- [x] MySQL schema, sample books, and seed script (to be run in M3)
+- [x] REST API specification: request, response, and errors for all 13 endpoints
+- [x] UI wireframes for both desktop apps
+- [x] Bill layout (sample HTML bill)
+- [ ] Visual style of the two apps
 
 ### M3 — Backend Services (due 2026-11-26)
 
@@ -44,10 +47,11 @@ The live version of this plan is on GitHub: milestones hold the deadlines, issue
 - [ ] Test every requirement FR1–FR14 and N1–N5 end to end
 - [ ] Final documentation and release v1.0.0
 
-### Optional (extra credit, only if time allows)
+### Extra credit (all being done, +4% in total)
 
-- [ ] FR3: user registration (+1%)
-- [ ] FR10: email the bill to the customer (+1%)
+- [ ] FR3: user registration (+1%) — with user-service in M3 and the customer app in M4
+- [ ] FR10: email the bill to the customer (+1%) — with order-service in M3
+- [ ] Modern GUI framework (+2%) — both apps in JavaFX, M4
 
 ## Progress notes
 
@@ -60,3 +64,4 @@ Add a short dated note whenever a milestone closes or a deadline moves, and say 
 | 2026-11-13 | Official PRD received. Requirements, design docs, diagrams, and tasks corrected to match it. |
 | 2026-11-13 | Non-functional requirements received. Backend stack changed from Spring Boot to Java HttpServer + Python Flask (see problem log P-001). Deadlines unchanged. |
 | 2026-11-13 | UML diagrams drawn in draw.io (first drafts), ahead of the M2 deadline. Deployment, package, and composite structure diagrams were drawn and then dropped as not needed. |
+| 2026-11-13 | Decided to do every extra-credit item. Use case descriptions, more sequence and activity diagrams, database scripts, API specification, wireframes, and bill layout drafted. Visual style of the apps still open. |

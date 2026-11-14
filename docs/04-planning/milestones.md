@@ -18,7 +18,7 @@ The live version of this plan is on GitHub: milestones hold the deadlines, issue
 
 - [x] Record the requirements from the official PRD (FR1–FR14)
 - [x] Record the non-functional requirements (technology, N1–N5)
-- [ ] Resolve the remaining open questions (mail server, individual or team)
+- [ ] Resolve the remaining open question: which mail server sends the bill emails (the project is individual: confirmed)
 
 ### M2 — Design (due 2026-11-19)
 

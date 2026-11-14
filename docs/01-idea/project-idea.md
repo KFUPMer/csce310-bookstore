@@ -108,7 +108,6 @@ These were in the first draft of this document and have been removed because the
 
 - [ ] Which mail server does order-service use to send bills (FR10)? Needs an account or a local test mail server.
 - [ ] Visual style of the two apps — see [ui-design.md](../02-design/ui-design.md).
-- [ ] Is the project individual or a team project?
 
 ## Decisions made in this phase
 
@@ -121,3 +120,4 @@ These were in the first draft of this document and have been removed because the
 | 2026-11-13 | Both clients in JavaFX | Still Java, and a modern GUI framework earns +2% over Swing. **Replaced below.** |
 | 2026-11-13 | Do every extra-credit item: FR3, FR10, and a modern GUI framework | +4% in total |
 | 2026-11-13 | Both clients in Flutter instead of JavaFX | UI and UX quality is the top priority; Flutter gives smoother animation and easier custom design on Windows desktop, and earns the same +2%. Cost: a third language (Dart) |
+| 2026-11-13 | The project is done individually | Confirmed; one person does all of the design, code, and testing |

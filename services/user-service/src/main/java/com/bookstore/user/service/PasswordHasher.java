@@ -14,6 +14,22 @@ public class PasswordHasher {
     /** Work factor: each step up doubles the time to hash. 10 is the common default. */
     private static final int COST = 10;
 
+    /** How many practice checks {@link #warmUp} runs. */
+    private static final int WARM_UP_ROUNDS = 6;
+
+    /**
+     * Runs a few practice checks so the first real login is as fast as later ones.
+     *
+     * <p>Java runs code slowly until it has been used a few times. Without this,
+     * the first login after start-up took just over the 500 ms that N1 allows (P-005).
+     */
+    public void warmUp() {
+        String practice = hash("warm-up");
+        for (int i = 0; i < WARM_UP_ROUNDS; i++) {
+            matches("warm-up", practice);
+        }
+    }
+
     public String hash(String password) {
         return BCrypt.hashpw(password, BCrypt.gensalt(COST));
     }

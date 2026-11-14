@@ -50,8 +50,9 @@ def seed_users():
     )
     cur = db.cursor()
     for username, email, password, role in TEST_USERS:
-        # prefix 2a so the hash is accepted by both Python and Java bcrypt libraries
-        hashed = bcrypt.hashpw(password.encode(), bcrypt.gensalt(prefix=b"2a")).decode()
+        # prefix 2a so the hash is accepted by both Python and Java bcrypt libraries;
+        # rounds=10 is the same cost user-service uses, which keeps login well under 500 ms (N1)
+        hashed = bcrypt.hashpw(password.encode(), bcrypt.gensalt(rounds=10, prefix=b"2a")).decode()
         cur.execute(
             "INSERT INTO users (username, email, password_hash, role) VALUES (%s, %s, %s, %s) "
             "ON DUPLICATE KEY UPDATE email = VALUES(email), password_hash = VALUES(password_hash), role = VALUES(role)",

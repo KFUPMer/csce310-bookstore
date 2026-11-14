@@ -12,9 +12,10 @@ Work towards v0.3.0 (milestone M3, Backend services).
 - Class diagram and file map for the shared UI package
 - Sample books loaded into MongoDB
 - `database/make_local_setup.py`: generates a dedicated, limited MySQL account for the services, so the root password is never stored or shared
-- **user-service**: login, logout, session check, and registration (FR1, FR2, FR3, FR11), with bcrypt password hashing, one error format, and 26 tests
+- **user-service**: login, logout, session check, and registration (FR1, FR2, FR3, FR11), with bcrypt password hashing, one error format, and 26 tests; verified against MySQL
 
 ### Fixed
+- P-005: login was too close to the 500 ms limit against the real database; user-service now uses a connection pool and warms up at start-up (login 85–255 ms, session check 7–19 ms)
 - P-004: the first request to a service by the name `localhost` took over 2 seconds; services now listen on both loopback addresses
 
 ### Changed

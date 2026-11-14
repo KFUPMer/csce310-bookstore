@@ -35,6 +35,6 @@ python database/seed.py
 ## Status
 
 - **MongoDB: loaded and checked** on 2026-11-13. 15 books, indexes on title and author, and a search for "java" returns 3 books.
-- **MySQL: not run yet.** Step 1 is done on the development machine; step 2 needs the MySQL root password, typed by its owner.
+- **MySQL: created and checked** on 2026-11-13. Four tables, the limited `bookstore_app` account, and the two test accounts. user-service logs in with them.
 
 Design: [database-design.md](../docs/02-design/database-design.md).

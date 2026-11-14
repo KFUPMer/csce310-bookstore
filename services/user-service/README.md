@@ -47,7 +47,7 @@ Four layers; each only calls the one below ([engineering rules](../../docs/02-de
 |---|---|---|
 | `http`, `http.dto` | Receives requests, validates them, sends JSON, turns errors into responses | `BaseHandler`, `AuthHandler`, `UserHandler`, `Json`, `LoginRequest`, `RegisterRequest`, `UserResponse` |
 | `service` | The rules | `AuthService`, `PasswordHasher`, `TokenGenerator` |
-| `repository` | Database access | `UserRepository`, `SessionRepository`, and a MySQL and an in-memory version of each; `Database` |
+| `repository` | Database access | `UserRepository`, `SessionRepository`, and a MySQL and an in-memory version of each; `Database` (connection pool) |
 | `model` | Plain data | `User`, `Session`, `Role` |
 
 Plus `error` (the exceptions), `config.Config` (settings), and `UserServer` (start-up).
@@ -77,5 +77,13 @@ Handlers and services throw; `BaseHandler` catches everything in one place:
 
 ## Status
 
-All 26 tests pass, and every endpoint was called on the running service in memory mode (each answered in under 150 ms).
-**Not yet run against MySQL**: the `Jdbc...Repository` classes are written but untested until the database is created.
+Built and verified on 2026-11-13:
+
+- All 26 tests pass.
+- Every endpoint was called on the running service **against the real MySQL database**: login with the accounts created by the Python seed script, session check, wrong password, register, duplicate register, logout, session after logout.
+- Timings against MySQL, over four cold starts: login 85–255 ms (most of it is bcrypt, on purpose), session check 7–19 ms. N1 allows 500 ms.
+
+## Performance notes
+
+- Database connections come from a small pool (HikariCP) instead of being opened per query.
+- At start-up the service practises password hashing and sends itself one refused login, so the first real request is as fast as later ones. See P-005 in the problem log.

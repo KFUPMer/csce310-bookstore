@@ -41,11 +41,13 @@ pip install flask mysql-connector-python pymongo bcrypt requests
 
 The 15 sample books are loaded and the indexes on `title` and `author` exist. Checked on 2026-11-13: a search for "java" returns 3 books.
 
-### MySQL — one command left, to be run by the machine's owner
+### MySQL — done
 
 The services do **not** use the MySQL root account. They log in as `bookstore_app`, an account that can only read and write the `bookstore` database. Its password is generated on this machine and kept in `services/.env`, which git ignores. The root password is typed once, by its owner, and is never stored or shared.
 
-1. Generate the local setup (already done on this machine; safe to repeat):
+Set up and checked on 2026-11-13: four tables, the `bookstore_app` account (confirmed unable to read other databases), and the two test accounts. To repeat it on another machine:
+
+1. Generate the local setup:
 
 ```bash
 python database/make_local_setup.py

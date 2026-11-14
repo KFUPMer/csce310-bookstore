@@ -70,6 +70,8 @@ Manager-only actions are refused unless the session belongs to a manager (FR11).
 | 8 | 2026-11-13 | Repositories are interfaces, each with a MySQL and an in-memory version | Classes that talk to MySQL directly | The rules can be tested without a database, and a service can be run before the database exists |
 | 9 | 2026-11-13 | Each service listens on both loopback addresses (127.0.0.1 and ::1), never on the network | IPv4 only | "localhost" can mean either; with only one, the first request waited about 2 seconds (P-004). Not listening on the network keeps the services private to this machine |
 | 10 | 2026-11-13 | The services use a dedicated MySQL account (`bookstore_app`) limited to the bookstore database | The root account | Least privilege: the services get only the access they need, and the root password never has to be stored or shared |
+| 11 | 2026-11-13 | user-service takes database connections from a pool and warms itself up at start-up | A new connection per query; no warm-up | Measured: a new connection per query made session checks about 75 ms and the first login over 500 ms. With the pool and warm-up they are under 20 ms and under 260 ms (P-005) |
+| 12 | 2026-11-13 | bcrypt cost 10 in both the Java service and the Python seed script | The Python default of 12 | The same cost on both sides; cost 12 made each login about 300 ms, leaving little room under N1 |
 
 ## Email settings (FR10)
 

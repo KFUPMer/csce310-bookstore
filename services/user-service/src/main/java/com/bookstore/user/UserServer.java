@@ -1,6 +1,7 @@
 package com.bookstore.user;
 
 import com.bookstore.user.config.Config;
+import com.bookstore.user.error.UnauthorizedException;
 import com.bookstore.user.http.AuthHandler;
 import com.bookstore.user.http.UserHandler;
 import com.bookstore.user.model.Role;
@@ -18,6 +19,10 @@ import com.sun.net.httpserver.HttpServer;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -78,6 +83,40 @@ public class UserServer {
         return listeners.get(0).getAddress().getPort();
     }
 
+    /**
+     * Practises the slow paths once before the first real request: password
+     * hashing, and one login for a user that does not exist (which runs a
+     * database query and a password check, and changes nothing). Without it
+     * the first login after start-up took about 500 ms; N1 allows 500 (P-005).
+     */
+    private static void warmUp(PasswordHasher hasher, AuthService auth) {
+        hasher.warmUp();
+        try {
+            auth.login("warm-up-no-such-user", "warm-up");
+        } catch (UnauthorizedException expected) {
+            // Exactly what should happen: there is no such user.
+        }
+    }
+
+    /**
+     * Sends the running server one real request (a login that is refused), so
+     * that the HTTP and JSON code has also run once before a user arrives.
+     * If it fails, the service still works; only the first request is slower.
+     */
+    private static void warmUpOverHttp(int port) {
+        try {
+            HttpRequest request = HttpRequest.newBuilder(URI.create("http://127.0.0.1:" + port + AuthHandler.PATH + "/login"))
+                    .header("Content-Type", "application/json")
+                    .POST(HttpRequest.BodyPublishers.ofString("{\"username\":\"warm-up-no-such-user\",\"password\":\"warm-up\"}"))
+                    .build();
+            HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.discarding());
+        } catch (IOException | RuntimeException e) {
+            LOG.fine("Warm-up request failed: " + e.getMessage());
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+    }
+
     public static void main(String[] args) throws IOException {
         Config config = Config.load();
         PasswordHasher hasher = new PasswordHasher();
@@ -93,13 +132,16 @@ public class UserServer {
             LOG.warning("Running in MEMORY mode: no database, test accounts only, nothing is kept after a restart");
         } else {
             Database database = new Database(config);
-            database.check();
+            Runtime.getRuntime().addShutdownHook(new Thread(database::close));
             users = new JdbcUserRepository(database);
             sessions = new JdbcSessionRepository(database);
         }
 
-        UserServer server = new UserServer(config.port(), new AuthService(users, sessions, hasher, new TokenGenerator()));
+        AuthService auth = new AuthService(users, sessions, hasher, new TokenGenerator());
+        warmUp(hasher, auth);
+        UserServer server = new UserServer(config.port(), auth);
         server.start();
+        warmUpOverHttp(server.port());
         LOG.info("user-service is listening on http://localhost:" + server.port());
     }
 }

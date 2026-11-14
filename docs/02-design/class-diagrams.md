@@ -94,7 +94,7 @@ An overview of all three services, drawn during design, is in [uml-diagrams.md](
 
 ### user-service
 
-Built. Every class is in the diagram.
+Built, and verified against the real MySQL database. Every class is in the diagram.
 
 ![user-service class diagram](diagrams/class-user-service.png)
 
@@ -104,7 +104,7 @@ File map (`services/user-service/src/main/java/com/bookstore/user/`):
 
 | File | Kind | Purpose |
 |---|---|---|
-| `UserServer.java` | Start-up | Builds the parts, connects them, listens on both loopback addresses |
+| `UserServer.java` | Start-up | Builds the parts, connects them, warms up, listens on both loopback addresses |
 | `config/Config.java` | Settings | Reads the port, storage mode, and MySQL settings from the environment or `.env` |
 | `http/BaseHandler.java` | HTTP | Shared by all handlers: reads JSON, reads the token, writes JSON, and turns every error into a response in one place |
 | `http/AuthHandler.java` | HTTP | `/api/auth/login`, `/logout`, `/session` |
@@ -122,7 +122,7 @@ File map (`services/user-service/src/main/java/com/bookstore/user/`):
 | `repository/JdbcSessionRepository.java` | Database | Sessions in MySQL |
 | `repository/InMemoryUserRepository.java` | Database | Users in memory, for tests and memory mode |
 | `repository/InMemorySessionRepository.java` | Database | Sessions in memory, for tests and memory mode |
-| `repository/Database.java` | Database | Opens MySQL connections |
+| `repository/Database.java` | Database | Lends out MySQL connections from a small pool |
 | `model/User.java`, `Session.java`, `Role.java` | Data | Plain data |
 | `error/ApiException.java` | Error | An error that is safe to show, with its HTTP status |
 | `error/ValidationException.java` | Error | 400 |

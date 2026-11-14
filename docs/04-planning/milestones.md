@@ -33,8 +33,9 @@ The live version of this plan is on GitHub: milestones hold the deadlines, issue
 ### M3 — Backend Services (due 2026-11-26)
 
 - [x] Install Java 21, Maven, MongoDB, and the Python packages; load the books into MongoDB
-- [ ] Create the MySQL database (needs the root password) and the three service projects
-- [x] user-service in Java HttpServer: login, logout, sessions, roles, bcrypt, registration (FR1, FR2, FR3, FR11, N3). 26 tests pass; still to run against MySQL
+- [x] Create the MySQL database, with a dedicated limited account for the services; load the test accounts
+- [ ] Create the book-service and order-service projects
+- [x] user-service in Java HttpServer: login, logout, sessions, roles, bcrypt, registration (FR1, FR2, FR3, FR11, N3). 26 tests pass; verified against MySQL
 - [ ] book-service in Python Flask: keyword search, add and update books (FR4, FR5, FR14)
 - [ ] order-service in Python Flask: orders, HTML bill, order list, payment status (FR6–FR9, FR12, FR13)
 
@@ -74,3 +75,4 @@ Add a short dated note whenever a milestone closes or a deadline moves, and say 
 | 2026-11-13 | Visual style approved. **M2 closed, v0.2.0 released**, six days before its deadline. Next: M3, the backend services. |
 | 2026-11-13 | M3 started. Java 21, Maven 3.9.9, and MongoDB 9.0 installed; books loaded into MongoDB and search checked. MySQL 8.0 was already installed; creating the database waits for the root password. Engineering rules written. |
 | 2026-11-13 | user-service built: 27 classes in four layers, 26 tests passing, every endpoint called on the running service. Found and fixed a 2-second delay on the first request (P-004). Not yet run against MySQL. |
+| 2026-11-13 | MySQL database created with a dedicated `bookstore_app` account; test accounts loaded. user-service verified against it. Measuring showed login too close to the 500 ms limit; fixed with a connection pool and a start-up warm-up (P-005). |

@@ -128,3 +128,33 @@ The server now listens on both `127.0.0.1` and `::1` (two listeners sharing the 
 
 **Lesson**
 Passing tests are not the same as working. Start the real program and call it the way a client will, and measure. The Flask services must listen on both addresses too.
+
+## P-005 — Login too close to the 500 ms limit against the real database
+
+- **Date found:** 2026-11-13
+- **Phase / milestone:** M3 Backend Services
+- **Issue:** #8
+- **Status:** Solved
+
+**What happened**
+In memory mode every request took under 150 ms. Against the real MySQL database, logins took 290–375 ms and the first login after start-up took 539 ms. N1 allows 500 ms. Session checks, which the other two services will make on every request, took about 75 ms.
+
+**Cause**
+Three separate things, found one at a time by measuring:
+
+1. The Python seed script hashed passwords with bcrypt cost 12; the Java service uses cost 10. Cost 12 is four times slower to check.
+2. Every query opened a new database connection (about 35 ms each), and a login needs two queries.
+3. Java runs code slowly the first few times. The first request paid for that in the hashing, database, HTTP, and JSON code all at once.
+
+**What we tried**
+1. Seed script changed to cost 10: logins dropped to about 200 ms, first login still 539 ms.
+2. Connection pool (HikariCP): session checks dropped from about 75 ms to 7–19 ms, first login 509 ms.
+3. Practice hashing at start-up: first login 430–470 ms. Under the limit, but too close.
+4. A practice login against the database at start-up: first login 258–495 ms. Better on average, still not reliable.
+5. One real request from the service to itself at start-up: first login 102–255 ms over four cold starts.
+
+**Solution**
+All of the above together: the same bcrypt cost on both sides, a connection pool, and a warm-up at start-up (`PasswordHasher.warmUp`, `UserServer.warmUp`, `UserServer.warmUpOverHttp`). The warm-up logs in as a user that does not exist, so it changes nothing.
+
+**Lesson**
+Test against the real database, not only the in-memory one, and measure from a cold start, because that is what a demo is. A number that passes with no margin is not a pass. Each fix was measured before the next was tried, which showed that no single change was enough.

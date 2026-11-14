@@ -50,6 +50,10 @@
 
 ## user-service — `http://localhost:8081`
 
+**Status: built and tested** (26 tests; not yet run against MySQL). Listens on this machine only, on both `127.0.0.1` and `::1`.
+
+Also answers `404` for an unknown address and `405` for a wrong HTTP method.
+
 ### POST `/api/auth/login`
 
 Request:
@@ -92,7 +96,7 @@ Request:
 { "username": "alice", "email": "alice@example.com", "password": "…" }
 ```
 
-Rules: username 3–50 characters · email must look like an email · password at least 8 characters. The password is hashed with bcrypt (N3). The new account always has role `CUSTOMER`.
+Rules: username 3–50 characters, only letters, digits, dots, dashes, underscores · email must look like an email (stored in lower case) · password 8 to 72 characters. The password is hashed with bcrypt (N3). The new account always has role `CUSTOMER`.
 
 Response `201`:
 

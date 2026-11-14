@@ -105,3 +105,26 @@ Smart App Control can be turned off in Windows Security, but Windows does not al
 
 **Lesson**
 Depend on as few tools as possible. The project needs the database server and a driver; a separate shell is optional, and MongoDB Compass (a graphical viewer) is an alternative if looking at the data by hand becomes necessary.
+
+## P-004 — First request to user-service took over 2 seconds
+
+- **Date found:** 2026-11-13
+- **Phase / milestone:** M3 Backend Services
+- **Issue:** #8
+- **Status:** Solved
+
+**What happened**
+All tests passed, but when the packaged service was started and called for real, the first login took about 2,500 ms. Requirement N1 allows 500 ms. Later requests took under 100 ms.
+
+**Cause**
+The server was listening on `127.0.0.1` (IPv4) only. The name `localhost` can also mean `::1` (IPv6), and Windows tries IPv6 first. The client waited about two seconds for that attempt to fail before trying IPv4. The tests did not show it because Java's own client goes straight to IPv4.
+
+**What we tried**
+1. Timed the same request by address: `127.0.0.1` took 95 ms, `localhost` took 2,126 ms. That confirmed the cause.
+2. Considered telling every client to use `127.0.0.1`: it works, but it is a trap for anyone who types `localhost`.
+
+**Solution**
+The server now listens on both `127.0.0.1` and `::1` (two listeners sharing the same handlers). After the fix: `localhost` 58–135 ms, `127.0.0.1` 58 ms, `::1` 57 ms. The service is still not reachable from other machines.
+
+**Lesson**
+Passing tests are not the same as working. Start the real program and call it the way a client will, and measure. The Flask services must listen on both addresses too.

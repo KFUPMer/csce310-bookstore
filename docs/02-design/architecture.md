@@ -67,6 +67,8 @@ Manager-only actions are refused unless the session belongs to a manager (FR11).
 | 5 | 2026-11-13 | order-service reduces book copies through a service-only endpoint protected by a shared key | Let customers call the manager endpoint; skip stock changes | Stock must go down when a book is ordered, but customers must not be able to change stock themselves (N5) |
 | 6 | 2026-11-13 | If the bill email fails, the order still succeeds | Fail the whole order | The bill file is the required part (FR9); the email is a copy |
 | 7 | 2026-11-13 | order-service sends bill emails through Gmail SMTP | A local test mail catcher | Real delivery for the demo. A test catcher can still be used during development by changing the settings only |
+| 8 | 2026-11-13 | Repositories are interfaces, each with a MySQL and an in-memory version | Classes that talk to MySQL directly | The rules can be tested without a database, and a service can be run before the database exists |
+| 9 | 2026-11-13 | Each service listens on both loopback addresses (127.0.0.1 and ::1), never on the network | IPv4 only | "localhost" can mean either; with only one, the first request waited about 2 seconds (P-004). Not listening on the network keeps the services private to this machine |
 
 ## Email settings (FR10)
 

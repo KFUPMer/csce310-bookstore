@@ -90,4 +90,50 @@ Still the empty Flutter starter project. Built in M4.
 
 ## Backend services
 
-The class diagram of the three backend services is in [uml-diagrams.md](uml-diagrams.md), together with the other UML diagram types.
+An overview of all three services, drawn during design, is in [uml-diagrams.md](uml-diagrams.md). Each service gets its own detailed diagram here when it is built.
+
+### user-service
+
+Built. Every class is in the diagram.
+
+![user-service class diagram](diagrams/class-user-service.png)
+
+Source: [diagrams/class-user-service.drawio](diagrams/class-user-service.drawio)
+
+File map (`services/user-service/src/main/java/com/bookstore/user/`):
+
+| File | Kind | Purpose |
+|---|---|---|
+| `UserServer.java` | Start-up | Builds the parts, connects them, listens on both loopback addresses |
+| `config/Config.java` | Settings | Reads the port, storage mode, and MySQL settings from the environment or `.env` |
+| `http/BaseHandler.java` | HTTP | Shared by all handlers: reads JSON, reads the token, writes JSON, and turns every error into a response in one place |
+| `http/AuthHandler.java` | HTTP | `/api/auth/login`, `/logout`, `/session` |
+| `http/UserHandler.java` | HTTP | `/api/users/register` |
+| `http/Json.java` | HTTP | The one place that knows the JSON library |
+| `http/dto/LoginRequest.java` | Request | Body of login, with its validation |
+| `http/dto/RegisterRequest.java` | Request | Body of register, with its validation (lengths, email shape) |
+| `http/dto/UserResponse.java` | Response | What callers are told about a user; never the password hash |
+| `service/AuthService.java` | Rules | Login, logout, session check, registration |
+| `service/PasswordHasher.java` | Rules | bcrypt hashing and checking (N3) |
+| `service/TokenGenerator.java` | Rules | Random session tokens |
+| `repository/UserRepository.java` | Database | What the rules need from user storage (interface) |
+| `repository/SessionRepository.java` | Database | What the rules need from session storage (interface) |
+| `repository/JdbcUserRepository.java` | Database | Users in MySQL |
+| `repository/JdbcSessionRepository.java` | Database | Sessions in MySQL |
+| `repository/InMemoryUserRepository.java` | Database | Users in memory, for tests and memory mode |
+| `repository/InMemorySessionRepository.java` | Database | Sessions in memory, for tests and memory mode |
+| `repository/Database.java` | Database | Opens MySQL connections |
+| `model/User.java`, `Session.java`, `Role.java` | Data | Plain data |
+| `error/ApiException.java` | Error | An error that is safe to show, with its HTTP status |
+| `error/ValidationException.java` | Error | 400 |
+| `error/UnauthorizedException.java` | Error | 401 |
+| `error/ConflictException.java` | Error | 409 |
+| `error/DataAccessException.java` | Error | Database failure; logged, answered as a plain 500 |
+
+Tests (`src/test/java/com/bookstore/user/`): `service/AuthServiceTest` (10: the rules), `http/dto/RegisterRequestTest` (5: validation), `UserServerHttpTest` (11: every endpoint over real HTTP, success and each error).
+
+**Changes from the design overview:** the overview had 7 classes; the built service has 27. Added: the two repository interfaces with an in-memory version of each (so the rules can be tested without MySQL), request and response records, the error classes, `BaseHandler`, `Config`, `Database`, `Json`, and `TokenGenerator`. Nothing in the overview was dropped.
+
+### book-service, order-service
+
+Not built yet.

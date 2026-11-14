@@ -4,7 +4,7 @@ Each service is its own project, added during milestone M3. The technology of ea
 
 | Folder | Built with | Does | Database |
 |---|---|---|---|
-| `user-service/` | Java HttpServer (Maven) | Login, logout, sessions, roles | MySQL |
+| [`user-service/`](user-service/README.md) | Java HttpServer (Maven) | Login, logout, sessions, roles, registration. **Built** | MySQL |
 | `book-service/` | Python Flask | Keyword search, add and update books | MongoDB |
 | `order-service/` | Python Flask | Orders, HTML bills, payment status | MySQL |
 

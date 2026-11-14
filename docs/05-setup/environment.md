@@ -14,7 +14,7 @@ What is installed on the development machine, how it got there, and how to check
 | Java JDK (Eclipse Temurin) | 21.0.13 | user-service | `winget install EclipseAdoptium.Temurin.21.JDK` | `java -version` |
 | Maven | 3.9.9 | Building user-service | Downloaded from archive.apache.org (checksum verified), unpacked to `%USERPROFILE%\develop`, added to PATH | `mvn -version` |
 | MongoDB Server | 9.0.4 | Books | `winget install MongoDB.Server` (service `MongoDB`, port 27017, this machine only) | see below |
-| MongoDB Shell | 2.14.1 | Optional: looking at the data by hand | `winget install MongoDB.Shell` | blocked, see P-003 |
+| MongoDB Shell | 2.14.1 | Optional: looking at the data by hand | `winget install MongoDB.Shell` | blocked by Smart App Control, see P-003 |
 | Flutter SDK | 3.50.0 (Dart 3.14) | Both desktop apps | Cloned from github.com/flutter/flutter (stable) to `%USERPROFILE%\develop\flutter`, added to PATH | `flutter doctor` |
 | Visual Studio 2022 Build Tools | 17.14 | Compiling Flutter Windows apps | `winget install Microsoft.VisualStudio.2022.BuildTools` with the C++ desktop workload | `flutter doctor` |
 | draw.io Desktop | 32.6 | All diagrams | `winget install JGraph.Draw` | — |
@@ -57,3 +57,13 @@ The `bookstore` database is not created yet, because that needs the MySQL root p
 ## Starting on a fresh terminal
 
 PATH changes only apply to terminals opened after the install. If `flutter`, `mvn`, or `java` is "not recognized", close and reopen the terminal (and restart VS Code).
+
+## Windows Smart App Control
+
+Smart App Control is **on** on this machine. It blocks programs that are unsigned and unknown to Microsoft. So far it has blocked the MongoDB shell (P-003) and, once, a Flutter build tool (P-002).
+
+It is left on. Turning it off is permanent: Windows only lets it be re-enabled by reinstalling Windows. If something this project really needs gets blocked:
+
+1. Try again once (this fixed P-002).
+2. Use a signed alternative (for looking at MongoDB data: MongoDB Compass, or the MongoDB extension for VS Code).
+3. Only then consider switching it off, in Windows Security → App & browser control → Smart App Control. This is the machine owner's decision.

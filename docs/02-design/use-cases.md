@@ -8,6 +8,22 @@
 
 Source: [diagrams/use-case.drawio](diagrams/use-case.drawio)
 
+## Actors
+
+An actor is someone or something **outside** the system that uses it or is used by it.
+
+| Actor | Kind | Who or what it is |
+|---|---|---|
+| Customer | Person (primary) | A registered user who searches for books and orders them. Uses the customer app |
+| Manager | Person (primary) | The bookstore's own staff member who runs it: manages books, sees orders, records payments. Uses the management app |
+| Mail server (Gmail) | External system (secondary) | Delivers the bill email. The bookstore system calls it; it never starts anything |
+
+**The bookstore is not an actor.** "Online Bookstore" is the system itself: the box in the diagram that contains the use cases. The business is represented by its Manager.
+
+**Manager and admin are the same actor.** The PRD defines exactly two user roles, Customer and Manager, and describes the Manager as "an administrative user responsible for business operations". There is no separate administrator, and nothing in the requirements (such as creating manager accounts from inside an app) that would need one. Manager accounts are created by the seed script.
+
+Generate bill, Save bill as HTML file, and Email bill to customer have no person attached: they are steps the system performs as part of Place order, which is why they are joined to it with «include».
+
 ## Summary
 
 | ID | Use case | Actor | Requirement |
@@ -20,7 +36,7 @@ Source: [diagrams/use-case.drawio](diagrams/use-case.drawio)
 | [UC6](#uc6--place-order) | Place order (buy and/or rent) | Customer | FR7 |
 | [UC7](#uc7--generate-bill) | Generate bill | System (part of UC6) | FR8 |
 | [UC8](#uc8--save-bill-as-html-file) | Save bill as HTML file | System (part of UC7) | FR9 |
-| [UC9](#uc9--email-bill-to-customer) | Email bill to customer | System (part of UC7) | FR10 (extra credit) |
+| [UC9](#uc9--email-bill-to-customer) | Email bill to customer | System (part of UC7), with the Mail server | FR10 (extra credit) |
 | [UC10](#uc10--view-bill) | View bill | Customer | FR8 |
 | [UC11](#uc11--view-all-orders) | View all orders | Manager | FR12 |
 | [UC12](#uc12--update-payment-status) | Update payment status | Manager | FR13 |
@@ -129,12 +145,12 @@ Source: [diagrams/use-case.drawio](diagrams/use-case.drawio)
 
 | | |
 |---|---|
-| **Actor** | System (order-service), as part of UC7 |
+| **Actor** | System (order-service), as part of UC7. Secondary actor: Mail server (Gmail) |
 | **Goal** | Send the bill to the customer automatically |
 | **Requirements** | FR10 (extra credit) |
 | **Before** | The bill has been saved. The customer account has an email address. |
-| **Main flow** | 1. order-service sends an email to the customer's address with the bill as its content. |
-| **Other flows** | **1a.** The email cannot be sent: the order is still completed (the bill file exists) and the failure is written to the service log. |
+| **Main flow** | 1. order-service hands an email, addressed to the customer and with the bill as its content, to the mail server.<br>2. The mail server delivers it. |
+| **Other flows** | **1a.** The mail server cannot be reached or refuses the email: the order is still completed (the bill file exists) and the failure is written to the service log. |
 | **After** | The customer has the bill in their inbox. |
 
 ### UC10 — View bill

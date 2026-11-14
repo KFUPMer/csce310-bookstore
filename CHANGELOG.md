@@ -14,6 +14,7 @@ Work towards v0.3.0 (milestone M3, Backend services).
 
 ### Changed
 - `CatalogScreen` renamed `SearchScreen`, to match the class diagram
+- Use case diagram: the mail server (Gmail) added as an external actor; actors defined in `use-cases.md`
 
 ## v0.2.0 — 2026-11-13 — Design (M2)
 

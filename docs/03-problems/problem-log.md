@@ -91,7 +91,7 @@ On a freshly installed toolchain, a first-run failure that mentions a security p
 After installing MongoDB Shell, running `mongosh` failed with "An Application Control policy has blocked this file". MongoDB Server itself installed and runs normally.
 
 **Cause**
-The same Windows protection as in P-002: it can refuse to run a newly installed program it does not yet trust. Unlike P-002, a second try did not help here.
+Windows **Smart App Control** is turned on on this machine. It blocks programs that are not digitally signed and that it does not recognize, and `mongosh.exe` is not signed (checked: its signature status is "NotSigned"). This is also what caused P-002. Unlike P-002, a second try did not help here.
 
 **What we tried**
 1. Ran `mongosh` after the install: blocked.
@@ -99,6 +99,9 @@ The same Windows protection as in P-002: it can refuse to run a newly installed 
 
 **Solution**
 The shell is only a convenience for looking at data by hand, so it is not needed. The seed script and the services use the Python driver (`pymongo`), which works: the 15 books were loaded and searched through it. No security setting was changed.
+
+**Why it was not switched off**
+Smart App Control can be turned off in Windows Security, but Windows does not allow turning it back on without reinstalling Windows. That is too high a price for an optional tool.
 
 **Lesson**
 Depend on as few tools as possible. The project needs the database server and a driver; a separate shell is optional, and MongoDB Compass (a graphical viewer) is an alternative if looking at the data by hand becomes necessary.

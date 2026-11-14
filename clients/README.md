@@ -6,8 +6,9 @@ Two separate Flutter desktop apps, written in Dart.
 |---|---|---|
 | `customer-app/` | Customers | Log in, register, search books, select and order them, see the bill |
 | `management-app/` | Managers | View orders, update payment status, add and update books |
+| `bookstore-ui/` | Both apps | The shared look: colors, typefaces, spacing, motion, and common widgets |
 
-Both are still the empty starter project that Flutter generates; the real screens are built in milestone M4. Both compile and open a window (checked on 2026-11-13 with Flutter 3.50).
+The customer app currently shows a **style preview**: the catalog screen running on sample books, to judge the look ([style guide](../docs/02-design/style-guide.md)). The management app is still the empty starter project. The real screens are built in milestone M4.
 
 Design: [UI](../docs/02-design/ui-design.md), [class diagrams](../docs/02-design/class-diagrams.md).
 

@@ -13,6 +13,9 @@ Work towards v0.2.0 (milestone M2, Design). These drafts already exist; M2 close
 - Full API specification: request, response, and errors for every endpoint
 - UI wireframes for both apps and a sample HTML bill
 - The two Flutter desktop projects (`clients/customer-app`, `clients/management-app`) and a VS Code launch configuration for each
+- Visual style guide with a working preview of the catalog screen in light and dark mode (`docs/02-design/style-guide.md`)
+- Shared Flutter package `clients/bookstore-ui`: colors, type, glass panels, generated book covers, buttons, smooth scrolling
+- Optional `coverUrl` field on books
 
 ## v0.1.0 — 2026-11-13 — Idea and requirements (M1)
 

@@ -90,4 +90,4 @@ The file [services/.env.example](../../services/.env.example) lists the settings
 - [x] Use case descriptions — see [use-cases.md](use-cases.md)
 - [x] UI wireframes for both clients — see [ui-design.md](ui-design.md)
 - [x] Bill layout — see [bill-design.md](bill-design.md)
-- [ ] Visual style of the apps — see [ui-design.md](ui-design.md)
+- [ ] Visual style of the apps — proposed in [style-guide.md](style-guide.md), waiting for review

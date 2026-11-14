@@ -28,7 +28,7 @@ The live version of this plan is on GitHub: milestones hold the deadlines, issue
 - [x] REST API specification: request, response, and errors for all 13 endpoints
 - [x] UI wireframes for both desktop apps
 - [x] Bill layout (sample HTML bill)
-- [ ] Visual style of the two apps
+- [ ] Visual style of the two apps — proposed with a working preview ([style-guide.md](../02-design/style-guide.md)), waiting for review
 
 ### M3 — Backend Services (due 2026-11-26)
 
@@ -69,3 +69,4 @@ Add a short dated note whenever a milestone closes or a deadline moves, and say 
 | 2026-11-13 | Client framework changed from JavaFX to Flutter because UI/UX quality is the priority. App class diagrams redrawn. Flutter is not installed yet. |
 | 2026-11-13 | Flutter 3.50 and Visual Studio 2022 Build Tools installed; both empty apps compile and open a window. Done ahead of M4. |
 | 2026-11-13 | **M1 closed, v0.1.0 released**, two days before its deadline. |
+| 2026-11-13 | Visual style proposed from the owner's brief (Apple-like, glass, neutral colors, light and dark, color-blind safe, Nielsen heuristics) and built as a working preview of the catalog screen. Waiting for review before M2 closes. |

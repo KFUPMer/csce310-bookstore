@@ -109,8 +109,10 @@ Errors: `400` a field is missing or invalid · `409` username or email already u
 A book looks like this everywhere:
 
 ```json
-{ "id": "655f1c2ab7e4a1d2c3f4a5b6", "title": "Clean Code", "author": "Robert C. Martin", "price": 40.00, "copiesAvailable": 4 }
+{ "id": "655f1c2ab7e4a1d2c3f4a5b6", "title": "Clean Code", "author": "Robert C. Martin", "price": 40.00, "copiesAvailable": 4, "coverUrl": null }
 ```
+
+`coverUrl` is optional (the address of a cover image, or `null`). It can be set in POST and PUT.
 
 ### GET `/api/books?keyword=java`
 

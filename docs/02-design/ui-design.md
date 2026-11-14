@@ -1,6 +1,6 @@
 # Phase 2 — UI design
 
-> Status: **wireframes drafted; visual style not decided.**
+> Status: **wireframes drafted; visual style proposed and waiting for review.**
 
 ## 1. Wireframes (layout only)
 
@@ -39,21 +39,11 @@ Wireframes show **what is on each screen and where**. They are grey boxes on pur
 
 UI and UX quality is the top priority of this project, so both apps are built with Flutter: it draws every pixel itself, which makes smooth animation and a custom look much easier than in JavaFX or Swing.
 
-## 3. Visual style (not decided yet)
+## 3. Visual style
 
-The look of the apps is a separate decision from the layout, and it has not been made. It needs a real reference to aim at, otherwise the result is a generic template.
+The style is proposed in [style-guide.md](style-guide.md), with screenshots of a working preview in light and dark mode: warm neutral colors where only the book covers carry color, translucent "glass" panels, Inter and Source Serif 4 as typefaces, and a table of how each of Nielsen's ten heuristics is met.
 
-To decide:
+It is **waiting for review**. Two things in the wireframes above change with it:
 
-- [ ] One or two existing apps or sites whose look to take as a reference
-- [ ] Light, dark, or both
-- [ ] Colors: background, text, one accent color
-- [ ] Typeface for headings and for body text
-- [ ] How dense the tables are (compact like a desktop tool, or spacious)
-
-Constraints already known:
-
-- These are desktop tools used with a mouse and keyboard, with tables as the main content. They should look like a desktop program, not like a phone app or a marketing web page.
-- The bill is already designed as a plain printed document ([bill-design.md](bill-design.md)); the apps should not clash with it.
-
-Once the style is decided, it is written here as a short style guide and applied through one shared Flutter theme used by both apps.
+- The search screen shows books as a grid of covers; the table becomes an optional list view.
+- Books can have a cover image.

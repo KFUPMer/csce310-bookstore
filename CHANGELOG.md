@@ -4,7 +4,11 @@ All versions and patches of the project, newest first.
 
 ## Unreleased
 
-Work towards v0.2.0 (milestone M2, Design). These drafts already exist; M2 closes when the visual style of the apps is decided.
+Nothing yet. Next is v0.3.0 (milestone M3, Backend services).
+
+## v0.2.0 — 2026-11-13 — Design (M2)
+
+The design phase is complete: how the system is built and how it looks are both decided.
 
 ### Added
 - UML diagrams: class (apps and services), object, component, profile, use case, sequence, activity, state machine
@@ -16,6 +20,19 @@ Work towards v0.2.0 (milestone M2, Design). These drafts already exist; M2 close
 - Visual style guide with a working preview of the catalog screen in light and dark mode (`docs/02-design/style-guide.md`)
 - Shared Flutter package `clients/bookstore-ui`: colors, type, glass panels, generated book covers, buttons, smooth scrolling
 - Optional `coverUrl` field on books
+
+### Decided
+- Visual style of both apps: warm neutral colors where only the book covers carry color, glass panels, light and dark mode, Inter and Source Serif 4, color-blind safe, mapped to Nielsen's ten heuristics
+- The search screen shows books as a grid of covers, with a list view as the alternative
+- Placing an order reduces the available copies of each book
+- order-service generates the bill and emails it; if the email fails, the order still succeeds
+
+### Problems solved
+- P-002: the first Flutter build was blocked by Windows security
+
+### Not done in this version
+- The database scripts have not been run (no database installed yet)
+- Only the catalog screen exists, on sample data; no service is implemented
 
 ## v0.1.0 — 2026-11-13 — Idea and requirements (M1)
 

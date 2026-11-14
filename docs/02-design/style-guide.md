@@ -1,6 +1,6 @@
 # Phase 2 — Visual style guide
 
-> Status: **proposed, waiting for review.** Built as a working preview of one screen (the book catalog) so that it can be judged by looking at it. Nothing here is final until it has been seen running.
+> Status: **approved on 2026-11-13.** This is the style of both apps. It was judged from a working preview of one screen (the book catalog); how the motion feels is tuned while the screens are built in M4.
 
 ## The brief
 

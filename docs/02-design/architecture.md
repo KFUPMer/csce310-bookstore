@@ -82,7 +82,7 @@ order-service reads these from environment variables, kept in a local `.env` fil
 
 The file [services/.env.example](../../services/.env.example) lists the settings without any real values.
 
-## Still to design in M2
+## Design checklist (M2, complete)
 
 - [x] Use case, sequence, activity, state machine, component, object, and profile diagrams — see [uml-diagrams.md](uml-diagrams.md)
 - [x] Class diagrams for both clients — see [class-diagrams.md](class-diagrams.md)
@@ -90,4 +90,4 @@ The file [services/.env.example](../../services/.env.example) lists the settings
 - [x] Use case descriptions — see [use-cases.md](use-cases.md)
 - [x] UI wireframes for both clients — see [ui-design.md](ui-design.md)
 - [x] Bill layout — see [bill-design.md](bill-design.md)
-- [ ] Visual style of the apps — proposed in [style-guide.md](style-guide.md), waiting for review
+- [x] Visual style of the apps — [style-guide.md](style-guide.md), approved

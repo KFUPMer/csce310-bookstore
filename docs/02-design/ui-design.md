@@ -1,6 +1,6 @@
 # Phase 2 — UI design
 
-> Status: **wireframes drafted; visual style proposed and waiting for review.**
+> Status: **wireframes drafted; visual style approved.**
 
 ## 1. Wireframes (layout only)
 
@@ -41,9 +41,9 @@ UI and UX quality is the top priority of this project, so both apps are built wi
 
 ## 3. Visual style
 
-The style is proposed in [style-guide.md](style-guide.md), with screenshots of a working preview in light and dark mode: warm neutral colors where only the book covers carry color, translucent "glass" panels, Inter and Source Serif 4 as typefaces, and a table of how each of Nielsen's ten heuristics is met.
+The style is defined in [style-guide.md](style-guide.md), with screenshots of a working preview in light and dark mode: warm neutral colors where only the book covers carry color, translucent "glass" panels, Inter and Source Serif 4 as typefaces, and a table of how each of Nielsen's ten heuristics is met.
 
-It is **waiting for review**. Two things in the wireframes above change with it:
+It was **approved on 2026-11-13**. Two things in the wireframes above change with it:
 
 - The search screen shows books as a grid of covers; the table becomes an optional list view.
 - Books can have a cover image.

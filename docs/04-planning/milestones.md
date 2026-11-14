@@ -7,7 +7,7 @@ The live version of this plan is on GitHub: milestones hold the deadlines, issue
 | Milestone | Goal | Deadline | Release |
 |---|---|---|---|
 | M1 — Idea & Requirements | Scope and requirements agreed | 2026-11-15 | v0.1.0 — **released 2026-11-13** |
-| M2 — Design | Architecture, database, API, and UI designed | 2026-11-19 | v0.2.0 |
+| M2 — Design | Architecture, database, API, and UI designed | 2026-11-19 | v0.2.0 — **released 2026-11-13** |
 | M3 — Backend Services | All three services working against their databases | 2026-11-26 | v0.3.0 |
 | M4 — Desktop Clients | Both GUI apps working against the services | 2026-12-01 | v0.4.0 |
 | M5 — Testing & Final Release | Tested, documented, ready to submit | 2026-12-04 | v1.0.0 |
@@ -28,7 +28,7 @@ The live version of this plan is on GitHub: milestones hold the deadlines, issue
 - [x] REST API specification: request, response, and errors for all 13 endpoints
 - [x] UI wireframes for both desktop apps
 - [x] Bill layout (sample HTML bill)
-- [ ] Visual style of the two apps — proposed with a working preview ([style-guide.md](../02-design/style-guide.md)), waiting for review
+- [x] Visual style of the two apps — [style-guide.md](../02-design/style-guide.md), approved
 
 ### M3 — Backend Services (due 2026-11-26)
 
@@ -70,3 +70,4 @@ Add a short dated note whenever a milestone closes or a deadline moves, and say 
 | 2026-11-13 | Flutter 3.50 and Visual Studio 2022 Build Tools installed; both empty apps compile and open a window. Done ahead of M4. |
 | 2026-11-13 | **M1 closed, v0.1.0 released**, two days before its deadline. |
 | 2026-11-13 | Visual style proposed from the owner's brief (Apple-like, glass, neutral colors, light and dark, color-blind safe, Nielsen heuristics) and built as a working preview of the catalog screen. Waiting for review before M2 closes. |
+| 2026-11-13 | Visual style approved. **M2 closed, v0.2.0 released**, six days before its deadline. Next: M3, the backend services. |

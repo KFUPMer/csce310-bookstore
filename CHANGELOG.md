@@ -9,6 +9,7 @@ Work towards v0.3.0 (milestone M3, Backend services).
 ### Added
 - Engineering rules: documentation, layers, error handling, tests (`docs/02-design/engineering-rules.md`)
 - `REFERENCES.md`: every third-party file, library, tool, and source, with its license
+- MIT License for the project's own work (`LICENSE`)
 - Enhancement log (`docs/03-problems/enhancement-log.md`): 20 improvements beyond the requirements, with reasons and measured effects
 - Problem log extended with the problems the AI assistant caused or ran into, an index, and a list of known gaps
 - Record of the development environment and how to reproduce it (`docs/05-setup/environment.md`)

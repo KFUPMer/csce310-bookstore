@@ -31,6 +31,7 @@ Dates and tasks: [docs/04-planning/milestones.md](docs/04-planning/milestones.md
 | `clients/` | The two desktop GUI applications |
 | [CHANGELOG.md](CHANGELOG.md) | What changed in every version and patch |
 | [REFERENCES.md](REFERENCES.md) | Everything that came from someone else, with its source and license |
+| [LICENSE](LICENSE) | The MIT License, which covers this project's own work |
 
 ## Tech stack
 
@@ -54,3 +55,7 @@ Dates and tasks: [docs/04-planning/milestones.md](docs/04-planning/milestones.md
 6. Anything taken from outside is listed in [REFERENCES.md](REFERENCES.md) with its license.
 
 Versioning rules are in [docs/04-planning/versioning.md](docs/04-planning/versioning.md).
+
+## License
+
+This project's own code, documents, and diagrams are under the [MIT License](LICENSE). Third-party fonts and libraries keep their own licenses, listed in [REFERENCES.md](REFERENCES.md).

@@ -121,3 +121,4 @@ None left for the requirements. The visual style of the two apps is a design dec
 | 2026-11-13 | Both clients in Flutter instead of JavaFX | UI and UX quality is the top priority; Flutter gives smoother animation and easier custom design on Windows desktop, and earns the same +2%. Cost: a third language (Dart) |
 | 2026-11-13 | The project is done individually | Confirmed; one person does all of the design, code, and testing |
 | 2026-11-13 | Bill emails are sent through Gmail (SMTP) | Real emails reach a real inbox, which is what FR10 asks for and what can be shown in the demo. The Gmail app password stays in a local settings file and is never committed |
+| 2026-11-13 | The project's own work is released under the MIT License | Chosen by the owner. Short, permissive, and compatible with every library and font the project uses ([REFERENCES.md](../../REFERENCES.md)) |

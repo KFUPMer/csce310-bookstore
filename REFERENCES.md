@@ -106,7 +106,21 @@ A large part of this project's documents, diagrams, and code was produced with *
 
 ## 7. This project's own license
 
-No license has been chosen for this repository, so by default all rights are reserved by its author. The repository is private.
+The project's own work (code, documents, and diagrams) is released under the **MIT License**: see [LICENSE](LICENSE). Anyone may use, copy, and change it, as long as the copyright notice and the license text are kept.
+
+What the MIT License here does **not** cover, because it belongs to someone else:
+
+| Not covered | Its own license |
+|---|---|
+| The font files in `clients/bookstore-ui/fonts/` | SIL Open Font License 1.1 (license files are next to them) |
+| The libraries the code depends on | Each keeps its own license (section 2) |
+| The course's Product Requirements Document | Course material; only summarized here, not reproduced |
+
+Is MIT compatible with what the project uses? Yes:
+
+- The Apache 2.0, BSD, ISC, MIT, and EPL libraries can all be used by MIT-licensed software.
+- The two MySQL connectors are GPL v2 **with an exception** written for exactly this case: it allows them to be used unmodified by software under an approved open-source license, and MIT is one.
+- The fonts stay under the Open Font License, which allows bundling them with software under any license.
 
 ## How to add an entry
 

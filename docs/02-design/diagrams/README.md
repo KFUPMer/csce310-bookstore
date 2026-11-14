@@ -19,6 +19,7 @@ When a diagram changes, update the `.drawio` file, export the image again, and c
 | Database ER / document model | `database-er.drawio` | `database-er.png` | [database-design.md](../database-design.md) |
 | Class diagram, customer app | `class-customer-app.drawio` | `class-customer-app.png` | [class-diagrams.md](../class-diagrams.md) |
 | Class diagram, manager app | `class-manager-app.drawio` | `class-manager-app.png` | [class-diagrams.md](../class-diagrams.md) |
+| Class diagram, shared UI package | `class-bookstore-ui.drawio` | `class-bookstore-ui.png` | [class-diagrams.md](../class-diagrams.md) |
 | Class diagram, backend services | `class-services.drawio` | `class-services.png` | [uml-diagrams.md](../uml-diagrams.md) |
 | Object diagram | `object.drawio` | `object.png` | [uml-diagrams.md](../uml-diagrams.md) |
 | Component diagram | `component.drawio` | `component.png` | [uml-diagrams.md](../uml-diagrams.md) |

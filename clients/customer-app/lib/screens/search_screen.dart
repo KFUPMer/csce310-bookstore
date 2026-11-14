@@ -11,8 +11,8 @@ import '../preview/mock_books.dart';
 ///
 /// STYLE PREVIEW: this screen runs on [mockBooks] so that the look can be
 /// judged before book-service exists. In M4 it loads books from the API.
-class CatalogScreen extends StatefulWidget {
-  const CatalogScreen({super.key, required this.isDark, required this.onToggleTheme, this.startList = false, this.startSelected, this.startQuery = ''});
+class SearchScreen extends StatefulWidget {
+  const SearchScreen({super.key, required this.isDark, required this.onToggleTheme, this.startList = false, this.startSelected, this.startQuery = ''});
 
   final bool isDark;
   final VoidCallback onToggleTheme;
@@ -21,7 +21,7 @@ class CatalogScreen extends StatefulWidget {
   final String startQuery;
 
   @override
-  State<CatalogScreen> createState() => _CatalogScreenState();
+  State<SearchScreen> createState() => _SearchScreenState();
 }
 
 class _OrderLine {
@@ -30,7 +30,7 @@ class _OrderLine {
   final ItemType type;
 }
 
-class _CatalogScreenState extends State<CatalogScreen> {
+class _SearchScreenState extends State<SearchScreen> {
   static const double _barHeight = 64;
   static const double _panelWidth = 340;
 

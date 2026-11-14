@@ -27,6 +27,7 @@ python database/seed.py
 
 ## Status
 
-Written during the design phase. **Not run yet**: MySQL and MongoDB are installed in milestone M3, and the scripts will be tested then.
+- **MongoDB: loaded and checked** on 2026-11-13. 15 books, indexes on title and author, and a search for "java" returns 3 books.
+- **MySQL: not run yet.** Creating the database needs the MySQL root password, typed by its owner. The steps are in [docs/05-setup/environment.md](../docs/05-setup/environment.md).
 
 Design: [database-design.md](../docs/02-design/database-design.md).

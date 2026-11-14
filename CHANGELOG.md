@@ -4,7 +4,16 @@ All versions and patches of the project, newest first.
 
 ## Unreleased
 
-Nothing yet. Next is v0.3.0 (milestone M3, Backend services).
+Work towards v0.3.0 (milestone M3, Backend services).
+
+### Added
+- Engineering rules: documentation, layers, error handling, tests (`docs/02-design/engineering-rules.md`)
+- Record of the development environment and how to reproduce it (`docs/05-setup/environment.md`)
+- Class diagram and file map for the shared UI package
+- Sample books loaded into MongoDB
+
+### Changed
+- `CatalogScreen` renamed `SearchScreen`, to match the class diagram
 
 ## v0.2.0 — 2026-11-13 — Design (M2)
 

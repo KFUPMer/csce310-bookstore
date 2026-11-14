@@ -1,7 +1,7 @@
 import 'package:bookstore_ui/bookstore_ui.dart';
 import 'package:material_ui/material_ui.dart';
 
-import 'screens/catalog_screen.dart';
+import 'screens/search_screen.dart';
 
 /// Start-up options, only used to take screenshots of the style preview:
 ///   --dark        start in dark mode
@@ -46,7 +46,7 @@ class _CustomerAppState extends State<CustomerApp> {
       themeMode: _mode,
       themeAnimationDuration: Motion.slow,
       themeAnimationCurve: Motion.curve,
-      home: CatalogScreen(
+      home: SearchScreen(
         isDark: _mode == ThemeMode.dark,
         onToggleTheme: () => setState(() => _mode = _mode == ThemeMode.dark ? ThemeMode.light : ThemeMode.dark),
         startList: widget.startList,

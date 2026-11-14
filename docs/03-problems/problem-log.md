@@ -79,3 +79,26 @@ Run the build again. No security setting was changed.
 
 **Lesson**
 On a freshly installed toolchain, a first-run failure that mentions a security policy is worth one retry before looking for a fault in the code.
+
+## P-003 — MongoDB shell blocked by Windows security
+
+- **Date found:** 2026-11-13
+- **Phase / milestone:** M3 Backend Services (setup)
+- **Issue:** #7
+- **Status:** Worked around
+
+**What happened**
+After installing MongoDB Shell, running `mongosh` failed with "An Application Control policy has blocked this file". MongoDB Server itself installed and runs normally.
+
+**Cause**
+The same Windows protection as in P-002: it can refuse to run a newly installed program it does not yet trust. Unlike P-002, a second try did not help here.
+
+**What we tried**
+1. Ran `mongosh` after the install: blocked.
+2. Checked whether the server was affected: it was not; the `MongoDB` service is running on port 27017.
+
+**Solution**
+The shell is only a convenience for looking at data by hand, so it is not needed. The seed script and the services use the Python driver (`pymongo`), which works: the 15 books were loaded and searched through it. No security setting was changed.
+
+**Lesson**
+Depend on as few tools as possible. The project needs the database server and a driver; a separate shell is optional, and MongoDB Compass (a graphical viewer) is an alternative if looking at the data by hand becomes necessary.

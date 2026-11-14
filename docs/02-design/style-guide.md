@@ -44,7 +44,7 @@ The catalog screen of the customer app, running on sample data. These are real s
 
 ![Empty search result, dark mode](ui/catalog-dark-empty.png)
 
-To run it: open the repository in VS Code, choose "Customer app" in Run and Debug, press F5.
+To run it: open the repository in VS Code, choose "Customer app" in Run and Debug, press F5. The screen is `SearchScreen` in `clients/customer-app/lib/screens/search_screen.dart`.
 
 ## Color
 

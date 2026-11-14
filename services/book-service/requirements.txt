@@ -1,0 +1,5 @@
+# book-service. Licenses and sources: REFERENCES.md
+flask>=3.1,<4
+pymongo>=4.20,<5
+requests>=2.34,<3
+waitress>=3.0,<4

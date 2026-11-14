@@ -106,8 +106,7 @@ These were in the first draft of this document and have been removed because the
 
 ## Open questions
 
-- [ ] Which mail server does order-service use to send bills (FR10)? Needs an account or a local test mail server.
-- [ ] Visual style of the two apps — see [ui-design.md](../02-design/ui-design.md).
+None left for the requirements. The visual style of the two apps is a design decision, tracked in [ui-design.md](../02-design/ui-design.md).
 
 ## Decisions made in this phase
 
@@ -121,3 +120,4 @@ These were in the first draft of this document and have been removed because the
 | 2026-11-13 | Do every extra-credit item: FR3, FR10, and a modern GUI framework | +4% in total |
 | 2026-11-13 | Both clients in Flutter instead of JavaFX | UI and UX quality is the top priority; Flutter gives smoother animation and easier custom design on Windows desktop, and earns the same +2%. Cost: a third language (Dart) |
 | 2026-11-13 | The project is done individually | Confirmed; one person does all of the design, code, and testing |
+| 2026-11-13 | Bill emails are sent through Gmail (SMTP) | Real emails reach a real inbox, which is what FR10 asks for and what can be shown in the demo. The Gmail app password stays in a local settings file and is never committed |

@@ -8,7 +8,7 @@ This repository records the **whole process** of the project, not only the final
 
 | Phase | Milestone | Version | Status |
 |---|---|---|---|
-| 1. Idea & requirements | M1 | v0.1.0 | In progress |
+| 1. Idea & requirements | M1 | v0.1.0 | Done — released 2026-11-13 |
 | 2. Design | M2 | v0.2.0 | In progress |
 | 3. Backend services | M3 | v0.3.0 | Not started |
 | 4. Desktop clients | M4 | v0.4.0 | Not started |

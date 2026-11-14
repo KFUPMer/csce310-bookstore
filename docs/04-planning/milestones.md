@@ -6,7 +6,7 @@ The live version of this plan is on GitHub: milestones hold the deadlines, issue
 
 | Milestone | Goal | Deadline | Release |
 |---|---|---|---|
-| M1 — Idea & Requirements | Scope and requirements agreed | 2026-11-15 | v0.1.0 |
+| M1 — Idea & Requirements | Scope and requirements agreed | 2026-11-15 | v0.1.0 — **released 2026-11-13** |
 | M2 — Design | Architecture, database, API, and UI designed | 2026-11-19 | v0.2.0 |
 | M3 — Backend Services | All three services working against their databases | 2026-11-26 | v0.3.0 |
 | M4 — Desktop Clients | Both GUI apps working against the services | 2026-12-01 | v0.4.0 |
@@ -18,7 +18,7 @@ The live version of this plan is on GitHub: milestones hold the deadlines, issue
 
 - [x] Record the requirements from the official PRD (FR1–FR14)
 - [x] Record the non-functional requirements (technology, N1–N5)
-- [ ] Resolve the remaining open question: which mail server sends the bill emails (the project is individual: confirmed)
+- [x] Open questions resolved: individual project; bill emails through Gmail
 
 ### M2 — Design (due 2026-11-19)
 
@@ -68,3 +68,4 @@ Add a short dated note whenever a milestone closes or a deadline moves, and say 
 | 2026-11-13 | Decided to do every extra-credit item. Use case descriptions, more sequence and activity diagrams, database scripts, API specification, wireframes, and bill layout drafted. Visual style of the apps still open. |
 | 2026-11-13 | Client framework changed from JavaFX to Flutter because UI/UX quality is the priority. App class diagrams redrawn. Flutter is not installed yet. |
 | 2026-11-13 | Flutter 3.50 and Visual Studio 2022 Build Tools installed; both empty apps compile and open a window. Done ahead of M4. |
+| 2026-11-13 | **M1 closed, v0.1.0 released**, two days before its deadline. |

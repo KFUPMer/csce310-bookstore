@@ -66,6 +66,21 @@ Manager-only actions are refused unless the session belongs to a manager (FR11).
 | 4 | 2026-11-13 | order-service generates the bill | A separate billing service | The bill is made at the moment the order is created; one less service |
 | 5 | 2026-11-13 | order-service reduces book copies through a service-only endpoint protected by a shared key | Let customers call the manager endpoint; skip stock changes | Stock must go down when a book is ordered, but customers must not be able to change stock themselves (N5) |
 | 6 | 2026-11-13 | If the bill email fails, the order still succeeds | Fail the whole order | The bill file is the required part (FR9); the email is a copy |
+| 7 | 2026-11-13 | order-service sends bill emails through Gmail SMTP | A local test mail catcher | Real delivery for the demo. A test catcher can still be used during development by changing the settings only |
+
+## Email settings (FR10)
+
+order-service reads these from environment variables, kept in a local `.env` file that is not committed:
+
+| Setting | Value |
+|---|---|
+| `SMTP_HOST` | `smtp.gmail.com` |
+| `SMTP_PORT` | `587` (STARTTLS) |
+| `SMTP_USER` | the Gmail address that sends the bills |
+| `SMTP_PASSWORD` | a Gmail **app password** created for this project (not the account password) |
+| `MAIL_FROM` | the name and address shown as the sender |
+
+The file [services/.env.example](../../services/.env.example) lists the settings without any real values.
 
 ## Still to design in M2
 

@@ -41,18 +41,31 @@ pip install flask mysql-connector-python pymongo bcrypt requests
 
 The 15 sample books are loaded and the indexes on `title` and `author` exist. Checked on 2026-11-13: a search for "java" returns 3 books.
 
-### MySQL — one step left, to be done by hand
+### MySQL — one command left, to be run by the machine's owner
 
-The `bookstore` database is not created yet, because that needs the MySQL root password, which is only typed by its owner.
+The services do **not** use the MySQL root account. They log in as `bookstore_app`, an account that can only read and write the `bookstore` database. Its password is generated on this machine and kept in `services/.env`, which git ignores. The root password is typed once, by its owner, and is never stored or shared.
 
-1. Create the database and tables (asks for the root password):
+1. Generate the local setup (already done on this machine; safe to repeat):
 
 ```bash
-"C:\Program Files\MySQL\MySQL Server 8.0\bin\mysql.exe" -u root -p < database/mysql/schema.sql
+python database/make_local_setup.py
 ```
 
-2. Put the MySQL settings in `services/.env` (copy `services/.env.example`). This file is ignored by git.
-3. Load the test accounts and books: `python database/seed.py`
+   It writes `services/.env` and `database/mysql/setup.local.sql` (the tables plus the `bookstore_app` account). Both are ignored by git.
+
+2. Run the setup as root, in **Command Prompt** from the project folder. It asks for the root password:
+
+```bash
+"C:\Program Files\MySQL\MySQL Server 8.0\bin\mysql.exe" -u root -p < database\mysql\setup.local.sql
+```
+
+3. Load the test accounts and books:
+
+```bash
+python database/seed.py
+```
+
+Why not just use root: an application should have only the access it needs. If the app account's password leaked, only the bookstore data would be exposed, not the whole MySQL server.
 
 ## Starting on a fresh terminal
 

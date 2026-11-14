@@ -9,11 +9,9 @@ Run schema.sql first, then:
     pip install bcrypt mysql-connector-python pymongo
     python database/seed.py
 
-Connection settings come from environment variables (defaults in brackets):
-    MYSQL_HOST [localhost]  MYSQL_USER [root]  MYSQL_PASSWORD []  MYSQL_DATABASE [bookstore]
-    MONGO_URL [mongodb://localhost:27017]
-
-NOT RUN YET: written during the design phase, before the databases were installed.
+Connection settings come from services/.env (written by make_local_setup.py), or
+from environment variables of the same names:
+    MYSQL_HOST  MYSQL_USER  MYSQL_PASSWORD  MYSQL_DATABASE  MONGO_URL
 """
 import json
 import os
@@ -22,6 +20,19 @@ from pathlib import Path
 import bcrypt
 import mysql.connector
 from pymongo import ASCENDING, MongoClient
+
+
+def load_env_file():
+    """Use the settings in services/.env unless they are already set in the environment."""
+    env_file = Path(__file__).resolve().parent.parent / "services" / ".env"
+    if not env_file.exists():
+        return
+    for line in env_file.read_text(encoding="utf-8").splitlines():
+        line = line.strip()
+        if line and not line.startswith("#") and "=" in line:
+            name, value = line.split("=", 1)
+            os.environ.setdefault(name.strip(), value.strip())
+
 
 # Test accounts. For local testing only; never reuse these passwords anywhere real.
 TEST_USERS = [
@@ -62,5 +73,6 @@ def seed_books():
 
 
 if __name__ == "__main__":
+    load_env_file()
     seed_users()
     seed_books()

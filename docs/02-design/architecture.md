@@ -69,6 +69,7 @@ Manager-only actions are refused unless the session belongs to a manager (FR11).
 | 7 | 2026-11-13 | order-service sends bill emails through Gmail SMTP | A local test mail catcher | Real delivery for the demo. A test catcher can still be used during development by changing the settings only |
 | 8 | 2026-11-13 | Repositories are interfaces, each with a MySQL and an in-memory version | Classes that talk to MySQL directly | The rules can be tested without a database, and a service can be run before the database exists |
 | 9 | 2026-11-13 | Each service listens on both loopback addresses (127.0.0.1 and ::1), never on the network | IPv4 only | "localhost" can mean either; with only one, the first request waited about 2 seconds (P-004). Not listening on the network keeps the services private to this machine |
+| 10 | 2026-11-13 | The services use a dedicated MySQL account (`bookstore_app`) limited to the bookstore database | The root account | Least privilege: the services get only the access they need, and the root password never has to be stored or shared |
 
 ## Email settings (FR10)
 

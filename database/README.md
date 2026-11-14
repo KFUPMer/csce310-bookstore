@@ -4,17 +4,24 @@
 |---|---|
 | [mysql/schema.sql](mysql/schema.sql) | Creates the `bookstore` database and its four tables |
 | [mongodb/books.json](mongodb/books.json) | 15 sample books (title, author, price, copies) |
+| [make_local_setup.py](make_local_setup.py) | Generates the local setup: a dedicated MySQL account and `services/.env` |
 | [seed.py](seed.py) | Creates the test accounts and loads the books |
 
 ## Steps
 
-```bash
-mysql -u root -p < database/mysql/schema.sql
-```
+1. Generate this machine's setup: a dedicated MySQL account for the services and the `services/.env` settings file.
 
 ```bash
-pip install bcrypt mysql-connector-python pymongo
+python database/make_local_setup.py
 ```
+
+2. Create the database, tables, and that account. Run in Command Prompt; it asks for the MySQL root password.
+
+```bash
+"C:\Program Files\MySQL\MySQL Server 8.0\bin\mysql.exe" -u root -p < database\mysql\setup.local.sql
+```
+
+3. Load the test accounts and the books.
 
 ```bash
 python database/seed.py
@@ -28,6 +35,6 @@ python database/seed.py
 ## Status
 
 - **MongoDB: loaded and checked** on 2026-11-13. 15 books, indexes on title and author, and a search for "java" returns 3 books.
-- **MySQL: not run yet.** Creating the database needs the MySQL root password, typed by its owner. The steps are in [docs/05-setup/environment.md](../docs/05-setup/environment.md).
+- **MySQL: not run yet.** Step 1 is done on the development machine; step 2 needs the MySQL root password, typed by its owner.
 
 Design: [database-design.md](../docs/02-design/database-design.md).

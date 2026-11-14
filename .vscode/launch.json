@@ -1,0 +1,21 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Customer app",
+      "type": "dart",
+      "request": "launch",
+      "cwd": "clients/customer-app",
+      "program": "lib/main.dart",
+      "deviceId": "windows"
+    },
+    {
+      "name": "Management app",
+      "type": "dart",
+      "request": "launch",
+      "cwd": "clients/management-app",
+      "program": "lib/main.dart",
+      "deviceId": "windows"
+    }
+  ]
+}

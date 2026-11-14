@@ -2,6 +2,26 @@
 
 Every problem that cost real time or changed a decision gets an entry here. The goal is to show how the project actually went, not only the result.
 
+Much of this project was built with an AI coding assistant (Claude). Its mistakes and dead ends are logged here like anyone else's, marked **Who: assistant**. Improvements that go beyond the requirements are in the [enhancement log](enhancement-log.md).
+
+## Index
+
+| ID | Problem | Who | Status |
+|---|---|---|---|
+| P-001 | Backend designed on the wrong technology | Assistant | Solved |
+| P-002 | First Flutter build blocked by Windows security | Environment | Solved |
+| P-003 | MongoDB shell blocked by Windows security | Environment | Worked around |
+| P-004 | First request to user-service took over 2 seconds | Assistant | Solved |
+| P-005 | Login too close to the 500 ms limit against the real database | Assistant | Solved |
+| P-006 | Requirements and deadlines were guessed before the PRD arrived | Assistant | Solved |
+| P-007 | Bundled fonts did not appear in the app | Assistant | Solved |
+| P-008 | A documentation update failed and a commit silently did not happen | Assistant | Solved |
+| P-009 | A hand-written placeholder was used where a real bcrypt hash was needed | Assistant | Solved before it ran |
+| P-010 | The requested typeface (SF Pro) could not be used | Licensing | Worked around |
+| P-011 | Diagram layout faults, and deleted diagrams coming back | Assistant | Solved |
+| P-012 | Maven was not available from the package manager | Environment | Solved |
+| P-013 | Small things that went wrong | Mixed | Solved |
+
 ## How to add an entry
 
 Copy the template, give it the next number, and link the GitHub issue and the commit or patch version that fixed it.
@@ -158,3 +178,170 @@ All of the above together: the same bcrypt cost on both sides, a connection pool
 
 **Lesson**
 Test against the real database, not only the in-memory one, and measure from a cold start, because that is what a demo is. A number that passes with no margin is not a pass. Each fix was measured before the next was tried, which showed that no single change was enough.
+
+## P-006 — Requirements and deadlines were guessed before the PRD arrived
+
+- **Date found:** 2026-11-13
+- **Phase / milestone:** M1 Idea & Requirements
+- **Who:** assistant
+- **Status:** Solved
+
+**What happened**
+The repository was set up from a two-line description of the project. To fill it, the assistant invented a set of requirements (categories, reviews, order history, shipping statuses, a "staff" role, login by email) and a five-week schedule. When the PRD arrived it contradicted most of them.
+
+**Cause**
+Starting the design before having the requirements document, and writing guesses in the same confident form as facts.
+
+**Solution**
+Everything was rewritten from the PRD (FR1–FR14, then N1–N5), the invented features were removed and listed as removed, and the schedule was redone for the real deadline of 4 December. P-001 is the largest single consequence of this.
+
+**Lesson**
+Ask for the requirements document first. When something has to be assumed, label it as an assumption where it is written, which the early drafts did ("proposed"), and keep assumptions out of anything that looks final, such as GitHub milestones with dates.
+
+## P-007 — Bundled fonts did not appear in the app
+
+- **Date found:** 2026-11-13
+- **Phase / milestone:** M2 Design (style preview)
+- **Who:** assistant
+- **Status:** Solved
+
+**What happened**
+After Inter and Source Serif 4 were added to the shared package, the app was rebuilt and screenshots were taken. The build succeeded and the analyzer reported no issues, but the screenshots still showed the Windows system font: headings that should have been serif were not.
+
+**Cause**
+The build had reused earlier output and did not pick up the new font declarations in the package's `pubspec.yaml`. The built app's font list (`FontManifest.json`) did not contain the new fonts.
+
+**What we tried**
+1. Looked at the screenshots rather than trusting the successful build: the fonts were visibly wrong.
+2. Opened the built app's font list: the fonts were missing from it.
+3. Cleaned the build and rebuilt: the fonts appeared.
+
+**Solution**
+`flutter clean`, then rebuild. The font list was checked again before taking new screenshots.
+
+**Lesson**
+"It compiled" does not mean "it worked". A change to assets or fonts needs a clean build, and visual work has to be checked by looking at it.
+
+## P-008 — A documentation update failed and a commit silently did not happen
+
+- **Date found:** 2026-11-13
+- **Phase / milestone:** M3 Backend Services
+- **Who:** assistant
+- **Status:** Solved
+
+**What happened**
+The documents are updated by small scripts and then committed in one command. One script crashed half-way (a Windows path containing a backslash was treated as an escape sequence in a text replacement). Because the commit was chained after the script, nothing was committed or pushed, and the summary for that step had already been written as if it had been.
+
+**Cause**
+A script error in the middle of a chain of commands, and a summary prepared before reading the output.
+
+**Solution**
+The output was read before anything was reported, the script was fixed to treat replacement text literally, and it was rerun. The commit and push were then checked. Earlier, a similar failure came from a quotation mark inside a command; since then, longer scripts are written to a file and run from there instead of being typed inline.
+
+**Lesson**
+Read the result of every step before describing it. Chain a commit after the work so that a failure stops the commit (which is what happened here and is why nothing half-done was pushed). Never report from the plan; report from the output.
+
+## P-009 — A hand-written placeholder was used where a real bcrypt hash was needed
+
+- **Date found:** 2026-11-13
+- **Phase / milestone:** M3 Backend Services
+- **Who:** assistant
+- **Status:** Solved before it ran
+
+**What happened**
+To make a login for an unknown user take as long as one for a known user (E-013), the service compares the password against a spare hash. The first version of `AuthService` contained that spare hash as a constant typed by hand to look like a bcrypt hash.
+
+**Cause**
+Writing something that looks right instead of producing something that is right. A made-up string is very unlikely to be a valid bcrypt hash; the library would have rejected it immediately, the timing protection would silently not have worked, and nothing would have reported it.
+
+**Solution**
+Caught on re-reading, before the code was compiled. The constant was removed and the spare hash is now computed by the real hasher when the service starts.
+
+**Lesson**
+Never invent a value that has a format: compute it. And a protection that fails silently needs a test; the test `anUnknownUserGetsTheSameMessageAsAWrongPassword` covers the message, though not yet the timing.
+
+## P-010 — The requested typeface (SF Pro) could not be used
+
+- **Date found:** 2026-11-13
+- **Phase / milestone:** M2 Design
+- **Who:** licensing
+- **Status:** Worked around
+
+**What happened**
+The project owner asked for Apple's SF Pro, to get an Apple-like interface.
+
+**Cause**
+Apple licenses SF Pro only for software that runs on Apple platforms. These are Windows apps, so bundling it is not allowed.
+
+**Solution**
+Inter was used for interface text and Source Serif 4 for headings. Both are open source under the SIL Open Font License, which allows bundling, and both were taken from their official GitHub repositories with their license files.
+
+**Lesson**
+Check the license of an asset before designing around it.
+
+## P-011 — Diagram layout faults, and deleted diagrams coming back
+
+- **Date found:** 2026-11-13 (repeatedly)
+- **Phase / milestone:** M2 Design, M3 Backend Services
+- **Who:** assistant
+- **Status:** Solved
+
+**What happened**
+The diagrams are generated by scripts and exported to images. Many first exports had faults: lines drawn through boxes (class diagrams, use case, composite structure, the user-service diagram), text cut off or overflowing (method names, wireframe labels, activity decisions, cover titles breaking in the middle of a word), labels hidden under other labels (component diagram), a placeholder `<orderId>` that vanished because it was read as HTML, and titles that were not centered.
+
+Separately, after the deployment, package, and composite structure diagrams were removed on request, the script that generates the other diagrams still contained them, so every later run recreated the three deleted files.
+
+**Cause**
+Positions are calculated, not seen, so a layout can be wrong in ways only visible in the image. And the removed diagrams were deleted from the repository but not from the generator.
+
+**Solution**
+Every exported image is opened and looked at before it is committed; each fault above was fixed and the image exported again. The recreated files are deleted after each run, and the list of changed files is checked before committing so that only the intended diagrams change.
+
+**Lesson**
+Generated output has to be inspected, every time. Removing something means removing it from whatever generates it, not only from where it ends up. The second half of this is still open: see "Known gaps".
+
+## P-012 — Maven was not available from the package manager
+
+- **Date found:** 2026-11-13
+- **Phase / milestone:** M3 Backend Services (setup)
+- **Who:** environment
+- **Status:** Solved
+
+**What happened**
+Java and MongoDB were installed with `winget`. Maven is not in the winget catalog.
+
+**Solution**
+Maven 3.9.9 was downloaded from Apache's own archive, its SHA-512 checksum was compared with the one Apache publishes before unpacking it, and its `bin` folder was added to the user PATH.
+
+**Lesson**
+When a tool has to come from a direct download, take it from the publisher and verify the checksum.
+
+## P-013 — Small things that went wrong
+
+Problems that cost minutes, not hours. Listed so the record is complete.
+
+| What happened | Who | What was done |
+|---|---|---|
+| The project folder could not be renamed from `csce310-bookstore` to `CSCE310-Bookstore`: Windows treats names that differ only in capital letters as the same | Environment | Kept the lower-case name |
+| The Mermaid diagrams in the first docs had to be replaced when the owner asked for draw.io | Assistant | Redrawn in draw.io; draw.io Desktop installed for exporting |
+| The first headless screenshot of the sample bill produced no file | Assistant | Run a different way (a separate browser profile and waiting for it to finish) |
+| The sequence diagram was drawn in color; the owner wanted it plain | Assistant | Redrawn without color |
+| In the catalog preview, price and availability overlapped on narrow cards, and "Only 2 left" was cut off | Assistant | Shorter wording on cards; found by looking at the screenshots |
+| The detail panel's "Rent" button was cut off at the default window height | Assistant | The panel now scrolls when the window is short |
+| The login response sent `"token": null` on endpoints that have no token | Assistant | Empty fields are no longer sent; a test checks it |
+| The first timing check of the service reported "server not up" although it was | Assistant | The check itself was hitting the `localhost` delay that became P-004 |
+| The screen class was named `CatalogScreen` in code but `SearchScreen` in the approved class diagram | Assistant | Code renamed to match the diagram |
+| The use case diagram was missing the mail server as an actor | Assistant | Added after the owner questioned the actors |
+
+## Known gaps
+
+Things that are known to be unfinished or unverified, so nobody is surprised later.
+
+| Gap | Since | Plan |
+|---|---|---|
+| The scripts that generate the diagrams are not in the repository, only their output | M2 | Clean them up (remove the three deleted diagrams from them) and add them under `tools/` |
+| How the app's animations and scrolling feel has not been judged by a person | M2 | The owner tries the preview; adjust in M4 |
+| Trackpad scrolling, screen readers, and a color-blindness simulation are untested | M2 | Test during M5 |
+| The timing protection of E-013 has a test for the message but not for the timing | M3 | Add a timing test, or accept and document |
+| Sessions never expire; they end only at logout | M2 | The PRD asks for exactly this (FR2). Noted in case an expiry is wanted |
+| book-service and order-service are not built | M3 | Next |

@@ -12,7 +12,9 @@ A change is not done until its documentation is done. In the **same commit** as 
 | An endpoint or its JSON changes | [api-design.md](api-design.md) |
 | A table, column, or document field changes | [database-design.md](database-design.md), the ER diagram, and `database/` |
 | A design decision is made or reversed | The decisions table in [architecture.md](architecture.md) |
-| A problem cost real time | A new entry in the [problem log](../03-problems/problem-log.md) |
+| A problem cost real time, **whoever caused it** | A new entry in the [problem log](../03-problems/problem-log.md), saying who or what caused it |
+| Something is made better than the requirements asked | A new entry in the [enhancement log](../03-problems/enhancement-log.md), with why and the measured effect |
+| Anything is taken from outside: a library, font, image, file, or idea | A row in [REFERENCES.md](../../REFERENCES.md), with source, version, and license. Copied files get their license file next to them |
 | Anything a user would notice | [CHANGELOG.md](../../CHANGELOG.md) |
 
 In the code itself:
@@ -76,7 +78,15 @@ The aim: **a user always learns what happened and what to do next; a developer a
 - A bug fix comes with a test that fails without the fix.
 - `flutter analyze` and the tests pass before every commit.
 
-## 5. Commits
+## 5. Other people's work
+
+- Nothing from outside enters the repository without a row in [REFERENCES.md](../../REFERENCES.md).
+- No license, or an unclear one, means it is not used.
+- Libraries are declared as dependencies and downloaded by the build tool; their code is not copied in.
+- Code is written for this project, not pasted from elsewhere. If a snippet is ever adapted from a source, the source is named in a comment above it and in REFERENCES.md.
+- Images and text from books, websites, or other apps are not used. Book covers are generated.
+
+## 6. Commits
 
 - One purpose per commit, with a message that says what and why.
 - Every change is committed and pushed, so the history on GitHub shows the real order of work.

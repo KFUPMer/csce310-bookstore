@@ -15,6 +15,7 @@ All versions and patches of the project, newest first.
 - MySQL schema, 15 sample books, and a seed script (`database/`)
 - Full API specification: request, response, and errors for every endpoint
 - UI wireframes for both apps and a sample HTML bill
+- The two Flutter desktop projects (`clients/customer-app`, `clients/management-app`) and a VS Code launch configuration for each
 
 ### Changed
 - Registration (FR3) and emailing the bill (FR10) are no longer optional: every extra-credit item is being done

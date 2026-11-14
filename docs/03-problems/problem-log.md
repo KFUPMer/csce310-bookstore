@@ -56,3 +56,26 @@ Changed the stack in every document and in the architecture diagram: user-servic
 
 **Lesson**
 Read the whole requirements document, including the non-functional part, before choosing technology. Caught in M1, this cost one documentation update; caught in M3 it would have cost a rewrite of the backend.
+
+## P-002 — First Flutter build blocked by Windows security
+
+- **Date found:** 2026-11-13
+- **Phase / milestone:** M4 Desktop Clients (setup, done early)
+- **Issue:** #18
+- **Status:** Solved
+
+**What happened**
+The first `flutter build windows` of customer-app failed with "An Application Control policy or security policy has blocked execution". The blocked program was `impellerc.exe`, the shader compiler inside the Flutter SDK that had just been downloaded.
+
+**Cause**
+Windows checks a newly downloaded program the first time it runs and can block that first run. It was not a problem in the project: the starter app had not been changed.
+
+**What we tried**
+1. Built management-app straight after: it succeeded, using the same tool.
+2. Built customer-app again: it succeeded.
+
+**Solution**
+Run the build again. No security setting was changed.
+
+**Lesson**
+On a freshly installed toolchain, a first-run failure that mentions a security policy is worth one retry before looking for a fault in the code.

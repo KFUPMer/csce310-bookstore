@@ -7,7 +7,7 @@ Two separate Flutter desktop apps, written in Dart.
 | `customer-app/` | Customers | Log in, register, search books, select and order them, see the bill |
 | `management-app/` | Managers | View orders, update payment status, add and update books |
 
-Both are still the empty starter project that Flutter generates; the real screens are built in milestone M4.
+Both are still the empty starter project that Flutter generates; the real screens are built in milestone M4. Both compile and open a window (checked on 2026-11-13 with Flutter 3.50).
 
 Design: [UI](../docs/02-design/ui-design.md), [class diagrams](../docs/02-design/class-diagrams.md).
 

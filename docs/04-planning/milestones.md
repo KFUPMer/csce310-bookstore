@@ -39,7 +39,7 @@ The live version of this plan is on GitHub: milestones hold the deadlines, issue
 
 ### M4 — Desktop Clients (due 2026-12-01)
 
-- [ ] Install Flutter and create the two desktop projects
+- [x] Install Flutter and create the two desktop projects
 - [ ] customer-app in Flutter, asynchronous calls (N2): register, login, search, select books, place order, see bill
 - [ ] management-app in Flutter, asynchronous calls (N2): login, orders list, payment status, add and update books
 
@@ -67,3 +67,4 @@ Add a short dated note whenever a milestone closes or a deadline moves, and say 
 | 2026-11-13 | UML diagrams drawn in draw.io (first drafts), ahead of the M2 deadline. Deployment, package, and composite structure diagrams were drawn and then dropped as not needed. |
 | 2026-11-13 | Decided to do every extra-credit item. Use case descriptions, more sequence and activity diagrams, database scripts, API specification, wireframes, and bill layout drafted. Visual style of the apps still open. |
 | 2026-11-13 | Client framework changed from JavaFX to Flutter because UI/UX quality is the priority. App class diagrams redrawn. Flutter is not installed yet. |
+| 2026-11-13 | Flutter 3.50 and Visual Studio 2022 Build Tools installed; both empty apps compile and open a window. Done ahead of M4. |

@@ -22,6 +22,7 @@ Much of this project was built with an AI coding assistant (Claude). Its mistake
 | P-012 | Maven was not available from the package manager | Environment | Solved |
 | P-013 | Small things that went wrong | Mixed | Solved |
 | P-014 | A manual check failed and left a service running | Assistant | Solved |
+| P-015 | order-service passed all its tests with faults a review then found | Assistant | Solved, with three limits left open |
 
 ## How to add an entry
 
@@ -360,15 +361,52 @@ The manual check was rewritten in Python, which sends requests directly instead 
 **Lesson**
 Write checks in a language that handles data properly rather than gluing text into commands. A check must say what it expects, so that a failure cannot be mistaken for a pass. Anything a script starts, it must be sure to stop. And when a check fails, say what was and was not verified instead of rounding up.
 
+## P-015 — order-service passed all its tests with faults a review then found
+
+- **Date found:** 2026-11-16
+- **Phase / milestone:** M3 Backend Services
+- **Issue:** #10
+- **Who:** assistant
+- **Status:** Solved, with three limits left open (see "Known gaps")
+
+**What happened**
+order-service was written test-first: the tests were written, seen to fail, and then the code made them pass (83 tests, then all 33 checks on the running service). A code review of the result, done before committing, still found ten things. None was a wrong answer to a request, which is why no test had caught them.
+
+**What the review found, and what was done**
+
+| Found | Done |
+|---|---|
+| The bill's wording said "7 days" and "10%" as text, separate from the constants the charge is calculated from. Changing the rule would have left every bill wrong | Fixed: the rule moved to `pricing.py`; the bill reads it from there. A test changes the rule and checks the bill follows |
+| The bill file was written in place, so someone opening it at the same moment could get half a file | Fixed: it is written beside the real file and swapped in, in one step |
+| The manual check worked out the expected rent with ordinary decimal fractions (`float`), which can differ by a cent from the service's exact arithmetic. A correct service could have been reported as failing | Fixed: the check uses exact arithmetic too |
+| A port setting that is not a number crashed start-up with a raw error | Fixed: the message names the setting. A test covers it |
+| The API document and the sequence diagram still described the first design (`emailSent`; save the order, then reduce copies) | Fixed in the same commit: both updated |
+| If book-service takes a copy but its answer is lost, the copy is not given back | Not fixed: logged as an error naming the book. Known gap |
+| The MySQL tests use up real order numbers | Not fixed: the services' account cannot create a test database. Documented. Known gap |
+| The list of orders loads every item, though the list shows none | Left: fine at this size. Known gap |
+| One HTTP connection object is shared by all request threads | Left: the same as book-service, and no fault was seen under the checks |
+| The error classes and session check are copies of book-service's | Left on purpose: architecture decision 20 |
+
+**One more, found while fixing**
+The test written for the "swapped in, in one step" fix passed before the fix was made. It checks that the new text is there and no draft is left behind, which was already true. It cannot show that a reader never sees half a file. The test's own comment now says so.
+
+**Lesson**
+Tests written first prove the answers; they do not prove what happens around the answers: a rule written twice, a file read mid-write, a check that is itself wrong. Review the code before committing, as a separate step. And when a new test passes before its fix, say what it really proves instead of counting it.
+
 ## Known gaps
 
 Things that are known to be unfinished or unverified, so nobody is surprised later.
 
 | Gap | Since | Plan |
 |---|---|---|
-| The diagram scripts are now in `tools/diagrams`, but `uml.py` still writes the three diagrams that were removed, and `uml.py` and `flows.py` have not been run from their new place | M2 | Remove the three from `uml.py`; run both once and check `git status` shows no change |
+| `uml.py` still writes the three diagrams that were removed, and has not been run from `tools/diagrams`. (`flows.py` was run from there on 2026-11-16 and changed only the diagram that was meant to change) | M2 | Remove the three from `uml.py`; run it once and check `git status` shows no change |
+| **Emailing the bill through Gmail has not been tried for real.** The Gmail app password is not in `services/.env` yet. The message and the steps with the mail server are tested against a stand-in only | M3 | The owner adds `SMTP_USER` and `SMTP_PASSWORD`; then place one order and check the email arrives and the log says so |
+| If book-service takes copies for an order but its answer does not arrive within 3 seconds, the order fails and those copies are not given back. order-service logs an error naming the book | M3 | Accept and document; a manager can correct the number of copies (FR14). Rare on one machine |
+| The MySQL tests of order-service run in the real `bookstore` database and use up order numbers, so real order ids are not consecutive | M3 | Accept, or have the owner grant the services' account a `bookstore_test` database |
+| `GET /api/orders` returns every order at once, and loads their items | M3 | Fine for a course project; add paging if the list grows |
+| `activity-place-order` and `class-services` (drawn in M2 by `uml.py`) still show the first design: the order is saved before the copies are reduced | M3 | Update with `uml.py` when its other fault is fixed. The sequence diagram and the as-built class diagram are current |
 | How the app's animations and scrolling feel has not been judged by a person | M2 | The owner tries the preview; adjust in M4 |
 | Trackpad scrolling, screen readers, and a color-blindness simulation are untested | M2 | Test during M5 |
 | The timing protection of E-013 has a test for the message but not for the timing | M3 | Add a timing test, or accept and document |
 | Sessions never expire; they end only at logout | M2 | The PRD asks for exactly this (FR2). Noted in case an expiry is wanted |
-| order-service is not built | M3 | Next |
+| Returning a rented book is not built: a rented copy never comes back to the shelf by itself | M2 | Not asked for by the PRD. A manager can raise the number of copies (FR14) |

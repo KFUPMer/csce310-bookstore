@@ -36,10 +36,10 @@ Manager-only actions are refused unless the session belongs to a manager (FR11).
 ## How an order becomes a bill (FR7–FR9)
 
 1. The customer app sends the selected books to order-service.
-2. order-service gets each book's current price from book-service and checks copies are available. A bought book is charged at full price; a rented book at 10% of the price, due back in 7 days.
-3. order-service saves the order in MySQL with payment status `PENDING`.
-4. order-service reduces the available copies of each book through book-service.
-5. order-service writes the bill to `bills/bill-<orderId>.html`, emails it to the customer, and returns it to the customer app.
+2. order-service takes the copies of each book through book-service. That one call checks copies are available, reduces them, and answers with the book's current title, author, and price. A bought book is charged at full price; a rented book at 10% of the price, due back in 7 days.
+3. order-service saves the order in MySQL, in one transaction, with payment status `PENDING`. If anything in steps 2 or 3 fails, the copies already taken are given back and nothing is saved.
+4. order-service writes the bill to `bills/bill-<orderId>.html` and returns it to the customer app.
+5. order-service emails the bill to the customer, in the background.
 
 ## How the non-functional requirements are met
 
@@ -75,6 +75,11 @@ Manager-only actions are refused unless the session belongs to a manager (FR11).
 | 13 | 2026-11-16 | The Python services are served by waitress | Flask's built-in development server | The built-in server is for development only and listens on one address; waitress is a production server and can listen on both loopback addresses (P-004) |
 | 14 | 2026-11-16 | Taking copies of a book is one atomic database step | Read the number, check it, then write it | Two orders at the same moment must not both take the last copy. Tested with 20 simultaneous attempts |
 | 15 | 2026-11-16 | If user-service does not answer within about 2 seconds, the other services answer 503 | Wait; or treat the user as logged out | A clear "try again" is better than a frozen app or a false "you are not logged in" |
+| 16 | 2026-11-16 | order-service takes the copies first and saves the order second, giving the copies back if anything fails | Save the order, then reduce the copies (the first design); read the book, then reduce | Saving first could leave a saved order for a book that turned out to have no copies. The copies call is atomic and already returns the book, so it replaces the separate "get the book" call: one call per book instead of two |
+| 17 | 2026-11-16 | The bill email is sent on a background thread, after the answer | Send it before answering | A mail server can take seconds; N1 allows 500 ms. The response says `emailQueued`, not `emailSent`, because delivery is not known yet |
+| 18 | 2026-11-16 | A bill can always be made again from the saved order | Treat the file as the only copy | The bill shows only what is stored with the order and always says "Pending", so the same order gives the same bill. A deleted or unwritable file is not a lost bill |
+| 19 | 2026-11-16 | Money is `Decimal` in order-service | `float`, as JSON gives it | Sums of prices and the 10% rent charge must be exact to the cent |
+| 20 | 2026-11-16 | The two Flask services each keep their own copy of the error classes and the session check | A shared Python package | Each service is its own project and runs alone (PRD 4.1). The cost is that a fix must be made twice |
 
 ## Email settings (FR10)
 

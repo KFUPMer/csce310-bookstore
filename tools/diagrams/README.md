@@ -10,6 +10,7 @@ They were written quickly while the diagrams were being made, and are kept as th
 | `ui_cls.py` | `class-bookstore-ui` |
 | `user_cls.py` | `class-user-service` |
 | `book_cls.py` | `class-book-service` |
+| `order_cls.py` | `class-order-service` |
 | `flows.py` | The four sequence diagrams, `activity-login`, `activity-manager-payment`, and the two wireframes |
 | `uml.py` | `use-case`, `activity-place-order`, `state-machine`, `component`, `object`, `profile`, `class-services` |
 

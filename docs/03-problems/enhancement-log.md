@@ -32,6 +32,12 @@ Each entry says whether the PRD required it. "No" means it was a choice, and cou
 | E-022 | 2026-11-16 | A clear answer when another service is down | book-service | No |
 | E-023 | 2026-11-16 | Search treats the keyword as plain text | book-service | No |
 | E-024 | 2026-11-16 | Database tests on a separate, disposable database | book-service | No |
+| E-025 | 2026-11-16 | An order is all or nothing across two services | order-service | Partly (the PRD asks for one transaction) |
+| E-026 | 2026-11-16 | A lost bill file is made again | order-service | No |
+| E-027 | 2026-11-16 | The bill email is sent in the background | order-service | No (helps N1) |
+| E-028 | 2026-11-16 | Exact money | order-service | No |
+| E-029 | 2026-11-16 | A repeatable check of the whole running system | order-service | No |
+| E-030 | 2026-11-16 | A code review before each service is committed | Process | No |
 
 ## Details
 
@@ -168,3 +174,41 @@ The keyword is escaped before it is used in the database's pattern search.
 
 The tests of the MongoDB repository run against a real MongoDB, but in a database of their own (`bookstore_test`) that is emptied before each test and dropped at the end.
 **Why:** testing against the real thing catches what a stand-in cannot, and the real `bookstore` data is never touched.
+
+### E-025 — An order is all or nothing across two services
+
+Placing an order changes two databases owned by two services: copies in MongoDB (book-service) and the order in MySQL. order-service takes the copies first, then saves the order in one transaction; if a later book is missing or sold out, or the save fails, it gives back every copy it took.
+**Why:** a database transaction covers only one database. Without the give-back, a failed order would quietly lower the stock.
+**Verified:** tests order a real book together with an unknown one, a sold-out one, and with a database that fails; each time no order exists and every copy is back. On the running services the same was checked against the real MongoDB.
+**Limit:** see "Known gaps" in the problem log (an answer from book-service that is lost).
+**Where:** `OrderService.place`, architecture decision 16.
+
+### E-026 — A lost bill file is made again
+
+A bill shows only what is saved with the order, and always says "Pending". So if the file is missing when someone opens the bill, order-service makes it again, identical, and saves it. An order also still succeeds if the file cannot be written at that moment.
+**Why:** FR9 makes the file the required part of an order; a deleted or unwritable file should not mean a lost bill or a failed order.
+**Verified:** a test and the running check delete the file, open the bill, and compare it with the original: the same, character for character.
+
+### E-027 — The bill email is sent in the background
+
+The email is handed to a background thread and the order is answered at once. A failed send is logged with the order number and never reaches the customer as an error.
+**Why:** a mail server can take seconds, and N1 allows 500 ms. The design had already said the email would move after the response if it proved slow; it was built that way from the start rather than measured into it.
+**Effect:** the response says `emailQueued` instead of `emailSent`, because delivery is not known when the answer is given.
+**Not yet verified:** a real send through Gmail (see "Known gaps").
+
+### E-028 — Exact money
+
+order-service keeps every amount as an exact decimal number, not as the approximate fractions (`float`) that JSON numbers become by default. A rent charge is rounded to the cent, half up.
+**Why:** with approximate fractions, 10% of 35.55 or the sum of several prices can be a cent off, and a bill must add up.
+**Verified:** tests for 35.55 (3.56), 35.54 (3.55), and a price that arrives from book-service as 40.1.
+
+### E-029 — A repeatable check of the whole running system
+
+`services/order-service/manual_check.py` starts all three services, calls every order endpoint for real with 33 checks that each state the expected result, times every call from a cold start, deletes what it created, stops the services, and confirms none is left running.
+**Why:** P-004, P-005, and P-014 all came from the gap between "the tests pass" and "the running program works". A check that is kept can be run again before every release.
+**Effect:** first order after a cold start 93 ms; other requests 6–44 ms; with book-service stopped, 503 in 2.0 seconds.
+
+### E-030 — A code review before each service is committed
+
+After its tests and the running check passed, order-service was reviewed as a separate step, looking for bugs, duplicated rules, wasted work, and anything that disagreed with the documents.
+**Why and effect:** see P-015. Ten findings; five fixed before the first commit, the rest recorded as decisions or known gaps.

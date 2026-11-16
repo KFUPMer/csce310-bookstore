@@ -34,10 +34,11 @@ The live version of this plan is on GitHub: milestones hold the deadlines, issue
 
 - [x] Install Java 21, Maven, MongoDB, and the Python packages; load the books into MongoDB
 - [x] Create the MySQL database, with a dedicated limited account for the services; load the test accounts
-- [ ] Create the book-service and order-service projects
+- [x] Create the book-service and order-service projects
 - [x] user-service in Java HttpServer: login, logout, sessions, roles, bcrypt, registration (FR1, FR2, FR3, FR11, N3). 26 tests pass; verified against MySQL
 - [x] book-service in Python Flask (31 tests, verified on the running service): keyword search, add and update books (FR4, FR5, FR14)
-- [ ] order-service in Python Flask: orders, HTML bill, order list, payment status (FR6–FR9, FR12, FR13)
+- [x] order-service in Python Flask (87 tests, verified on the running service): orders, HTML bill, order list, payment status (FR6–FR9, FR12, FR13)
+- [ ] Try the bill email for real through Gmail (needs the owner's Gmail app password in `services/.env`), then release v0.3.0
 
 ### M4 — Desktop Clients (due 2026-12-01)
 
@@ -53,7 +54,7 @@ The live version of this plan is on GitHub: milestones hold the deadlines, issue
 ### Extra credit (all being done, +4% in total)
 
 - [ ] FR3: user registration (+1%) — with user-service in M3 and the customer app in M4
-- [ ] FR10: email the bill to the customer (+1%) — with order-service in M3
+- [ ] FR10: email the bill to the customer (+1%) — built and tested in order-service; not yet sent for real through Gmail
 - [ ] Modern GUI framework (+2%) — both apps in Flutter, M4
 
 ## Progress notes
@@ -77,3 +78,4 @@ Add a short dated note whenever a milestone closes or a deadline moves, and say 
 | 2026-11-13 | user-service built: 27 classes in four layers, 26 tests passing, every endpoint called on the running service. Found and fixed a 2-second delay on the first request (P-004). Not yet run against MySQL. |
 | 2026-11-13 | MySQL database created with a dedicated `bookstore_app` account; test accounts loaded. user-service verified against it. Measuring showed login too close to the 500 ms limit; fixed with a connection pool and a start-up warm-up (P-005). |
 | 2026-11-16 | book-service built and verified: 31 tests, every endpoint checked on the running service with user-service and MongoDB, 3–38 ms per request. order-service is next. |
+| 2026-11-16 | order-service built and verified: 87 tests, 33 checks on the three running services, 6–93 ms per request. A review before committing found ten things; five fixed, the rest recorded (P-015). All three services now work. M3 stays open until a bill has been emailed for real, which needs the owner's Gmail app password. |

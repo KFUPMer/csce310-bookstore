@@ -163,4 +163,33 @@ Tests (`services/book-service/tests/`): `test_api.py` (24: every endpoint, succe
 
 ### order-service
 
-Not built yet.
+Built, and verified on the running service with user-service, book-service, MySQL, and MongoDB. Every class and module is in the diagram.
+
+![order-service class diagram](diagrams/class-order-service.png)
+
+Source: [diagrams/class-order-service.drawio](diagrams/class-order-service.drawio)
+
+File map (`services/order-service/order_service/`):
+
+| File | Kind | Holds | Purpose |
+|---|---|---|---|
+| `__main__.py` | Start-up | `main()` | Starts the server on both loopback addresses; a clear message if MySQL or a setting is wrong |
+| `app.py` | HTTP | `create_app()`, `create_production_app()` | Puts the parts together; the only place that knows the concrete classes |
+| `config.py` | Settings | `Config` | Port, MySQL, the other services' addresses, service key, bills folder, mail settings. Secrets are never printed |
+| `routes.py` | HTTP | `create_routes()` | The four endpoints |
+| `schemas.py` | Request | `OrderInput`, `OrderLine`, `PaymentStatusInput` | What a request must contain, with validation |
+| `auth.py` | Rules | `SessionChecker`, `UserServiceSessionChecker`, `token_from()`, `require_customer()`, `require_manager()` | Who is asking, and whether they may |
+| `services.py` | Rules | `OrderService`, `PlacedOrder` | Place an order (all or nothing), list, open a bill, set the payment status |
+| `pricing.py` | Rules | `RENT_RATE`, `RENT_DAYS`, `charge_for()` | The renting rule (FR7), in one place |
+| `bill.py` | Rules, files | `render_bill()`, `bill_file_name()`, `money()`, `BillStore` | Makes the bill from an order; saves and reads bill files |
+| `catalog.py` | Other service | `BookCatalog`, `BookServiceCatalog` | Takes and gives back copies through book-service |
+| `mailer.py` | Other service | `Mailer`, `SmtpMailer`, `NoMailer`, `build_message()` | Emails the bill in the background; a failure is logged, never raised |
+| `repository.py` | Database | `OrderRepository`, `MySqlOrderRepository`, `InMemoryOrderRepository`, `create_pool()` | Reading and writing orders |
+| `models.py` | Data | `Order`, `OrderItem`, `CurrentUser`, `CatalogBook` | Plain data; money is `Decimal` |
+| `errors.py` | Error | `ApiError` and its six subclasses, `register_error_handlers()` | The errors, and the one place that answers them |
+
+Also in `services/order-service/`: `manual_check.py`, which starts all three services and checks every endpoint for real.
+
+Tests (`services/order-service/tests/`): `test_api.py` (37: every endpoint, success and each error), `test_rules.py` (17: prices, validation, settings), `test_bill.py` (13), `test_book_catalog.py` (7: against a small real web server), `test_mailer.py` (5), `test_mysql_repository.py` (8: against the real MySQL), `fakes.py` (stand-ins for user-service, book-service, and the mail server).
+
+**Changes from the design overview:** the overview had `OrderService` with "repo, books, pricing, bills, mail" behind it; all five exist, each behind an interface or in its own module. Added: the request shapes with validation, the in-memory repository, the error classes, `Config`, `app.py`, and `PlacedOrder`. Changed: copies are taken before the order is saved, not after (architecture decision 16), and the email is sent in the background (decision 17).

@@ -1,0 +1,7 @@
+# order-service. Licenses and sources: REFERENCES.md
+flask>=3.1,<4
+mysql-connector-python>=9.1,<27
+requests>=2.34,<3
+waitress>=3.0,<4
+# Only for tests/test_mysql_repository.py (also used by database/seed.py):
+bcrypt>=4,<6

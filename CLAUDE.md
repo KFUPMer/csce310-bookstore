@@ -17,8 +17,8 @@ The live plan is `docs/04-planning/milestones.md`; tasks are GitHub issues on `K
 | M1 Idea, M2 Design | Closed. Released as v0.1.0 and v0.2.0 |
 | user-service (Java HttpServer, MySQL) | Done, verified against MySQL |
 | book-service (Python Flask, MongoDB) | Done, verified on the running service |
-| **order-service (Python Flask, MySQL)** | **Not started. This is next** (issues 10, 16, 7) |
-| customer-app, management-app (Flutter) | Only a style preview of one screen exists (`SearchScreen`, on sample data). M4 |
+| order-service (Python Flask, MySQL) | Done, verified on the running service with the other two. **Email (FR10) is built but not yet sent for real**: it needs the owner's Gmail app password in `services/.env` (issue 16 stays open until then) |
+| **customer-app, management-app (Flutter)** | **This is next (M4).** Only a style preview of one screen exists (`SearchScreen`, on sample data) |
 | Testing and final release | M5 |
 
 Known unfinished or unverified things: the "Known gaps" table at the end of `docs/03-problems/problem-log.md`.
@@ -43,6 +43,9 @@ These override any plugin or skill that says otherwise.
 - **Do not ask for or handle the MySQL root password.** Services log in as the limited `bookstore_app` account; its generated password is in `services/.env`, which git ignores. Never commit `.env` or `*.local.sql`; check `git diff --cached --name-only` before committing.
 - **Tech per service is fixed by the PRD** (section 4.1): user = Java HttpServer, book and order = Python Flask. Not negotiable (problem P-001).
 - **Renting** costs 10% of the book price, for 7 days. Returning a rented book is not built.
+- **The API the apps must use is `docs/02-design/api-design.md`**, which now matches the three built services. Note `emailQueued` (not `emailSent`) in the order response.
+- **The order-service MySQL tests run in the real `bookstore` database** (the app account cannot create another) and use up order numbers. They only touch their own temporary user.
+- **Review before committing.** A code review of order-service after its tests passed found ten things (P-015).
 - **Email** (FR10) goes through Gmail SMTP. The owner creates the Gmail app password themselves and puts it in `services/.env`.
 - **Services listen on both `127.0.0.1` and `::1`**, never the network (P-004). Flask services run under waitress.
 - **Measure from a cold start against the real database**, not only in tests (P-004, P-005). N1 allows 500 ms.
@@ -64,6 +67,9 @@ These override any plugin or skill that says otherwise.
 | user-service | `java -jar target/user-service-0.3.0.jar` |
 | book-service tests | `services/book-service`: `python -m unittest discover -s tests -t .` |
 | book-service | `python -m book_service` |
+| order-service tests | `services/order-service`: `python -m unittest discover -s tests -t .` |
+| order-service | `python -m order_service` |
+| All three services, checked for real | `services/order-service`: `python manual_check.py` (starts and stops them itself; ports 8081–8083 must be free) |
 | Customer app | `clients/customer-app`: `flutter run -d windows` |
 | Reset test data | repo root: `python database/seed.py` |
 

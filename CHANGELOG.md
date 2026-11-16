@@ -7,6 +7,9 @@ All versions and patches of the project, newest first.
 Work towards v0.3.0 (milestone M3, Backend services).
 
 ### Added
+- **order-service**: place an order with books bought or rented, the HTML bill saved as a file and emailed in the background, the manager's order list, and the payment status (FR6–FR10, FR12, FR13), with 87 tests; verified on the running service with the other two (33 checks, first order after a cold start in 93 ms). Emailing through Gmail is built but not yet tried for real
+- `services/order-service/manual_check.py`: starts all three services and checks every order endpoint for real
+- Class diagram and file map for order-service
 - Engineering rules: documentation, layers, error handling, tests (`docs/02-design/engineering-rules.md`)
 - `REFERENCES.md`: every third-party file, library, tool, and source, with its license
 - MIT License for the project's own work (`LICENSE`)
@@ -26,6 +29,7 @@ Work towards v0.3.0 (milestone M3, Backend services).
 - P-004: the first request to a service by the name `localhost` took over 2 seconds; services now listen on both loopback addresses
 
 ### Changed
+- Placing an order now takes the copies first and saves the order second, giving the copies back if anything fails (the design saved first). The response field `emailSent` is now `emailQueued`. API specification and the place-order sequence diagram updated
 - `CatalogScreen` renamed `SearchScreen`, to match the class diagram
 - Use case diagram: the mail server (Gmail) added as an external actor; actors defined in `use-cases.md`
 

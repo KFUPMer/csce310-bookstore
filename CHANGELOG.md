@@ -7,7 +7,7 @@ All versions and patches of the project, newest first.
 Work towards v0.3.0 (milestone M3, Backend services).
 
 ### Added
-- **order-service**: place an order with books bought or rented, the HTML bill saved as a file and emailed in the background, the manager's order list, and the payment status (FR6–FR10, FR12, FR13), with 87 tests; verified on the running service with the other two (33 checks, first order after a cold start in 93 ms). A real bill email was sent through Gmail
+- **order-service**: place an order with books bought or rented, the HTML bill saved as a file and emailed in the background, the manager's order list, and the payment status (FR6–FR10, FR12, FR13), with 88 tests; verified on the running service with the other two (33 checks, first order after a cold start in 93 ms). A real bill email was sent through Gmail
 - `services/order-service/manual_check.py`: starts all three services and checks every order endpoint for real; `email_check.py` sends one real bill email
 - Class diagram and file map for order-service
 - Engineering rules: documentation, layers, error handling, tests (`docs/02-design/engineering-rules.md`)
@@ -25,6 +25,7 @@ Work towards v0.3.0 (milestone M3, Backend services).
 - **user-service**: login, logout, session check, and registration (FR1, FR2, FR3, FR11), with bcrypt password hashing, one error format, and 26 tests; verified against MySQL
 
 ### Fixed
+- P-016: the bill email arrived in Gmail with a broken layout; the bill now uses tables instead of flex layout
 - P-005: login was too close to the 500 ms limit against the real database; user-service now uses a connection pool and warms up at start-up (login 85–255 ms, session check 7–19 ms)
 - P-004: the first request to a service by the name `localhost` took over 2 seconds; services now listen on both loopback addresses
 

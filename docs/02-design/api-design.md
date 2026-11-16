@@ -173,7 +173,7 @@ Response `200`: the updated book. Errors: `400` the change is not a whole number
 
 ## order-service — `http://localhost:8083`
 
-**Status: built, tested (87 tests), and verified on the running service.** The first order after a cold start answered in 93 ms; other requests in 6–44 ms. Also answers `503` when user-service, book-service, or MySQL is not available, and `404` / `405` for an unknown address or a wrong method.
+**Status: built, tested (88 tests), and verified on the running service.** The first order after a cold start answered in 93 ms; other requests in 6–44 ms. Also answers `503` when user-service, book-service, or MySQL is not available, and `404` / `405` for an unknown address or a wrong method.
 
 ### POST `/api/orders` — customer
 

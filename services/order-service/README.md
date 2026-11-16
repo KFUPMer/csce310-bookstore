@@ -37,13 +37,13 @@ Email: bills are emailed only when `SMTP_USER` and `SMTP_PASSWORD` are filled in
 python -m unittest discover -s tests -t .
 ```
 
-87 tests:
+88 tests:
 
 | File | Tests | What |
 |---|---|---|
 | `test_api.py` | 37 | Every endpoint, success and each error, with stand-ins for the other services |
 | `test_rules.py` | 17 | The renting price, request validation, settings |
-| `test_bill.py` | 13 | What is on the bill, and saving it |
+| `test_bill.py` | 14 | What is on the bill, and saving it |
 | `test_book_catalog.py` | 7 | The client for book-service, against a small real web server that answers like it |
 | `test_mailer.py` | 5 | The email message, and that a failed send is logged and never raised |
 | `test_mysql_repository.py` | 8 | The repository against the real MySQL; skipped if MySQL is not reachable |
@@ -126,13 +126,13 @@ Routes and services raise; `errors.py` answers every failure as `{ "error": "mes
 
 Built and verified on 2026-11-16:
 
-- All 87 tests pass, including the 8 against the real MySQL.
+- All 88 tests pass, including the 8 against the real MySQL.
 - Run for real with user-service, book-service, MySQL, and MongoDB: all 33 checks returned the expected result, and no service was left running.
 - Timings on the running service: the first order after a cold start took 93 ms; every other request took 6 to 44 ms. N1 allows 500 ms.
 - With book-service stopped, placing an order answered 503 in 2.0 seconds and order-service kept running.
 
-- A real bill was sent through Gmail with `python email_check.py`: the order answered in 101 ms and Gmail accepted the email afterwards ("Emailed the bill for order 1033" in the log).
+- A real bill was sent through Gmail with `python email_check.py`: the order answered in 101 ms and Gmail accepted the email afterwards ("Emailed the bill for order 1033" in the log). That first email showed the layout broken in Gmail; it was fixed (problem P-016) and a second one sent.
 
-**Not verified:** how the bill looks when opened in Gmail. Mail programs do not show HTML exactly as a browser does; that has to be looked at in the inbox.
+**Not verified:** how the fixed bill looks when opened in Gmail. Mail programs do not show HTML exactly as a browser does; that has to be looked at in the inbox.
 
 Known limits are listed under "Known gaps" in the [problem log](../../docs/03-problems/problem-log.md).

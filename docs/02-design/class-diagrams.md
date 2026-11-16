@@ -190,6 +190,6 @@ File map (`services/order-service/order_service/`):
 
 Also in `services/order-service/`: `manual_check.py`, which starts all three services and checks every endpoint for real, and `email_check.py`, which sends one real bill email.
 
-Tests (`services/order-service/tests/`): `test_api.py` (37: every endpoint, success and each error), `test_rules.py` (17: prices, validation, settings), `test_bill.py` (13), `test_book_catalog.py` (7: against a small real web server), `test_mailer.py` (5), `test_mysql_repository.py` (8: against the real MySQL), `fakes.py` (stand-ins for user-service, book-service, and the mail server).
+Tests (`services/order-service/tests/`): `test_api.py` (37: every endpoint, success and each error), `test_rules.py` (17: prices, validation, settings), `test_bill.py` (14), `test_book_catalog.py` (7: against a small real web server), `test_mailer.py` (5), `test_mysql_repository.py` (8: against the real MySQL), `fakes.py` (stand-ins for user-service, book-service, and the mail server).
 
 **Changes from the design overview:** the overview had `OrderService` with "repo, books, pricing, bills, mail" behind it; all five exist, each behind an interface or in its own module. Added: the request shapes with validation, the in-memory repository, the error classes, `Config`, `app.py`, and `PlacedOrder`. Changed: copies are taken before the order is saved, not after (architecture decision 16), and the email is sent in the background (decision 17).

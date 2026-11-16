@@ -51,6 +51,14 @@ class RenderBillTest(unittest.TestCase):
         for outside in ["<script", "<img", "<link", "http://", "https://"]:
             self.assertNotIn(outside, self.html)
 
+    def test_the_layout_uses_only_what_mail_programs_show(self):
+        # Gmail ignores flex layout and styles on <body> (problem P-016): the first real email
+        # arrived with its heading and details collapsed. Tables and a wrapper are shown everywhere.
+        self.assertNotIn("flex", self.html)
+        self.assertNotIn("body {", self.html.replace("body { margin: 0; }", ""))
+        self.assertIn('<div class="bill">', self.html)
+        self.assertIn('<td><strong>Order ID</strong>1042</td>', self.html)
+
     def test_text_from_a_book_or_a_user_cannot_become_html(self):
         from dataclasses import replace
 

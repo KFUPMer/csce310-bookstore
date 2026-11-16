@@ -26,23 +26,27 @@ BILLS_FOLDER = "bills"
 # Written out, so the bill is in English whatever language Windows is set to.
 _MONTHS = ("January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December")
 
+# The bill is also the body of an email, and mail programs show less than a browser does:
+# Gmail drops flex layout and any style placed on <body> (problem P-016). So the page's own
+# styles sit on a wrapper (.bill), and anything placed side by side is a table.
 _STYLE = """
-  body { font-family: Georgia, "Times New Roman", serif; color: #111; max-width: 720px; margin: 40px auto; padding: 0 24px; }
-  header { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 2px solid #111; padding-bottom: 12px; }
-  h1 { font-size: 26px; margin: 0; letter-spacing: 0.5px; }
-  .doc { font-size: 14px; text-transform: uppercase; letter-spacing: 2px; }
-  .meta { display: flex; justify-content: space-between; margin: 24px 0; font-size: 14px; line-height: 1.6; }
-  .meta strong { display: block; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #555; font-weight: normal; }
+  body { margin: 0; }
+  .bill { font-family: Georgia, "Times New Roman", serif; color: #111; max-width: 720px; margin: 40px auto; padding: 0 24px; }
   table { width: 100%; border-collapse: collapse; font-size: 14px; }
-  th { text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #555; font-weight: normal; border-bottom: 1px solid #111; padding: 8px 6px; }
-  td { padding: 10px 6px; border-bottom: 1px solid #ccc; vertical-align: top; }
-  .num { text-align: right; white-space: nowrap; }
+  .head td { border-bottom: 2px solid #111; padding: 0 0 12px; vertical-align: bottom; }
+  h1 { font-size: 26px; margin: 0; letter-spacing: 0.5px; }
+  .doc { font-size: 14px; text-transform: uppercase; letter-spacing: 2px; text-align: right; }
+  .meta td { width: 33%; padding: 24px 12px 24px 0; line-height: 1.6; vertical-align: top; }
+  .meta strong { display: block; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #555; font-weight: normal; }
+  .items th { text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #555; font-weight: normal; border-bottom: 1px solid #111; padding: 8px 6px; }
+  .items td { padding: 10px 6px; border-bottom: 1px solid #ccc; vertical-align: top; }
+  .items .num { text-align: right; white-space: nowrap; }
   .author { color: #555; font-size: 13px; }
-  tfoot td { border-bottom: none; font-size: 16px; font-weight: bold; padding-top: 16px; }
+  .items tfoot td { border-bottom: none; font-size: 16px; font-weight: bold; padding-top: 16px; }
   .status { margin-top: 24px; font-size: 14px; }
   .status span { border: 1px solid #111; padding: 3px 10px; text-transform: uppercase; letter-spacing: 1px; font-size: 12px; }
-  footer { margin-top: 40px; padding-top: 12px; border-top: 1px solid #ccc; font-size: 12px; color: #555; line-height: 1.5; }
-  @media print { body { margin: 0 auto; } }
+  .foot { margin-top: 40px; padding-top: 12px; border-top: 1px solid #ccc; font-size: 12px; color: #555; line-height: 1.5; }
+  @media print { .bill { margin: 0 auto; } }
 """
 
 
@@ -81,18 +85,20 @@ def render_bill(order: Order) -> str:
 <style>{_STYLE}</style>
 </head>
 <body>
-  <header>
-    <h1>Bookstore</h1>
-    <div class="doc">Bill</div>
-  </header>
+<div class="bill">
+  <table class="head">
+    <tr><td><h1>Bookstore</h1></td><td class="doc">Bill</td></tr>
+  </table>
 
-  <div class="meta">
-    <div><strong>Order ID</strong>{order.id}</div>
-    <div><strong>Date</strong>{_moment(order.created_at)}</div>
-    <div><strong>Customer</strong>{escape(order.username)}<br>{escape(order.email)}</div>
-  </div>
+  <table class="meta">
+    <tr>
+      <td><strong>Order ID</strong>{order.id}</td>
+      <td><strong>Date</strong>{_moment(order.created_at)}</td>
+      <td><strong>Customer</strong>{escape(order.username)}<br>{escape(order.email)}</td>
+    </tr>
+  </table>
 
-  <table>
+  <table class="items">
     <thead>
       <tr><th>Item</th><th>Type</th><th>Due back</th><th class="num">Qty</th><th class="num">Price</th></tr>
     </thead>
@@ -106,10 +112,11 @@ def render_bill(order: Order) -> str:
 
   <p class="status">Payment status: <span>Pending</span></p>
 
-  <footer>
+  <div class="foot">
     Rented books are charged at {RENT_RATE:.0%} of the book price and are due back {RENT_DAYS} days after the order date.<br>
     This bill was generated automatically when the order was placed.
-  </footer>
+  </div>
+</div>
 </body>
 </html>
 """

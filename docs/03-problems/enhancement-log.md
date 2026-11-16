@@ -144,7 +144,7 @@ Eleven of the 26 tests start the real server on a free port and call each endpoi
 The draw.io files are produced by scripts, and every exported image is looked at before it is committed.
 **Why:** diagrams stay consistent with each other and can be regenerated when the design changes.
 **Effect:** about a dozen layout faults were caught this way before being committed (see P-011).
-**Gap:** the generating scripts are not in the repository yet, only their output (the `.drawio` files, which can be edited by hand in draw.io). See "Known gaps" in the problem log.
+**Where:** the scripts are in `tools/diagrams`, with a README. One of them still has a known fault; see "Known gaps" in the problem log.
 
 ### E-021 — The last copy cannot be sold twice
 

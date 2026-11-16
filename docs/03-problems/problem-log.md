@@ -366,7 +366,7 @@ Things that are known to be unfinished or unverified, so nobody is surprised lat
 
 | Gap | Since | Plan |
 |---|---|---|
-| The scripts that generate the diagrams are not in the repository, only their output | M2 | Clean them up (remove the three deleted diagrams from them) and add them under `tools/` |
+| The diagram scripts are now in `tools/diagrams`, but `uml.py` still writes the three diagrams that were removed, and `uml.py` and `flows.py` have not been run from their new place | M2 | Remove the three from `uml.py`; run both once and check `git status` shows no change |
 | How the app's animations and scrolling feel has not been judged by a person | M2 | The owner tries the preview; adjust in M4 |
 | Trackpad scrolling, screen readers, and a color-blindness simulation are untested | M2 | Test during M5 |
 | The timing protection of E-013 has a test for the message but not for the timing | M3 | Add a timing test, or accept and document |

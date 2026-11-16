@@ -27,6 +27,8 @@ Dates and tasks: [docs/04-planning/milestones.md](docs/04-planning/milestones.md
 | [docs/03-problems](docs/03-problems/problem-log.md) | The [problem log](docs/03-problems/problem-log.md): what went wrong, who caused it, how it was fixed. The [enhancement log](docs/03-problems/enhancement-log.md): what was made better than required, and why |
 | [docs/04-planning](docs/04-planning/milestones.md) | Milestones, tasks, deadlines, versioning rules |
 | [docs/05-setup](docs/05-setup/environment.md) | The development environment: every tool, its version, and how to check it |
+| `tools/diagrams/` | The scripts that generate the draw.io diagrams |
+| [CLAUDE.md](CLAUDE.md) | Notes for the AI assistant: the standing rules, where things stand, and what is next |
 | `services/` | Backend RESTful web services |
 | `clients/` | The two desktop GUI applications |
 | [CHANGELOG.md](CHANGELOG.md) | What changed in every version and patch |

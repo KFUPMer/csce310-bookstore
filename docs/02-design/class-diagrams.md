@@ -134,6 +134,33 @@ Tests (`src/test/java/com/bookstore/user/`): `service/AuthServiceTest` (10: the 
 
 **Changes from the design overview:** the overview had 7 classes; the built service has 27. Added: the two repository interfaces with an in-memory version of each (so the rules can be tested without MySQL), request and response records, the error classes, `BaseHandler`, `Config`, `Database`, `Json`, and `TokenGenerator`. Nothing in the overview was dropped.
 
-### book-service, order-service
+### book-service
+
+Built, and verified on the running service with user-service and MongoDB. Every class and module is in the diagram.
+
+![book-service class diagram](diagrams/class-book-service.png)
+
+Source: [diagrams/class-book-service.drawio](diagrams/class-book-service.drawio)
+
+File map (`services/book-service/book_service/`):
+
+| File | Kind | Holds | Purpose |
+|---|---|---|---|
+| `__main__.py` | Start-up | `main()` | Starts the server on both loopback addresses |
+| `app.py` | HTTP | `create_app()`, `create_production_app()` | Puts the parts together; the only place that knows the concrete classes |
+| `config.py` | Settings | `Config` | Port, MongoDB address, user-service address, service key |
+| `routes.py` | HTTP | `create_routes()` | The five endpoints |
+| `schemas.py` | Request | `BookInput`, `CopiesChange` | What a request must contain, with validation |
+| `auth.py` | Rules | `SessionChecker`, `UserServiceSessionChecker`, `token_from()`, `require_manager()`, `require_service_key()` | Who is asking, and whether they may |
+| `services.py` | Rules | `BookService` | Search, get, add, update, change copies |
+| `repository.py` | Database | `BookRepository`, `MongoBookRepository`, `InMemoryBookRepository` | Reading and writing books |
+| `models.py` | Data | `Book`, `CurrentUser` | Plain data |
+| `errors.py` | Error | `ApiError` and its six subclasses, `register_error_handlers()` | The errors, and the one place that answers them |
+
+Tests (`services/book-service/tests/`): `test_api.py` (24: every endpoint, success and each error), `test_mongo_repository.py` (7: against a real MongoDB), `fakes.py` (the stand-in for user-service).
+
+**Changes from the design overview:** the overview had 4 boxes for this service. Added: the request shapes with validation, the repository interface with an in-memory version, the error classes, `Config`, and `app.py`. Because Python groups functions in modules, `routes.py`, `auth.py`, `app.py`, and `errors.py` are drawn as modules rather than classes.
+
+### order-service
 
 Not built yet.

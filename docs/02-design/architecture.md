@@ -72,6 +72,9 @@ Manager-only actions are refused unless the session belongs to a manager (FR11).
 | 10 | 2026-11-13 | The services use a dedicated MySQL account (`bookstore_app`) limited to the bookstore database | The root account | Least privilege: the services get only the access they need, and the root password never has to be stored or shared |
 | 11 | 2026-11-13 | user-service takes database connections from a pool and warms itself up at start-up | A new connection per query; no warm-up | Measured: a new connection per query made session checks about 75 ms and the first login over 500 ms. With the pool and warm-up they are under 20 ms and under 260 ms (P-005) |
 | 12 | 2026-11-13 | bcrypt cost 10 in both the Java service and the Python seed script | The Python default of 12 | The same cost on both sides; cost 12 made each login about 300 ms, leaving little room under N1 |
+| 13 | 2026-11-16 | The Python services are served by waitress | Flask's built-in development server | The built-in server is for development only and listens on one address; waitress is a production server and can listen on both loopback addresses (P-004) |
+| 14 | 2026-11-16 | Taking copies of a book is one atomic database step | Read the number, check it, then write it | Two orders at the same moment must not both take the last copy. Tested with 20 simultaneous attempts |
+| 15 | 2026-11-16 | If user-service does not answer within about 2 seconds, the other services answer 503 | Wait; or treat the user as logged out | A clear "try again" is better than a frozen app or a false "you are not logged in" |
 
 ## Email settings (FR10)
 

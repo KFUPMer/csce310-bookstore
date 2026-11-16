@@ -42,6 +42,7 @@ Not copied into the repository: downloaded by the build tools from their officia
 | MySQL Connector/Python | 26.10.0 | Talking to MySQL | GPL v2 with the FOSS License Exception | https://github.com/mysql/mysql-connector-python |
 | bcrypt | 5.0.0 | Hashing the test accounts' passwords | Apache License 2.0 | https://github.com/pyca/bcrypt |
 | Requests | 2.34.2 | One service calling another | Apache License 2.0 | https://github.com/psf/requests |
+| waitress | 3.0.2 | The web server that runs the Flask services | Zope Public License (ZPL) 2.1 | https://github.com/Pylons/waitress |
 
 ### Desktop apps (Dart / Flutter)
 
@@ -118,7 +119,7 @@ What the MIT License here does **not** cover, because it belongs to someone else
 
 Is MIT compatible with what the project uses? Yes:
 
-- The Apache 2.0, BSD, ISC, MIT, and EPL libraries can all be used by MIT-licensed software.
+- The Apache 2.0, BSD, ISC, MIT, EPL, and ZPL libraries can all be used by MIT-licensed software.
 - The two MySQL connectors are GPL v2 **with an exception** written for exactly this case: it allows them to be used unmodified by software under an approved open-source license, and MIT is one.
 - The fonts stay under the Open Font License, which allows bundling them with software under any license.
 

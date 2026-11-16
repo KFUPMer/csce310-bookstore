@@ -36,7 +36,7 @@ The live version of this plan is on GitHub: milestones hold the deadlines, issue
 - [x] Create the MySQL database, with a dedicated limited account for the services; load the test accounts
 - [ ] Create the book-service and order-service projects
 - [x] user-service in Java HttpServer: login, logout, sessions, roles, bcrypt, registration (FR1, FR2, FR3, FR11, N3). 26 tests pass; verified against MySQL
-- [ ] book-service in Python Flask: keyword search, add and update books (FR4, FR5, FR14)
+- [x] book-service in Python Flask (31 tests, verified on the running service): keyword search, add and update books (FR4, FR5, FR14)
 - [ ] order-service in Python Flask: orders, HTML bill, order list, payment status (FR6–FR9, FR12, FR13)
 
 ### M4 — Desktop Clients (due 2026-12-01)
@@ -76,3 +76,4 @@ Add a short dated note whenever a milestone closes or a deadline moves, and say 
 | 2026-11-13 | M3 started. Java 21, Maven 3.9.9, and MongoDB 9.0 installed; books loaded into MongoDB and search checked. MySQL 8.0 was already installed; creating the database waits for the root password. Engineering rules written. |
 | 2026-11-13 | user-service built: 27 classes in four layers, 26 tests passing, every endpoint called on the running service. Found and fixed a 2-second delay on the first request (P-004). Not yet run against MySQL. |
 | 2026-11-13 | MySQL database created with a dedicated `bookstore_app` account; test accounts loaded. user-service verified against it. Measuring showed login too close to the 500 ms limit; fixed with a connection pool and a start-up warm-up (P-005). |
+| 2026-11-16 | book-service built and verified: 31 tests, every endpoint checked on the running service with user-service and MongoDB, 3–38 ms per request. order-service is next. |

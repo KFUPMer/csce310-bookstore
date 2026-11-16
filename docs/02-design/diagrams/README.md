@@ -21,6 +21,7 @@ When a diagram changes, update the `.drawio` file, export the image again, and c
 | Class diagram, manager app | `class-manager-app.drawio` | `class-manager-app.png` | [class-diagrams.md](../class-diagrams.md) |
 | Class diagram, shared UI package | `class-bookstore-ui.drawio` | `class-bookstore-ui.png` | [class-diagrams.md](../class-diagrams.md) |
 | Class diagram, user-service (as built) | `class-user-service.drawio` | `class-user-service.png` | [class-diagrams.md](../class-diagrams.md) |
+| Class diagram, book-service (as built) | `class-book-service.drawio` | `class-book-service.png` | [class-diagrams.md](../class-diagrams.md) |
 | Class diagram, backend services (design overview) | `class-services.drawio` | `class-services.png` | [uml-diagrams.md](../uml-diagrams.md) |
 | Object diagram | `object.drawio` | `object.png` | [uml-diagrams.md](../uml-diagrams.md) |
 | Component diagram | `component.drawio` | `component.png` | [uml-diagrams.md](../uml-diagrams.md) |

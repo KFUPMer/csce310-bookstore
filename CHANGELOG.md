@@ -15,6 +15,7 @@ Work towards v0.3.0 (milestone M3, Backend services).
 - Record of the development environment and how to reproduce it (`docs/05-setup/environment.md`)
 - Class diagram and file map for the shared UI package
 - Sample books loaded into MongoDB
+- **book-service**: keyword search on title and author, add and update for managers, and a service-only endpoint for taking copies (FR4, FR5, FR6, FR14), with 31 tests; verified on the running service
 - `database/make_local_setup.py`: generates a dedicated, limited MySQL account for the services, so the root password is never stored or shared
 - **user-service**: login, logout, session check, and registration (FR1, FR2, FR3, FR11), with bcrypt password hashing, one error format, and 26 tests; verified against MySQL
 

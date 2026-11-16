@@ -21,6 +21,7 @@ Much of this project was built with an AI coding assistant (Claude). Its mistake
 | P-011 | Diagram layout faults, and deleted diagrams coming back | Assistant | Solved |
 | P-012 | Maven was not available from the package manager | Environment | Solved |
 | P-013 | Small things that went wrong | Mixed | Solved |
+| P-014 | A manual check failed and left a service running | Assistant | Solved |
 
 ## How to add an entry
 
@@ -333,6 +334,32 @@ Problems that cost minutes, not hours. Listed so the record is complete.
 | The screen class was named `CatalogScreen` in code but `SearchScreen` in the approved class diagram | Assistant | Code renamed to match the diagram |
 | The use case diagram was missing the mail server as an actor | Assistant | Added after the owner questioned the actors |
 
+## P-014 — A manual check failed and left a service running
+
+- **Date found:** 2026-11-13, finished 2026-11-16
+- **Phase / milestone:** M3 Backend Services
+- **Who:** assistant
+- **Status:** Solved
+
+**What happened**
+After book-service passed its tests, it was started together with user-service and called by hand from a PowerShell script. The first run printed nothing useful and ended with errors. The second run showed search and the login checks working, but "manager adds a book" failed with no response at all, which made the three checks after it meaningless. And after the first run, book-service was still running in the background.
+
+**Cause**
+Two mistakes in the checking script, none in the service:
+
+1. PowerShell does not distinguish capital letters in variable names. The script kept the service's process in `$b` and the address in `$B`; the second overwrote the first, so the script could no longer stop the service it had started.
+2. The test book's title had spaces in it ("Run Check Book"). The way the script passed it to the command split it into pieces, so the request was never sent.
+
+**What we tried**
+1. Found and stopped the leftover process, and added a check at the end of every run that no service process is left.
+2. Renamed the variables: this fixed the first mistake and exposed the second.
+
+**Solution**
+The manual check was rewritten in Python, which sends requests directly instead of building a command line. Each check now states the result it expects and the script says plainly whether all passed. All 16 checks passed, in 3 to 38 ms. The work was committed in between as "work in progress", with the three unverified endpoints named as unverified.
+
+**Lesson**
+Write checks in a language that handles data properly rather than gluing text into commands. A check must say what it expects, so that a failure cannot be mistaken for a pass. Anything a script starts, it must be sure to stop. And when a check fails, say what was and was not verified instead of rounding up.
+
 ## Known gaps
 
 Things that are known to be unfinished or unverified, so nobody is surprised later.
@@ -344,4 +371,4 @@ Things that are known to be unfinished or unverified, so nobody is surprised lat
 | Trackpad scrolling, screen readers, and a color-blindness simulation are untested | M2 | Test during M5 |
 | The timing protection of E-013 has a test for the message but not for the timing | M3 | Add a timing test, or accept and document |
 | Sessions never expire; they end only at logout | M2 | The PRD asks for exactly this (FR2). Noted in case an expiry is wanted |
-| book-service and order-service are not built | M3 | Next |
+| order-service is not built | M3 | Next |

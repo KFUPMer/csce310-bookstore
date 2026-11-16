@@ -28,6 +28,10 @@ Each entry says whether the PRD required it. "No" means it was a choice, and cou
 | E-018 | 2026-11-13 | Request validation with messages that name the field | user-service | Partly (FR3 asks for a valid email) |
 | E-019 | 2026-11-13 | Tests that call the real server over HTTP | user-service | No |
 | E-020 | 2026-11-13 | Generated diagrams, checked after every export | Docs | No |
+| E-021 | 2026-11-16 | The last copy of a book cannot be sold twice | book-service | No |
+| E-022 | 2026-11-16 | A clear answer when another service is down | book-service | No |
+| E-023 | 2026-11-16 | Search treats the keyword as plain text | book-service | No |
+| E-024 | 2026-11-16 | Database tests on a separate, disposable database | book-service | No |
 
 ## Details
 
@@ -141,3 +145,26 @@ The draw.io files are produced by scripts, and every exported image is looked at
 **Why:** diagrams stay consistent with each other and can be regenerated when the design changes.
 **Effect:** about a dozen layout faults were caught this way before being committed (see P-011).
 **Gap:** the generating scripts are not in the repository yet, only their output (the `.drawio` files, which can be edited by hand in draw.io). See "Known gaps" in the problem log.
+
+### E-021 — The last copy cannot be sold twice
+
+Taking copies is done in one atomic MongoDB step: "reduce the copies, but only if enough remain". It is not "read the number, check it, write it back".
+**Why:** with read-then-write, two orders arriving at the same moment could both read "1 copy" and both succeed.
+**Verified:** a test fires 20 attempts at once at a book with one copy. Exactly one succeeds, and the book ends at 0, not below.
+
+### E-022 — A clear answer when another service is down
+
+book-service asks user-service who each token belongs to. If user-service does not answer within about two seconds, book-service replies `503` with "The login service is not answering. Please try again in a moment."
+**Why:** the alternatives are a frozen app, or wrongly telling a logged-in user they are logged out. The same is done if MongoDB is down.
+**Verified:** user-service was stopped while book-service ran; the search answered 503 in 2.0 seconds.
+
+### E-023 — Search treats the keyword as plain text
+
+The keyword is escaped before it is used in the database's pattern search.
+**Why:** otherwise typing `(` would cause an error, and `.*` would match every book. It also closes a way to make the database do expensive work on purpose.
+**Verified:** tests search for `(`, `[`, `.*`, `\`, and `c++`; the last finds "The C++ Programming Language".
+
+### E-024 — Database tests on a disposable database
+
+The tests of the MongoDB repository run against a real MongoDB, but in a database of their own (`bookstore_test`) that is emptied before each test and dropped at the end.
+**Why:** testing against the real thing catches what a stand-in cannot, and the real `bookstore` data is never touched.

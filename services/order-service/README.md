@@ -133,6 +133,10 @@ Built and verified on 2026-11-16:
 
 - A real bill was sent through Gmail with `python email_check.py`: the order answered in 101 ms and Gmail accepted the email afterwards ("Emailed the bill for order 1033" in the log). That first email showed the layout broken in Gmail; it was fixed (problem P-016) and a second one sent.
 
-**Not verified:** how the fixed bill looks when opened in Gmail. Mail programs do not show HTML exactly as a browser does; that has to be looked at in the inbox.
+The owner opened the second email in Gmail and it looks as designed.
+
+**Not verified:** how the bill looks in other mail programs (Outlook, phone apps).
+
+**Not built, on purpose:** there is no "Pay" button on the bill. The PRD says there is no real-time payment processing: a manager marks the order as paid by hand (FR13).
 
 Known limits are listed under "Known gaps" in the [problem log](../../docs/03-problems/problem-log.md).

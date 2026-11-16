@@ -23,7 +23,7 @@ Much of this project was built with an AI coding assistant (Claude). Its mistake
 | P-013 | Small things that went wrong | Mixed | Solved |
 | P-014 | A manual check failed and left a service running | Assistant | Solved |
 | P-015 | order-service passed all its tests with faults a review then found | Assistant | Solved, with three limits left open |
-| P-016 | The first real bill email arrived with its layout broken | Assistant | Fixed; waiting for the owner to confirm in Gmail |
+| P-016 | The first real bill email arrived with its layout broken | Assistant | Solved |
 
 ## How to add an entry
 
@@ -400,7 +400,7 @@ Tests written first prove the answers; they do not prove what happens around the
 - **Phase / milestone:** M3 Backend Services
 - **Issue:** #16
 - **Who:** assistant
-- **Status:** Fixed; waiting for the owner to confirm in Gmail
+- **Status:** Solved. The owner opened the second email (order 1041) in Gmail and sent a screenshot: heading, details, table, and typeface all as designed
 
 **What happened**
 The first bill sent through Gmail arrived, with the right content, but looked wrong: "Bookstore" and "Bill" were pushed together, the Order ID, Date, and Customer were squeezed into one corner, and the serif typeface was replaced by Gmail's own. The same bill opened as a file in a browser looked right. The owner found it by opening the email and sending a screenshot.
@@ -421,7 +421,7 @@ Things that are known to be unfinished or unverified, so nobody is surprised lat
 | Gap | Since | Plan |
 |---|---|---|
 | `uml.py` still writes the three diagrams that were removed, and has not been run from `tools/diagrams`. (`flows.py` was run from there on 2026-11-16 and changed only the diagram that was meant to change) | M2 | Remove the three from `uml.py`; run it once and check `git status` shows no change |
-| The bill's new mail-safe layout (P-016) was sent through Gmail for real (order 1041) but has not yet been looked at in the inbox. Other mail programs (Outlook, phone apps) are untested | M3 | The owner opens the second email; test others in M5 if wanted |
+| The bill email has been seen to look right in Gmail in a desktop browser only. Other mail programs (Outlook, phone apps) are untested | M3 | Test others in M5 if wanted |
 | If book-service takes copies for an order but its answer does not arrive within 3 seconds, the order fails and those copies are not given back. order-service logs an error naming the book | M3 | Accept and document; a manager can correct the number of copies (FR14). Rare on one machine |
 | The MySQL tests of order-service run in the real `bookstore` database and use up order numbers, so real order ids are not consecutive | M3 | Accept, or have the owner grant the services' account a `bookstore_test` database |
 | `GET /api/orders` returns every order at once, and loads their items | M3 | Fine for a course project; add paging if the list grows |

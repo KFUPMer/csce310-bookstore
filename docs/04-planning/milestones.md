@@ -39,7 +39,8 @@ The live version of this plan is on GitHub: milestones hold the deadlines, issue
 - [x] book-service in Python Flask (31 tests, verified on the running service): keyword search, add and update books (FR4, FR5, FR14)
 - [x] order-service in Python Flask (87 tests, verified on the running service): orders, HTML bill, order list, payment status (FR6–FR9, FR12, FR13)
 - [x] Try the bill email for real through Gmail: sent and accepted by Gmail on 2026-11-16
-- [ ] Owner looks at the email in the inbox; then release v0.3.0
+- [x] Owner looks at the email in the inbox: the first showed a broken layout (P-016), the second, after the fix, looks as designed
+- [ ] Release v0.3.0
 
 ### M4 — Desktop Clients (due 2026-12-01)
 

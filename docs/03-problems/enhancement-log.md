@@ -194,7 +194,7 @@ A bill shows only what is saved with the order, and always says "Pending". So if
 The email is handed to a background thread and the order is answered at once. A failed send is logged with the order number and never reaches the customer as an error.
 **Why:** a mail server can take seconds, and N1 allows 500 ms. The design had already said the email would move after the response if it proved slow; it was built that way from the start rather than measured into it.
 **Effect:** the response says `emailQueued` instead of `emailSent`, because delivery is not known when the answer is given.
-**Not yet verified:** a real send through Gmail (see "Known gaps").
+**Verified:** a real order answered in 101 ms and Gmail accepted its bill afterwards (`email_check.py`). How the bill looks inside Gmail is still to be looked at (see "Known gaps").
 
 ### E-028 — Exact money
 

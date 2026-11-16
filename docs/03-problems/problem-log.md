@@ -400,7 +400,7 @@ Things that are known to be unfinished or unverified, so nobody is surprised lat
 | Gap | Since | Plan |
 |---|---|---|
 | `uml.py` still writes the three diagrams that were removed, and has not been run from `tools/diagrams`. (`flows.py` was run from there on 2026-11-16 and changed only the diagram that was meant to change) | M2 | Remove the three from `uml.py`; run it once and check `git status` shows no change |
-| **Emailing the bill through Gmail has not been tried for real.** The Gmail app password is not in `services/.env` yet. The message and the steps with the mail server are tested against a stand-in only | M3 | The owner adds `SMTP_USER` and `SMTP_PASSWORD`; then place one order and check the email arrives and the log says so |
+| A real bill email was sent through Gmail on 2026-11-16 and Gmail accepted it, but how the bill looks when opened in Gmail has not been looked at | M3 | The owner opens the email; adjust the bill's HTML if Gmail shows it badly |
 | If book-service takes copies for an order but its answer does not arrive within 3 seconds, the order fails and those copies are not given back. order-service logs an error naming the book | M3 | Accept and document; a manager can correct the number of copies (FR14). Rare on one machine |
 | The MySQL tests of order-service run in the real `bookstore` database and use up order numbers, so real order ids are not consecutive | M3 | Accept, or have the owner grant the services' account a `bookstore_test` database |
 | `GET /api/orders` returns every order at once, and loads their items | M3 | Fine for a course project; add paging if the list grows |

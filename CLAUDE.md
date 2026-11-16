@@ -17,7 +17,7 @@ The live plan is `docs/04-planning/milestones.md`; tasks are GitHub issues on `K
 | M1 Idea, M2 Design | Closed. Released as v0.1.0 and v0.2.0 |
 | user-service (Java HttpServer, MySQL) | Done, verified against MySQL |
 | book-service (Python Flask, MongoDB) | Done, verified on the running service |
-| order-service (Python Flask, MySQL) | Done, verified on the running service with the other two. **Email (FR10) is built but not yet sent for real**: it needs the owner's Gmail app password in `services/.env` (issue 16 stays open until then) |
+| order-service (Python Flask, MySQL) | Done, verified on the running service with the other two. A real bill email was sent through Gmail (`email_check.py`); the owner still has to look at it in the inbox (issue 16) |
 | **customer-app, management-app (Flutter)** | **This is next (M4).** Only a style preview of one screen exists (`SearchScreen`, on sample data) |
 | Testing and final release | M5 |
 

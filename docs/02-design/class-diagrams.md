@@ -188,7 +188,7 @@ File map (`services/order-service/order_service/`):
 | `models.py` | Data | `Order`, `OrderItem`, `CurrentUser`, `CatalogBook` | Plain data; money is `Decimal` |
 | `errors.py` | Error | `ApiError` and its six subclasses, `register_error_handlers()` | The errors, and the one place that answers them |
 
-Also in `services/order-service/`: `manual_check.py`, which starts all three services and checks every endpoint for real.
+Also in `services/order-service/`: `manual_check.py`, which starts all three services and checks every endpoint for real, and `email_check.py`, which sends one real bill email.
 
 Tests (`services/order-service/tests/`): `test_api.py` (37: every endpoint, success and each error), `test_rules.py` (17: prices, validation, settings), `test_bill.py` (13), `test_book_catalog.py` (7: against a small real web server), `test_mailer.py` (5), `test_mysql_repository.py` (8: against the real MySQL), `fakes.py` (stand-ins for user-service, book-service, and the mail server).
 

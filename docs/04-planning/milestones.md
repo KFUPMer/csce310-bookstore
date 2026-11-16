@@ -38,7 +38,8 @@ The live version of this plan is on GitHub: milestones hold the deadlines, issue
 - [x] user-service in Java HttpServer: login, logout, sessions, roles, bcrypt, registration (FR1, FR2, FR3, FR11, N3). 26 tests pass; verified against MySQL
 - [x] book-service in Python Flask (31 tests, verified on the running service): keyword search, add and update books (FR4, FR5, FR14)
 - [x] order-service in Python Flask (87 tests, verified on the running service): orders, HTML bill, order list, payment status (FR6–FR9, FR12, FR13)
-- [ ] Try the bill email for real through Gmail (needs the owner's Gmail app password in `services/.env`), then release v0.3.0
+- [x] Try the bill email for real through Gmail: sent and accepted by Gmail on 2026-11-16
+- [ ] Owner looks at the email in the inbox; then release v0.3.0
 
 ### M4 — Desktop Clients (due 2026-12-01)
 
@@ -54,7 +55,7 @@ The live version of this plan is on GitHub: milestones hold the deadlines, issue
 ### Extra credit (all being done, +4% in total)
 
 - [ ] FR3: user registration (+1%) — with user-service in M3 and the customer app in M4
-- [ ] FR10: email the bill to the customer (+1%) — built and tested in order-service; not yet sent for real through Gmail
+- [x] FR10: email the bill to the customer (+1%) — built in order-service; a real bill was sent through Gmail
 - [ ] Modern GUI framework (+2%) — both apps in Flutter, M4
 
 ## Progress notes

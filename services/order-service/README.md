@@ -58,6 +58,12 @@ python manual_check.py
 
 Starts all three services, calls every endpoint for real (33 checks, each stating what it expects), times each call from a cold start, cleans up what it created, stops the services, and confirms none is left running.
 
+```bash
+python email_check.py
+```
+
+Sends one real bill email: places one order as a temporary customer whose email is the sending address itself, waits for the log to say whether Gmail accepted it, and cleans up. Needs `SMTP_USER` and `SMTP_PASSWORD` in `services/.env`.
+
 ## How it is built
 
 Four layers; each only calls the one below ([engineering rules](../../docs/02-design/engineering-rules.md)):
@@ -125,6 +131,8 @@ Built and verified on 2026-11-16:
 - Timings on the running service: the first order after a cold start took 93 ms; every other request took 6 to 44 ms. N1 allows 500 ms.
 - With book-service stopped, placing an order answered 503 in 2.0 seconds and order-service kept running.
 
-**Not verified:** sending a real email through Gmail. The Gmail app password is not in `services/.env` yet, so the check ran with email off. The message and the conversation with the mail server are tested against a stand-in only.
+- A real bill was sent through Gmail with `python email_check.py`: the order answered in 101 ms and Gmail accepted the email afterwards ("Emailed the bill for order 1033" in the log).
+
+**Not verified:** how the bill looks when opened in Gmail. Mail programs do not show HTML exactly as a browser does; that has to be looked at in the inbox.
 
 Known limits are listed under "Known gaps" in the [problem log](../../docs/03-problems/problem-log.md).

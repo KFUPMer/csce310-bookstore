@@ -46,6 +46,38 @@ The catalog screen of the customer app, running on sample data. These are real s
 
 To run it: open the repository in VS Code, choose "Customer app" in Run and Debug, press F5. The screen is `SearchScreen` in `clients/customer-app/lib/screens/search_screen.dart`.
 
+## Customer app as built (M4)
+
+Every screen of the customer app, in the approved style. Drawn by Flutter from the app's real widgets, with the real typefaces, on the 15 sample books and stand-in services, at 1440 x 900 (`test/screenshots_test.dart`). They are not captures of the running window; that the app works against the real services was checked separately.
+
+**Log in**, and **a wrong password** in dark mode. The fan of covers is the only color on the screen.
+
+![Log in, light](ui/customer-login-light.png)
+
+![Log in with an error, dark](ui/customer-login-dark-error.png)
+
+**Create an account**: each problem under its field, with an icon, after the first attempt.
+
+![Create an account with problems, dark](ui/customer-register-dark-errors.png)
+
+**Search**, and a book opened after renting it. The toast says what happened and offers Undo.
+
+![Search, light](ui/customer-search-light.png)
+
+![Search with the detail panel, light](ui/customer-search-light-detail.png)
+
+**A search in the list view** (title, author, price in columns: FR5), dark.
+
+![Search results as a list, dark](ui/customer-search-dark-list.png)
+
+**Your order**: buy or rent with both prices shown, the due date of a rented book, and the total.
+
+![Your order, light](ui/customer-order-light.png)
+
+**The bill**: the same parts, in the same order, as the HTML bill that is saved and emailed.
+
+![Bill, light](ui/customer-bill-light.png)
+
 ## Color
 
 Warm neutrals only. Every value lives in one file: [tokens.dart](../../clients/bookstore-ui/lib/src/tokens.dart).
@@ -138,7 +170,7 @@ Everything decelerates into place (ease-out). Nothing bounces or loops.
 
 | # | Heuristic | How the design meets it | In the preview? |
 |---|---|---|---|
-| 1 | Visibility of system status | The heading always says what is shown ("3 of 15 books match"). Buttons show a spinner while a request runs. A toast confirms each action. The order button shows its item count | Yes, except spinners (no server yet) |
+| 1 | Visibility of system status | The heading always says what is shown ("3 of 15 books match"). Buttons show a spinner while a request runs. A toast confirms each action. The order button shows its item count | Yes, including spinners while the services answer |
 | 2 | Match between system and the real world | Books are shown as books, with covers. Plain words: "Buy", "Rent for 7 days", "Only 2 left". No codes or technical terms | Yes |
 | 3 | User control and freedom | Every toast has Undo. Esc closes the panel, then clears the search. The order can be changed until it is placed | Undo and Esc: yes |
 | 4 | Consistency and standards | One shared theme package for both apps: same buttons, spacing, and words everywhere. Standard shortcuts (Ctrl+F, Esc, Tab, Enter) | Yes |
@@ -146,7 +178,7 @@ Everything decelerates into place (ease-out). Nothing bounces or loops.
 | 6 | Recognition rather than recall | Price, availability, and "in your order" are on every card. The rent price is shown on the button, not left to be calculated | Yes |
 | 7 | Flexibility and efficiency of use | Covers view for browsing, list view for scanning. Search filters as you type. Keyboard shortcuts for frequent actions | Yes |
 | 8 | Aesthetic and minimalist design | Neutral interface; only the covers have color. Each screen has one main button. Details appear only when a book is selected | Yes |
-| 9 | Help users recognize, diagnose, and recover from errors | Messages say what happened and what to do, in plain words, next to where it happened. "No books match" suggests a fix and offers a button | Empty search: yes. Server errors: M4 |
+| 9 | Help users recognize, diagnose, and recover from errors | Messages say what happened and what to do, in plain words, next to where it happened. "No books match" suggests a fix and offers a button | Yes: field problems, wrong password, a service not answering ("Try again"), a book that sold out while ordering |
 | 10 | Help and documentation | Tooltips on every icon. Hints inside the search field. The renting rule is explained where the choice is made | Yes |
 
 ## What changes in the earlier design
@@ -161,4 +193,5 @@ Everything decelerates into place (ease-out). Nothing bounces or loops.
 - **Trackpad scrolling.** Written, but only testable on a real trackpad.
 - **Screen readers.** Labels are in place; they have not been tested with Windows Narrator.
 - **A color-blindness simulation** of the screenshots has not been run.
-- **Only one screen exists.** Login, register, order, bill, and the whole manager app still have to be built in this style.
+- **The manager app** still has to be built in this style. The customer app is built (screenshots above).
+- **The customer app's real window** has not been looked at by a person yet; the screenshots are drawn from its widgets.

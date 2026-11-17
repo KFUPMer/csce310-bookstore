@@ -18,7 +18,8 @@ The live plan is `docs/04-planning/milestones.md`; tasks are GitHub issues on `K
 | user-service (Java HttpServer, MySQL) | Done, verified against MySQL |
 | book-service (Python Flask, MongoDB) | Done, verified on the running service |
 | order-service (Python Flask, MySQL) | Done, verified on the running service with the other two. A real bill email was sent through Gmail (`email_check.py`) and the owner confirmed it looks right in the inbox |
-| **customer-app, management-app (Flutter)** | **This is next (M4)**: issues 11, 12, and 15 (the register screen). Only a style preview of one screen exists (`SearchScreen`, on sample data) |
+| customer-app (Flutter) | Built on the real services (issues 11, 15), 41 tests. **The owner has not tried the real window yet** |
+| **management-app (Flutter)** | **Next (issue 12).** Still the empty starter project. Reuse `bookstore-ui` (AuthLayout, AppTextField, BillView, ToastHost). Its "view bill" needs a new `GET /api/orders/{id}` (JSON) in order-service: decided 2026-11-17, not built yet |
 | Testing and final release | M5 |
 
 Known unfinished or unverified things: the "Known gaps" table at the end of `docs/03-problems/problem-log.md`.
@@ -57,7 +58,10 @@ These override any plugin or skill that says otherwise.
 - New terminals need the refreshed PATH: `$env:Path = [Environment]::GetEnvironmentVariable('Path','Machine') + ';' + [Environment]::GetEnvironmentVariable('Path','User')`.
 - Tools and versions: `docs/05-setup/environment.md`.
 - Smart App Control is on and blocks some unsigned programs (P-002, P-003). Do not turn it off. Retry once; otherwise use a signed alternative.
-- Windows Developer Mode is off. Flutter needs it for plugins; it is the owner's setting to change.
+- Windows Developer Mode is off. Flutter needs it for plugins; it is the owner's setting to change. The apps deliberately use no plugins (E-035), so it is not needed.
+- **Flutter release builds are blocked** by Smart App Control (P-017). Use debug builds (`flutter run`, `flutter build windows --debug`).
+- **Format Dart at 150 columns** (`dart format -l 150`), the width the code is written in. Plain `dart format` rewrites untouched files.
+- **The assistant cannot see or click the app window without the owner's approval** (computer use). To check the look, use `screenshots_test.dart`, and look at every image.
 
 ## How to run things
 
@@ -70,7 +74,9 @@ These override any plugin or skill that says otherwise.
 | order-service tests | `services/order-service`: `python -m unittest discover -s tests -t .` |
 | order-service | `python -m order_service` |
 | All three services, checked for real | `services/order-service`: `python manual_check.py` (starts and stops them itself; ports 8081–8083 must be free) |
-| Customer app | `clients/customer-app`: `flutter run -d windows` |
+| Customer app | `clients/customer-app`: `flutter run -d windows` (needs the services running) |
+| Customer app tests | `clients/customer-app`: `flutter test` |
+| Redraw the app screenshots | `clients/customer-app`: `set BOOKSTORE_SCREENSHOTS=1 && flutter test test/screenshots_test.dart` |
 | Reset test data | repo root: `python database/seed.py` |
 
 ## Installed plugins

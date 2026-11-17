@@ -2,6 +2,22 @@
 
 All versions and patches of the project, newest first.
 
+## Unreleased
+
+Work towards v0.4.0 (milestone M4, Desktop clients).
+
+### Added
+- **Customer app** on the real services: log in, create an account (FR3), search as you type, covers or list view, buy or rent, review and place the order, the bill (FR1–FR8). 41 tests; its service clients checked against the three running services
+- Shared UI package: text fields with their problem under them, error messages, the toast with Undo, page transitions, the bill drawn in the app, the log-in layout, and money and date formatting
+- Screenshots of every customer-app screen in the style guide, drawn with the real typefaces
+
+### Changed
+- The customer app's style preview on sample books is replaced by the real screens
+- The rent price is worked out in whole cents, exactly as order-service charges it; amounts show thousands separators
+
+### Known problems
+- P-017: release builds are blocked by Windows Smart App Control; debug builds work
+
 ## v0.3.0 — 2026-11-17 — Backend services (M3)
 
 All three backend services are built, tested, and verified running together against the real MySQL and MongoDB: 145 tests pass, every request answers well under the 500 ms limit (N1), and a real bill email was delivered through Gmail.

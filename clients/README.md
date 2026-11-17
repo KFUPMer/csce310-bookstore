@@ -4,11 +4,11 @@ Two separate Flutter desktop apps, written in Dart.
 
 | Folder | For | Does |
 |---|---|---|
-| `customer-app/` | Customers | Log in, register, search books, select and order them, see the bill |
+| [`customer-app/`](customer-app/README.md) | Customers | Log in, register, search books, select and order them, see the bill. **Built** |
 | `management-app/` | Managers | View orders, update payment status, add and update books |
 | `bookstore-ui/` | Both apps | The shared look: colors, typefaces, spacing, motion, and common widgets |
 
-The customer app currently shows a **style preview**: the catalog screen running on sample books, to judge the look ([style guide](../docs/02-design/style-guide.md)). The management app is still the empty starter project. The real screens are built in milestone M4.
+The customer app is built and works against the real services. The management app is still the empty starter project; it is next in M4.
 
 Design: [UI](../docs/02-design/ui-design.md), [class diagrams](../docs/02-design/class-diagrams.md).
 

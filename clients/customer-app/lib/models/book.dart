@@ -22,11 +22,27 @@ class Book {
 
   bool get isAvailable => copiesAvailable > 0;
 
-  /// Renting costs 10% of the price, for 7 days.
-  double get rentPrice => (price * 10).roundToDouble() / 100;
+  /// FR7: renting costs 10% of the price. Worked out in whole cents, rounded half up,
+  /// the same as order-service, so the price shown is the price on the bill.
+  double get rentPrice {
+    final priceCents = (price * 100).round();
+    return ((priceCents * rentPercent + 50) ~/ 100) / 100;
+  }
 }
 
-/// Whether a book in an order is bought or rented.
-enum ItemType { buy, rent }
+/// The renting rule (FR7), as order-service applies it.
+const rentPercent = 10;
+const rentDays = 7;
 
-String money(double value) => '\$${value.toStringAsFixed(2)}';
+/// Whether a book in an order is bought or rented.
+enum ItemType {
+  buy('BUY'),
+  rent('RENT');
+
+  const ItemType(this.json);
+
+  /// How order-service writes it.
+  final String json;
+
+  static ItemType fromJson(String value) => values.firstWhere((t) => t.json == value);
+}

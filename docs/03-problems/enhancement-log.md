@@ -38,6 +38,12 @@ Each entry says whether the PRD required it. "No" means it was a choice, and cou
 | E-028 | 2026-11-16 | Exact money | order-service | No |
 | E-029 | 2026-11-16 | A repeatable check of the whole running system | order-service | No |
 | E-030 | 2026-11-16 | A code review before each service is committed | Process | No |
+| E-031 | 2026-11-17 | Search as you type, without stale results | Customer app | No (FR4 needs a search) |
+| E-032 | 2026-11-17 | The app always shows the bill's prices, to the cent | Customer app | No |
+| E-033 | 2026-11-17 | An ended session returns to log in, says why, and forgets the order | Customer app | Partly (N4) |
+| E-034 | 2026-11-17 | The order survives a failure, and the message says what to do | Customer app | No |
+| E-035 | 2026-11-17 | No plugins: the apps need no Developer Mode | Both apps | No |
+| E-036 | 2026-11-17 | Screens tested as a customer uses them, in a small window too, and drawn to images | Customer app | No |
 
 ## Details
 
@@ -212,3 +218,39 @@ order-service keeps every amount as an exact decimal number, not as the approxim
 
 After its tests and the running check passed, order-service was reviewed as a separate step, looking for bugs, duplicated rules, wasted work, and anything that disagreed with the documents.
 **Why and effect:** see P-015. Ten findings; five fixed before the first commit, the rest recorded as decisions or known gaps.
+
+### E-031 — Search as you type, without stale results
+
+The customer app asks book-service for matching books a quarter of a second after the customer stops typing, instead of after pressing a Search button. Each search is numbered, and an answer to an older search that arrives after a newer one has started is thrown away.
+**Why:** fewer steps (Nielsen 7), and without the numbering a slow answer to "jav" could replace the results for "java".
+**Effect:** on the running services a search answered in 11 ms, so results follow the typing.
+
+### E-032 — The app always shows the bill's prices, to the cent
+
+The rent price is worked out in whole cents and rounded half up, the same way order-service charges it, and amounts are shown with thousands separators like the bill ($12,345.60).
+**Why:** a price on screen that differs by a cent from the bill looks like an error and is one.
+**Verified:** the live check placed a real rental order; the total order-service charged equals the price the app showed.
+
+### E-033 — An ended session returns to log in, says why, and forgets the order
+
+If any service answers that the session is no longer valid, the app goes back to the login screen with "Your session has ended. Please log in again." and empties the order being prepared. A manager account logging in to the customer app is told to use the management app.
+**Why:** the alternative is a screen full of errors, or the next person at the computer seeing someone else's order.
+**Verified:** a screen test, and the live check against user-service with an invalid token.
+
+### E-034 — The order survives a failure, and the message says what to do
+
+If placing the order fails, the books stay in it exactly as chosen. A book that sold out in the meantime is named: '"Clean Code" is not available. Remove it from the order and try again. Nothing was charged.'
+**Why:** engineering rule "the user's work survives a failure" (Nielsen 9).
+**Verified:** a screen test.
+
+### E-035 — No plugins: the apps need no Developer Mode
+
+The apps talk to the services with Dart's own HTTP client, and show the bill with their own widgets, instead of plugins (an HTTP package, a web view, a browser launcher).
+**Why:** Flutter plugins on Windows need Developer Mode, which is off on this machine, and every native part is one more thing Smart App Control can block (P-002, P-017).
+**Effect:** the customer app has no dependencies beyond Flutter and the shared UI package.
+
+### E-036 — Screens tested as a customer uses them, and drawn to images
+
+Eleven tests drive the real screens with stand-in services: log in, a wrong password, a manager refused, registering, adding books, placing an order, a failed order, Undo, an ended session, and one test that goes through every screen in a 1024 x 700 window and fails if anything overflows. A separate test draws each screen with the real typefaces into the style guide.
+**Why:** layout faults only show at certain sizes or with certain text, and this project's diagrams showed how easily they are missed (P-011).
+**Effect:** these tests found seven faults before the first commit (see P-013).

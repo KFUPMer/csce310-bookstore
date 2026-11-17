@@ -2,7 +2,7 @@
 import sys
 import flutter_cls as F  # also regenerates the two app diagrams (unchanged)
 
-COL, R = F.COL, [40, 330, 600]
+COL, R = F.COL, [40, 330, 600, 830, 1080]
 PURPLE = ('#e1d5e7', '#9673a6')
 B = '+ build(context) : Widget'
 c = [
@@ -20,9 +20,20 @@ c = [
  F.cls('scroll', 'SmoothScroll', COL[1], R[2], ['+ controller : ScrollController', '+ child : Widget', '+ physics (static)'], [B, '- onSignal(event) : void', '- onPan(event) : void'], F.BLUE, 'widget'),
  F.cls('chip', 'StatusChip', COL[2], R[2], ['+ label : String', '+ icon : IconData', '+ filled : bool'], [B], F.BLUE, 'widget'),
  F.cls('bstyle', 'AppButtonStyle', COL[3], R[2] + 30, ['primary', 'secondary', 'quiet'], None, F.YELLOW, 'enumeration'),
+ # Added in M4, used by both apps.
+ F.cls('format', 'format.dart', COL[0], R[2], ['the way the HTML bill writes them'], ['money(amount) : String   ($1,234.50)', 'toCents(amount) : int', 'formatDay(date) : String', 'formatMoment(dateTime) : String'], F.GREY, 'module'),
+ F.cls('field', 'AppTextField', COL[0], R[3], ['+ label : String', '+ controller', '+ error : String?', '+ hint : String?', '+ password : bool  (show/hide button)', '+ onChanged, onSubmitted'], [B], F.BLUE, 'widget'),
+ F.cls('error', 'ErrorMessage', COL[1], R[3], ['+ message : String', '+ small : bool'], [B, '(icon + sentence, read out', ' by screen readers)'], F.BLUE, 'widget'),
+ F.cls('toast', 'ToastHost', COL[2], R[3], ['- message : String?', '- undo : VoidCallback?'], [B, '+ of(context) (static)', '+ show(message, undo, icon)', '+ hide()'], F.BLUE, 'widget'),
+ F.cls('bill', 'BillView', COL[3], R[3], ['+ orderId : int', '+ createdAt : DateTime', '+ username, email : String', '+ lines : List<BillLine>', '+ total : double', '+ paid : bool'], [B], F.BLUE, 'widget'),
+ F.cls('line', 'BillLine', COL[4], R[3], ['+ title, author : String', '+ rented : bool', '+ quantity : int', '+ unitPrice : double', '+ dueBack : DateTime?'], None, F.YELLOW),
+ F.cls('auth', 'AuthLayout', COL[0], R[4], ['+ tagline, note : String', '+ coverTitles : List<String>', '+ child : Widget  (the form)', '+ actions : List<Widget>'], [B, '(form card, and a fan of', ' three BookCovers)'], F.BLUE, 'widget'),
+ F.cls('route', 'fadeRoute', COL[2], R[4], ['(page : Widget)'], ['returns a Route that fades and', 'rises into place (Motion.slow)'], F.GREY, 'function'),
  F.edge('uses', 'theme', 'colors', 'builds from'),
  F.edge('opens', 'button', 'bstyle'),
- F.note(COL[4], R[2], 150, ['Purple: design tokens (tokens.dart)', 'Blue: reusable widgets', 'Grey: the theme (theme.dart)', '', 'Every widget reads its colors from', 'BookstoreColors.of(context), so it follows', 'light and dark mode automatically.']),
+ F.edge('uses', 'field', 'error', 'shows'),
+ F.edge('has', 'bill', 'line', '1..*'),
+ F.note(COL[4], R[2], 150, ['Purple: design tokens (tokens.dart)', 'Blue: reusable widgets', 'Grey: functions (theme, formatting, page change)', 'Yellow: plain data', '', 'Every widget reads its colors from', 'BookstoreColors.of(context), so it follows', 'light and dark mode automatically.']),
 ]
 F.write('class-bookstore-ui', 'Shared UI package classes', c)
 print('ui written')

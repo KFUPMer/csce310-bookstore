@@ -18,16 +18,20 @@ Every `...Api` class extends `ApiClient`. All of its methods are `async` and ret
 
 Source: [diagrams/class-customer-app.drawio](diagrams/class-customer-app.drawio)
 
+Built in M4; the diagram shows the app as built.
+
 | Class | Purpose | Requirements |
 |---|---|---|
-| `LoginScreen` | Log in | FR1 |
-| `RegisterScreen` | Create an account | FR3 |
-| `SearchScreen` | Search by keyword, show title/author/price, add books to the order, log out | FR2, FR4, FR5, FR6 |
-| `OrderScreen` | Review the selected books, choose buy or rent for each, place the order | FR6, FR7 |
-| `BillScreen` | Show the bill returned for the order | FR8 |
-| `OrderDraft` | The order being prepared, shared by the search and order screens | FR6 |
-| `UserApi`, `BookApi`, `OrderApi` | Calls to user-service, book-service, order-service | N2, N4 |
-| `Book`, `OrderItem`, `Order`, `ItemType` | Data; `OrderItem` works out the charge (10% when rented) and the rent due date (7 days) | FR7 |
+| `LoginScreen` | Log in; refuses a manager account; shows why the last session ended | FR1, N5 |
+| `RegisterScreen` | Create an account; each field's problem is shown under it before anything is sent | FR3 |
+| `SearchScreen` | Search as you type, show title/author/price as covers or a list, add books to the order, log out | FR2, FR4, FR5, FR6 |
+| `OrderScreen` | Review the selected books, choose buy or rent for each, remove (with Undo), place the order | FR6, FR7 |
+| `BillScreen` | Show the bill of the order just placed, and that a copy is being emailed | FR8, FR10 |
+| `OrderDraft` | The order being prepared, kept by the app so it survives moving between screens and a failed attempt | FR6 |
+| `Session` | Who is logged in; ending it sends the app back to the login screen | FR1, FR2, N4 |
+| `UserApi`, `BookApi`, `OrderApi`, `ApiClient`, `ApiException` | Calls to the three services; every failure becomes one readable `ApiException` | N2, N4 |
+| `Book`, `OrderItem`, `Order`, `PlacedItem`, `ItemType` | Data; `OrderItem` works out the charge (10% when rented, in whole cents) and the rent due date (7 days) | FR7, FR8 |
+| `AppServices`, `AppScope`, `CustomerApp` | Holds the session, the order draft, and the three services, and gives them to every screen | — |
 
 ## Manager app
 
@@ -68,21 +72,36 @@ Every source file that exists so far, and the classes in it. Updated in the same
 | `lib/src/app_button.dart` | `AppButton`, `AppButtonStyle`, `AppIconButton` | Buttons with hover, press, focus, and loading states |
 | `lib/src/smooth_scroll.dart` | `SmoothScroll` | Animated mouse-wheel scrolling |
 | `lib/src/status_chip.dart` | `StatusChip` | A state shown as an icon and a word |
+| `lib/src/format.dart` | `money()`, `toCents()`, `formatDay()`, `formatMoment()` | Money and dates written the way the HTML bill writes them; money rounded to the cent half up |
+| `lib/src/app_text_field.dart` | `AppTextField`, `ErrorMessage` | A labelled field with its problem written under it; a problem said with an icon and a sentence |
+| `lib/src/toast.dart` | `ToastHost`, `fadeRoute()` | The toast that confirms an action and offers Undo; the page change used everywhere |
+| `lib/src/bill_view.dart` | `BillView`, `BillLine` | The bill drawn in the app, with the same parts as the HTML bill |
+| `lib/src/auth_layout.dart` | `AuthLayout`, `_CoverFan` | The layout of the log-in and create-account screens |
 | `test/bookstore_ui_test.dart` | — | Tests that a title always gets the same cover color |
 
 ### clients/customer-app
 
 | File | Classes | Purpose |
 |---|---|---|
-| `lib/main.dart` | `CustomerApp` | Starts the app, holds light or dark mode |
-| `lib/models/book.dart` | `Book`, `ItemType`, `money()` | A book, with its rent price (10%) |
-| `lib/screens/search_screen.dart` | `SearchScreen`, and its private parts: `_Heading`, `_SearchField`, `_Availability`, `_BookCard`, `_BookRow`, `_DetailPanel`, `_EmptyState`, `_OrderLine` | Search and browse books, add them to the order |
-| `lib/preview/mock_books.dart` | `mockBooks` | Sample data for the style preview. **Removed in M4** |
-| `test/book_test.dart` | — | Tests the rent price, availability, and reading a book from JSON |
+| `lib/main.dart` | `CustomerApp`, `AppServices`, `AppScope` | Starts the app at the login screen, holds light or dark mode, gives the screens the session, the order draft, and the services; returns to log in when the session ends |
+| `lib/api/session.dart` | `Session` | Who is logged in |
+| `lib/api/api_client.dart` | `ApiClient`, `ApiException` | Sends a request with the token, reads the answer, turns every failure into a readable message; uses dart:io, so no plugin is needed |
+| `lib/api/apis.dart` | `UserApi`, `BookApi`, `OrderApi` | One per service; also the services' addresses |
+| `lib/models/book.dart` | `Book`, `ItemType`, `rentPercent`, `rentDays` | A book, with its rent price (10%, in whole cents) |
+| `lib/models/order_draft.dart` | `OrderItem`, `OrderDraft` | The order being prepared |
+| `lib/models/order.dart` | `Order`, `PlacedItem` | A placed order, as order-service returns it |
+| `lib/models/account_rules.dart` | `checkRegistration()` | The account rules of user-service, checked in the app first |
+| `lib/screens/login_screen.dart` | `LoginScreen`, `_Note` | Log in |
+| `lib/screens/register_screen.dart` | `RegisterScreen` | Create an account |
+| `lib/screens/search_screen.dart` | `SearchScreen`, and its private parts: `_Heading`, `_SearchField`, `_Availability`, `_BookCard`, `_PlaceholderCard`, `_BookRow`, `_DetailPanel`, `_Message` | Search and browse books, add them to the order |
+| `lib/screens/order_screen.dart` | `OrderScreen`, `_ItemRow`, `_TypeChoice`, `_Segment`, `_Summary`, `_Empty` | Review and place the order |
+| `lib/screens/bill_screen.dart` | `BillScreen` | The bill of the order just placed |
+
+Tests (`clients/customer-app/test/`): `book_test.dart` (5: prices, money), `order_draft_test.dart` (9), `order_test.dart` (1), `account_rules_test.dart` (5), `api_client_test.dart` (10: against a small real web server), `screens_test.dart` (11: every screen driven as a customer uses it, including a 1024 x 700 window), `fakes.dart` (stand-ins for the services), plus two that are skipped unless asked for: `live_services_test.dart` (the app's clients against the real running services) and `screenshots_test.dart` (draws the screens to `docs/02-design/ui`).
 
 Private classes (names starting with `_`) are pieces of one screen and are used nowhere else, so they are listed here and not drawn as separate boxes.
 
-Not built yet, and so still only in the diagram above: `LoginScreen`, `RegisterScreen`, `OrderScreen`, `BillScreen`, `OrderDraft`, the `...Api` classes, `Session`, `Order`, `OrderItem`. In the preview, the order being prepared is kept inside `SearchScreen`; it moves to `OrderDraft` in M4.
+**Changes from the M2 design:** `OrderApi.getBill` was dropped (the bill comes back with the order). `Order` holds `PlacedItem`s, because order-service returns what was charged, not the book. `OrderItem` lost `quantity` (a book cannot be added twice). Added: `ApiException`, `AppServices`/`AppScope`, `account_rules.dart`, and `Session.endedMessage`. `RegisterScreen` now returns to `LoginScreen` (use case UC3) instead of opening the search.
 
 ### clients/management-app
 

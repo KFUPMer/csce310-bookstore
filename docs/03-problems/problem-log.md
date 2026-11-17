@@ -24,6 +24,7 @@ Much of this project was built with an AI coding assistant (Claude). Its mistake
 | P-014 | A manual check failed and left a service running | Assistant | Solved |
 | P-015 | order-service passed all its tests with faults a review then found | Assistant | Solved, with three limits left open |
 | P-016 | The first real bill email arrived with its layout broken | Assistant | Solved |
+| P-017 | Release builds of the apps are blocked by Windows security | Environment | Open: debug builds used |
 
 ## How to add an entry
 
@@ -336,6 +337,10 @@ Problems that cost minutes, not hours. Listed so the record is complete.
 | The screen class was named `CatalogScreen` in code but `SearchScreen` in the approved class diagram | Assistant | Code renamed to match the diagram |
 | The use case diagram was missing the mail server as an actor | Assistant | Added after the owner questioned the actors |
 | Releasing v0.3.0, the script's safety check stopped it three times before anything was committed: GitHub's issue list lagged a few seconds behind a change; an empty JSON list counts as one item in Windows PowerShell; and a git line-ending warning was treated as an error | Assistant | Each fixed in the script and rerun. Nothing half-done reached GitHub, because the commit and tag came after the checks (as P-008 taught) |
+| Building the customer app's screens, the assistant's screen tests and screenshots found seven faults before anything was committed: rows that overflowed in narrow places (the "Create an account" line, the due-date line, button labels, the Buy/Rent choice at 1024 px wide); the manager refusal message being lost when the logout reopened the login screen; the login screen's fanned covers hiding each other's titles; and a book's detail panel staying open after a new search no longer showed that book | Assistant | Each fixed, and each overflow and behavior is now covered by a test (one test drives every screen in a 1024 x 700 window) |
+| The assistant said a rounding test would show the app charging $3.55 instead of $3.56; the test passed on the old code, so the old code happened to be right for that price | Assistant | Said so at the time. The rent price is now worked out in whole cents anyway, so it no longer depends on how a price happens to be stored |
+| `dart format` reformatted twelve files of the shared package to 80-column lines, including files that had not been changed | Assistant | Found in `git status` before committing; the untouched files were restored and the changed ones formatted at the 150 columns the project uses |
+| The first class diagram of the built customer app had three lines through boxes and a label over text (P-011 again) | Assistant | Found by looking at the exported image; boxes moved and one line routed above the others |
 | The v0.3.0 release was published with `â€”` in its title instead of a dash: Windows PowerShell read the release script, saved as UTF-8 without a marker, in the old Windows encoding | Assistant | Found by reading the title back from GitHub character by character; corrected with an escaped character. The release notes were unaffected |
 
 ## P-014 — A manual check failed and left a service running
@@ -416,6 +421,30 @@ The heading and the details are now tables, and the page's own styles sit on a w
 **Lesson**
 "Gmail accepted it" is not "it looks right", in the same way that "it compiled" was not "it worked" (P-007). Something made to be shown in two places has to be looked at in both. This could not be checked without the owner's inbox, and was listed as not verified, which is how it was caught the same day.
 
+## P-017 — Release builds of the apps are blocked by Windows security
+
+- **Date found:** 2026-11-17
+- **Phase / milestone:** M4 Desktop Clients
+- **Issue:** #11
+- **Who:** environment
+- **Status:** Open. Debug builds are used meanwhile
+
+**What happened**
+`flutter build windows --release` of the customer app failed: "An Application Control policy or security policy has blocked execution", for `gen_snapshot.exe`, the Flutter tool that compiles Dart ahead of time for release builds.
+
+**Cause**
+Smart App Control (see P-002, P-003) blocks this unsigned program. Unlike P-002, a second try was blocked too, so it is not a one-time first-run check.
+
+**What we tried**
+1. Built again: blocked again.
+2. Built in debug mode, which does not use `gen_snapshot`: it works, and the app runs.
+
+**Solution so far**
+The apps are built and run in debug mode, which is also how they are run from VS Code (F5). No security setting was changed. Debug builds are slower to start and larger, but behave the same.
+
+**Still to decide (before v1.0.0)**
+Whether the submission needs a release build. If it does, the options are the owner's: turn off Smart App Control (Windows cannot turn it back on without a reinstall), or build on another machine.
+
 ## Known gaps
 
 Things that are known to be unfinished or unverified, so nobody is surprised later.
@@ -423,6 +452,8 @@ Things that are known to be unfinished or unverified, so nobody is surprised lat
 | Gap | Since | Plan |
 |---|---|---|
 | `uml.py` still writes the three diagrams that were removed, and has not been run from `tools/diagrams`. (`flows.py` was run from there on 2026-11-16 and changed only the diagram that was meant to change) | M2 | Remove the three from `uml.py`; run it once and check `git status` shows no change |
+| The customer app's real window has not been used by a person yet. The assistant could not drive it (that needs the owner's approval), so it checked the screens with widget tests, drawn screenshots, and its service clients against the real services, separately | M4 | The owner runs the app and tries it, including how the motion feels |
+| Release builds are blocked (P-017) | M4 | Decide before v1.0.0 |
 | The bill email has been seen to look right in Gmail in a desktop browser only. Other mail programs (Outlook, phone apps) are untested | M3 | Test others in M5 if wanted |
 | If book-service takes copies for an order but its answer does not arrive within 3 seconds, the order fails and those copies are not given back. order-service logs an error naming the book | M3 | Accept and document; a manager can correct the number of copies (FR14). Rare on one machine |
 | The MySQL tests of order-service run in the real `bookstore` database and use up order numbers, so real order ids are not consecutive | M3 | Accept, or have the owner grant the services' account a `bookstore_test` database |

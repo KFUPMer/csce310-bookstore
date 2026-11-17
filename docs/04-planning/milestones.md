@@ -45,7 +45,7 @@ The live version of this plan is on GitHub: milestones hold the deadlines, issue
 ### M4 — Desktop Clients (due 2026-12-01)
 
 - [x] Install Flutter and create the two desktop projects
-- [ ] customer-app in Flutter, asynchronous calls (N2): register (the app half of FR3, issue #15), login, search, select books, place order, see bill
+- [x] customer-app in Flutter, asynchronous calls (N2): register (the app half of FR3, issue #15), login, search, select books, place order, see bill. 41 tests; checked against the running services. **Waiting for the owner to try the real window**
 - [ ] management-app in Flutter, asynchronous calls (N2): login, orders list, payment status, add and update books
 
 ### M5 — Testing & Final Release (due 2026-12-04)
@@ -83,3 +83,4 @@ Add a short dated note whenever a milestone closes or a deadline moves, and say 
 | 2026-11-16 | order-service built and verified: 87 tests, 33 checks on the three running services, 6–93 ms per request. A review before committing found ten things; five fixed, the rest recorded (P-015). All three services now work. M3 stays open until a bill has been emailed for real, which needs the owner's Gmail app password. |
 | 2026-11-16 | A real bill was emailed through Gmail. The first one showed a broken layout in Gmail (P-016); after the fix the owner confirmed the second one looks right. |
 | 2026-11-17 | **M3 closed, v0.3.0 released**, nine days before its deadline. All 145 tests pass. Issue #15 (registration) moved to M4, because its remaining half is the register screen. Next: M4, the two desktop apps. |
+| 2026-11-17 | Customer app built on the real services: five screens, 41 tests, every screen drawn into the style guide. Release builds are blocked by Smart App Control (P-017); debug builds work. Next: the owner tries the app; then the management app. |

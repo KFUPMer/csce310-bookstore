@@ -73,27 +73,39 @@ class _AppButtonState extends State<AppButton> {
       mainAxisSize: widget.expand ? MainAxisSize.max : MainAxisSize.min,
       mainAxisAlignment: widget.trailing != null ? MainAxisAlignment.spaceBetween : MainAxisAlignment.center,
       children: [
-        Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            if (widget.loading)
-              Padding(
-                padding: const EdgeInsets.only(right: Space.sm),
-                child: SizedBox(width: 14, height: 14, child: CircularProgressIndicator(strokeWidth: 2, color: fg)),
-              )
-            else if (widget.icon != null)
-              Padding(
-                padding: const EdgeInsets.only(right: Space.sm),
-                child: Icon(widget.icon, size: 17, color: fg),
+        // Flexible: in a narrow space the label is shortened with "…" rather than overflowing.
+        Flexible(
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (widget.loading)
+                Padding(
+                  padding: const EdgeInsets.only(right: Space.sm),
+                  child: SizedBox(width: 14, height: 14, child: CircularProgressIndicator(strokeWidth: 2, color: fg)),
+                )
+              else if (widget.icon != null)
+                Padding(
+                  padding: const EdgeInsets.only(right: Space.sm),
+                  child: Icon(widget.icon, size: 17, color: fg),
+                ),
+              Flexible(
+                child: Text(
+                  widget.label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: Theme.of(context).textTheme.labelLarge!.copyWith(color: fg),
+                ),
               ),
-            Text(widget.label, style: Theme.of(context).textTheme.labelLarge!.copyWith(color: fg)),
-          ],
+            ],
+          ),
         ),
-        if (widget.trailing != null)
+        if (widget.trailing != null) ...[
+          const SizedBox(width: Space.sm),
           Text(
             widget.trailing!,
             style: Theme.of(context).textTheme.labelLarge!.copyWith(color: fg.withValues(alpha: 0.85), fontWeight: FontWeight.w500),
           ),
+        ],
       ],
     );
 

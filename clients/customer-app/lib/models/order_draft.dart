@@ -1,8 +1,5 @@
-import 'package:bookstore_ui/bookstore_ui.dart' show toCents;
-
+import 'package:bookstore_ui/bookstore_ui.dart';
 import 'package:flutter/foundation.dart';
-
-import 'book.dart';
 
 /// One book in the order being prepared, bought or rented.
 class OrderItem {

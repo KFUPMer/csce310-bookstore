@@ -1,5 +1,4 @@
-import 'package:customer_app/models/book.dart';
-import 'package:customer_app/models/order.dart';
+import 'package:bookstore_ui/bookstore_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

@@ -1,7 +1,5 @@
 import 'package:bookstore_ui/bookstore_ui.dart';
-import 'package:customer_app/api/api_client.dart';
 import 'package:customer_app/main.dart';
-import 'package:customer_app/models/book.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
 

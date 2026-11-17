@@ -342,6 +342,10 @@ Problems that cost minutes, not hours. Listed so the record is complete.
 | `dart format` reformatted twelve files of the shared package to 80-column lines, including files that had not been changed | Assistant | Found in `git status` before committing; the untouched files were restored and the changed ones formatted at the 150 columns the project uses |
 | The first class diagram of the built customer app had three lines through boxes and a label over text (P-011 again) | Assistant | Found by looking at the exported image; boxes moved and one line routed above the others |
 | The v0.3.0 release was published with `â€”` in its title instead of a dash: Windows PowerShell read the release script, saved as UTF-8 without a marker, in the old Windows encoding | Assistant | Found by reading the title back from GitHub character by character; corrected with an escaped character. The release notes were unaffected |
+| The owner's first `flutter run` of the customer app, from the Claude app's Terminal panel, failed with hundreds of "Type not found" errors: that panel could not read Flutter's package folder in `%LOCALAPPDATA%\Pub\Cache`, so every package looked empty | Environment | The assistant built the debug app itself and the owner started the `.exe`; the app worked. `clients/README.md` says to run from a normal PowerShell window or VS Code |
+| The management app's check against the real services failed on its first run: order-service had been started before `GET /api/orders/{id}` was added, so the running copy did not know it | Assistant | Services restarted; every call then answered as expected. Lesson: restart a service after changing it, before checking it for real |
+| The orders row of the management app overflowed by 84 pixels in a 1024-wide window once "Mark as paid" appeared on it | Assistant | Found by the small-window test before the owner saw it; the payment column now has a fixed width |
+| The stand-in data of the management app's tests had an order whose total ($4.50) did not match its one item ($4.80) | Assistant | Found when the bill test showed both numbers; the stand-in data corrected |
 
 ## P-014 — A manual check failed and left a service running
 
@@ -452,7 +456,7 @@ Things that are known to be unfinished or unverified, so nobody is surprised lat
 | Gap | Since | Plan |
 |---|---|---|
 | `uml.py` still writes the three diagrams that were removed, and has not been run from `tools/diagrams`. (`flows.py` was run from there on 2026-11-16 and changed only the diagram that was meant to change) | M2 | Remove the three from `uml.py`; run it once and check `git status` shows no change |
-| The customer app's real window has not been used by a person yet. The assistant could not drive it (that needs the owner's approval), so it checked the screens with widget tests, drawn screenshots, and its service clients against the real services, separately | M4 | The owner runs the app and tries it, including how the motion feels |
+| The management app's real window has not been used by a person yet. The assistant checked it with widget tests, drawn screenshots, and its service clients against the real services, separately. (The owner has run the customer app and it worked) | M4 | The owner runs the management app and tries it |
 | Release builds are blocked (P-017) | M4 | Decide before v1.0.0 |
 | The bill email has been seen to look right in Gmail in a desktop browser only. Other mail programs (Outlook, phone apps) are untested | M3 | Test others in M5 if wanted |
 | If book-service takes copies for an order but its answer does not arrive within 3 seconds, the order fails and those copies are not given back. order-service logs an error naming the book | M3 | Accept and document; a manager can correct the number of copies (FR14). Rare on one machine |

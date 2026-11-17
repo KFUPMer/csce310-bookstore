@@ -3,8 +3,6 @@ import 'package:flutter/services.dart';
 import 'package:material_ui/material_ui.dart';
 
 import '../main.dart';
-import '../models/book.dart';
-import '../models/order.dart';
 
 /// The bill of the order just placed (FR8), and whether a copy was emailed (FR10).
 class BillScreen extends StatelessWidget {
@@ -64,25 +62,7 @@ class BillScreen extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: Space.xl),
-                    BillView(
-                      orderId: order.id,
-                      createdAt: order.createdAt,
-                      username: order.username,
-                      email: email,
-                      paid: order.isPaid,
-                      total: order.total,
-                      lines: [
-                        for (final i in order.items)
-                          BillLine(
-                            title: i.title,
-                            author: i.author,
-                            rented: i.type == ItemType.rent,
-                            quantity: i.quantity,
-                            unitPrice: i.unitPrice,
-                            dueBack: i.dueBack,
-                          ),
-                      ],
-                    ),
+                    BillView(order: order, email: email),
                     const SizedBox(height: Space.xl),
                     Row(
                       children: [

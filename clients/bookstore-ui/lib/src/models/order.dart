@@ -25,21 +25,28 @@ class PlacedItem {
   );
 }
 
-/// A placed order with its bill, as returned by POST /api/orders (FR8).
+/// An order, as order-service returns it. Used by both apps.
+///
+/// A row of the manager's list (GET /api/orders) has no items and no email; a
+/// whole order (POST /api/orders, GET /api/orders/{id}) has both.
 class Order {
   const Order({
     required this.id,
     required this.username,
     required this.createdAt,
     required this.paymentStatus,
-    required this.items,
     required this.total,
-    required this.emailQueued,
+    this.email,
+    this.items = const [],
+    this.emailQueued = false,
   });
 
   final int id;
   final String username;
+  final String? email;
   final DateTime createdAt;
+
+  /// PENDING or PAID (FR13).
   final String paymentStatus;
   final List<PlacedItem> items;
   final double total;
@@ -47,14 +54,29 @@ class Order {
   /// True when the bill is being emailed to the customer (FR10). Not a promise it arrived.
   final bool emailQueued;
 
-  bool get isPaid => paymentStatus == 'PAID';
+  static const pending = 'PENDING';
+  static const paid = 'PAID';
+
+  bool get isPaid => paymentStatus == paid;
+
+  Order copyWith({String? paymentStatus}) => Order(
+    id: id,
+    username: username,
+    email: email,
+    createdAt: createdAt,
+    paymentStatus: paymentStatus ?? this.paymentStatus,
+    total: total,
+    items: items,
+    emailQueued: emailQueued,
+  );
 
   factory Order.fromJson(Map<String, dynamic> json) => Order(
     id: json['id'] as int,
     username: json['username'] as String,
+    email: json['email'] as String?,
     createdAt: DateTime.parse(json['createdAt'] as String),
     paymentStatus: json['paymentStatus'] as String,
-    items: [for (final i in json['items'] as List) PlacedItem.fromJson(i as Map<String, dynamic>)],
+    items: [for (final i in json['items'] as List? ?? const []) PlacedItem.fromJson(i as Map<String, dynamic>)],
     total: (json['total'] as num).toDouble(),
     emailQueued: json['emailQueued'] as bool? ?? false,
   );

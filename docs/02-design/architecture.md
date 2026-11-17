@@ -80,6 +80,9 @@ Manager-only actions are refused unless the session belongs to a manager (FR11).
 | 18 | 2026-11-16 | A bill can always be made again from the saved order | Treat the file as the only copy | The bill shows only what is stored with the order and always says "Pending", so the same order gives the same bill. A deleted or unwritable file is not a lost bill |
 | 19 | 2026-11-16 | Money is `Decimal` in order-service | `float`, as JSON gives it | Sums of prices and the 10% rent charge must be exact to the cent |
 | 20 | 2026-11-16 | The two Flask services each keep their own copy of the error classes and the session check | A shared Python package | Each service is its own project and runs alone (PRD 4.1). The cost is that a fix must be made twice |
+| 21 | 2026-11-17 | The apps draw the bill themselves; a new `GET /api/orders/{id}` gives the manager app an order as JSON; "Print bill" opens the saved HTML in the browser | A web-view plugin to show the HTML bill (needs Windows Developer Mode); opening the bill only in the browser | The customer app has to draw the bill anyway, so one shared `BillView` serves both apps; the apps need no plugin at all (E-035). Decided by the owner |
+| 22 | 2026-11-17 | The two Flutter apps share the service client, the session, the book and order data, and the login form (`clients/bookstore-ui`) | A copy in each app | Engineering rule: no duplication between the apps. Unlike the services (decision 20), the apps are always built together from this repository |
+| 23 | 2026-11-17 | To be built: a customer account page (order history, profile, preferences, rentals due back) and a mock checkout that marks an order paid at once | The PRD only: the manager marks orders paid (FR13), no order history | Decided by the owner, as features beyond the PRD. The mock checkout takes no real card details and sends none: it only asks order-service to mark the order paid |
 
 ## Email settings (FR10)
 

@@ -43,6 +43,7 @@
 | book | PATCH | `/api/books/{id}/copies` | order-service only | FR7 |
 | order | POST | `/api/orders` | Customer | FR6–FR10 |
 | order | GET | `/api/orders` | Manager | FR12 |
+| order | GET | `/api/orders/{id}` | Owner or Manager | FR8, FR12 |
 | order | GET | `/api/orders/{id}/bill` | Owner or Manager | FR8, FR9 |
 | order | PATCH | `/api/orders/{id}/payment-status` | Manager | FR13 |
 
@@ -173,7 +174,7 @@ Response `200`: the updated book. Errors: `400` the change is not a whole number
 
 ## order-service — `http://localhost:8083`
 
-**Status: built, tested (88 tests), and verified on the running service.** The first order after a cold start answered in 93 ms; other requests in 6–44 ms. Also answers `503` when user-service, book-service, or MySQL is not available, and `404` / `405` for an unknown address or a wrong method.
+**Status: built, tested (92 tests), and verified on the running service.** The first order after a cold start answered in 93 ms; other requests in 6–44 ms. Also answers `503` when user-service, book-service, or MySQL is not available, and `404` / `405` for an unknown address or a wrong method.
 
 ### POST `/api/orders` — customer
 
@@ -201,6 +202,7 @@ Response `201`:
 {
   "id": 1042,
   "username": "alice",
+  "email": "alice@example.com",
   "createdAt": "2026-11-13T10:05:00",
   "paymentStatus": "PENDING",
   "items": [
@@ -231,6 +233,20 @@ Response `200`: all orders, newest first.
 ```
 
 Errors: `401` · `403` not a manager.
+
+### GET `/api/orders/{id}` — owner or manager
+
+Added in M4, so the manager app can show an order's bill in the app (architecture decision 21).
+
+Response `200`: the whole order, in the same shape as the answer to `POST /api/orders` but without `billFile`, `billHtml`, and `emailQueued`:
+
+```json
+{ "id": 1042, "username": "alice", "email": "alice@example.com", "createdAt": "2026-11-13T10:05:00", "paymentStatus": "PENDING", "items": [ … ], "total": 103.00 }
+```
+
+Errors: `401` · `403` a customer asking for someone else's order ("This order belongs to another customer") · `404`.
+
+The answer to `POST /api/orders` also carries `email` since M4.
 
 ### GET `/api/orders/{id}/bill` — owner or manager
 

@@ -1,5 +1,4 @@
 import 'package:bookstore_ui/bookstore_ui.dart';
-import 'package:customer_app/models/book.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 Book book({double price = 40, int copies = 4}) =>

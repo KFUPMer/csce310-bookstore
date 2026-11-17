@@ -61,7 +61,12 @@ void main() {
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.reset);
     final services = fakeServices();
-    await tester.pumpWidget(RepaintBoundary(key: frame, child: CustomerApp(services: services)));
+    await tester.pumpWidget(
+      RepaintBoundary(
+        key: frame,
+        child: CustomerApp(services: services),
+      ),
+    );
     await tester.pumpAndSettle();
     return services;
   }

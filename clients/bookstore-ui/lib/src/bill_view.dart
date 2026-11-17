@@ -1,51 +1,28 @@
 import 'package:material_ui/material_ui.dart';
 
 import 'format.dart';
+import 'models/book.dart';
+import 'models/order.dart';
 import 'status_chip.dart';
 import 'tokens.dart';
-
-/// One line of a bill.
-class BillLine {
-  const BillLine({required this.title, required this.author, required this.rented, required this.quantity, required this.unitPrice, this.dueBack});
-
-  final String title;
-  final String author;
-  final bool rented;
-  final int quantity;
-
-  /// What was charged for one copy.
-  final double unitPrice;
-  final DateTime? dueBack;
-}
 
 /// A bill drawn in the app (FR8), with the same parts in the same order as the
 /// HTML bill that is saved and emailed (docs/02-design/bill-design.md): order id,
 /// date, customer, one row per book, the total, and the payment status.
 ///
 /// Used by both apps: the customer sees it after ordering, the manager when
-/// opening an order.
+/// opening an order. Unlike the HTML bill, it shows the current payment status.
 class BillView extends StatelessWidget {
-  const BillView({
-    super.key,
-    required this.orderId,
-    required this.createdAt,
-    required this.username,
-    required this.email,
-    required this.lines,
-    required this.total,
-    required this.paid,
-  });
+  const BillView({super.key, required this.order, this.email});
 
-  final int orderId;
-  final DateTime createdAt;
-  final String username;
+  final Order order;
+
+  /// The customer's email, when the order itself does not carry it.
   final String? email;
-  final List<BillLine> lines;
-  final double total;
-  final bool paid;
 
   @override
   Widget build(BuildContext context) {
+    final paid = order.isPaid;
     final c = BookstoreColors.of(context);
     final t = Theme.of(context).textTheme;
     final label = t.labelSmall;
@@ -100,7 +77,11 @@ class BillView extends StatelessWidget {
           const SizedBox(height: Space.lg),
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: [meta('Order ID', '$orderId'), meta('Date', formatMoment(createdAt)), meta('Customer', username, email)],
+            children: [
+              meta('Order ID', '${order.id}'),
+              meta('Date', formatMoment(order.createdAt)),
+              meta('Customer', order.username, order.email ?? email),
+            ],
           ),
           const SizedBox(height: Space.xl),
 
@@ -127,7 +108,7 @@ class BillView extends StatelessWidget {
                     ),
                 ],
               ),
-              for (final line in lines)
+              for (final line in order.items)
                 TableRow(
                   decoration: BoxDecoration(border: Border(bottom: hairline)),
                   children: [
@@ -142,8 +123,8 @@ class BillView extends StatelessWidget {
                         ],
                       ),
                     ),
-                    _cell(context, line.rented ? 'Rent (7 days)' : 'Buy'),
-                    _cell(context, line.rented && line.dueBack != null ? formatDay(line.dueBack!) : '—'),
+                    _cell(context, line.type == ItemType.rent ? 'Rent ($rentDays days)' : 'Buy'),
+                    _cell(context, line.dueBack != null ? formatDay(line.dueBack!) : '—'),
                     _cell(context, '${line.quantity}', right: true),
                     _cell(context, money(line.unitPrice * line.quantity), right: true),
                   ],
@@ -157,13 +138,16 @@ class BillView extends StatelessWidget {
               const Spacer(),
               Text('Total amount due', style: t.titleMedium),
               const SizedBox(width: Space.xl),
-              Text(money(total), style: t.headlineSmall),
+              Text(money(order.total), style: t.headlineSmall),
             ],
           ),
           const SizedBox(height: Space.xl),
           Container(height: 1, color: c.hairline),
           const SizedBox(height: Space.md),
-          Text('Rented books are charged at 10% of the book price and are due back 7 days after the order date.', style: t.bodySmall),
+          Text(
+            'Rented books are charged at $rentPercent% of the book price and are due back $rentDays days after the order date.',
+            style: t.bodySmall,
+          ),
         ],
       ),
     );

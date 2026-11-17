@@ -1,8 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:customer_app/api/api_client.dart';
-import 'package:customer_app/api/session.dart';
+import 'package:bookstore_ui/bookstore_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 /// ApiClient against a small real web server on this machine, so the address,

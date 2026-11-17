@@ -20,6 +20,9 @@ class Book {
     coverUrl: json['coverUrl'] as String?,
   );
 
+  /// The body of POST and PUT /api/books (FR14). The id is in the address, not the body.
+  Map<String, dynamic> toJson() => {'title': title, 'author': author, 'price': price, 'copiesAvailable': copiesAvailable, 'coverUrl': coverUrl};
+
   bool get isAvailable => copiesAvailable > 0;
 
   /// FR7: renting costs 10% of the price. Worked out in whole cents, rounded half up,

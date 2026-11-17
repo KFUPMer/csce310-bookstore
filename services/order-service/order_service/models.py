@@ -101,10 +101,11 @@ class Order:
         }
 
     def to_json(self) -> dict:
-        """The whole order, as returned when it is placed."""
+        """The whole order: returned when it is placed, and by GET /api/orders/{id}."""
         return {
             "id": self.id,
             "username": self.username,
+            "email": self.email,
             "createdAt": self.created_at.isoformat(),
             "paymentStatus": self.payment_status,
             "items": [item.to_json() for item in self.items],

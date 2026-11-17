@@ -78,6 +78,30 @@ Every screen of the customer app, in the approved style. Drawn by Flutter from t
 
 ![Bill, light](ui/customer-bill-light.png)
 
+## Management app as built (M4)
+
+The same style, the same shared widgets. Drawn the same way as the customer app's screenshots, on sample orders and the 15 sample books.
+
+**Log in**: the same form as the customer app, for managers only.
+
+![Manager log in, light](ui/manager-login-light.png)
+
+**Orders**: newest first, with how many wait for payment, a filter with counts, and "Mark as paid" on each pending row. Paid and Pending are told by an icon and a word, filled or outlined, never by color alone.
+
+![Orders, light](ui/manager-orders-light.png)
+
+![Orders, dark](ui/manager-orders-dark.png)
+
+**An order**: its bill, the same `BillView` the customer sees, with the current payment status, Mark as paid, and Print.
+
+![An order's bill, light](ui/manager-order-bill-light.png)
+
+**Books**, and **editing a book** with a problem under its field.
+
+![Books, light](ui/manager-books-light.png)
+
+![Edit book with a problem, light](ui/manager-book-form-light-error.png)
+
 ## Color
 
 Warm neutrals only. Every value lives in one file: [tokens.dart](../../clients/bookstore-ui/lib/src/tokens.dart).
@@ -193,5 +217,4 @@ Everything decelerates into place (ease-out). Nothing bounces or loops.
 - **Trackpad scrolling.** Written, but only testable on a real trackpad.
 - **Screen readers.** Labels are in place; they have not been tested with Windows Narrator.
 - **A color-blindness simulation** of the screenshots has not been run.
-- **The manager app** still has to be built in this style. The customer app is built (screenshots above).
-- **The customer app's real window** has not been looked at by a person yet; the screenshots are drawn from its widgets.
+- **The manager app's real window** has not been looked at by a person yet; its screenshots are drawn from its widgets. The owner has run the customer app.

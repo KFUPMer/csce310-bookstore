@@ -1,9 +1,7 @@
 import 'dart:io';
 
-import 'package:customer_app/api/api_client.dart';
+import 'package:bookstore_ui/bookstore_ui.dart';
 import 'package:customer_app/api/apis.dart';
-import 'package:customer_app/api/session.dart';
-import 'package:customer_app/models/book.dart';
 import 'package:customer_app/models/order_draft.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -28,7 +26,10 @@ void main() {
   final orders = OrderApi(session);
 
   test('a wrong password is refused with user-service\'s message', () async {
-    await expectLater(users.login('customer1', 'not-the-password'), throwsA(isA<ApiException>().having((e) => e.message, 'message', 'Wrong username or password')));
+    await expectLater(
+      users.login('customer1', 'not-the-password'),
+      throwsA(isA<ApiException>().having((e) => e.message, 'message', 'Wrong username or password')),
+    );
     expect(session.isLoggedIn, isFalse);
   });
 

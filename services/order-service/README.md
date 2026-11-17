@@ -10,6 +10,7 @@ Requirements covered: FR6, FR7, FR8, FR9, FR10 (extra credit), FR12, FR13, N1, N
 |---|---|---|---|
 | POST | `/api/orders` | Customer | Places an order for the selected books, each bought or rented; answers with the order and its bill |
 | GET | `/api/orders` | Manager | All orders, newest first |
+| GET | `/api/orders/{id}` | The customer who placed it, or a manager | One order with its items, as JSON (added in M4 for the manager app) |
 | GET | `/api/orders/{id}/bill` | The customer who placed it, or a manager | The bill, as HTML |
 | PATCH | `/api/orders/{id}/payment-status` | Manager | Sets `PENDING` or `PAID` |
 
@@ -37,11 +38,11 @@ Email: bills are emailed only when `SMTP_USER` and `SMTP_PASSWORD` are filled in
 python -m unittest discover -s tests -t .
 ```
 
-88 tests:
+92 tests:
 
 | File | Tests | What |
 |---|---|---|
-| `test_api.py` | 37 | Every endpoint, success and each error, with stand-ins for the other services |
+| `test_api.py` | 41 | Every endpoint, success and each error, with stand-ins for the other services |
 | `test_rules.py` | 17 | The renting price, request validation, settings |
 | `test_bill.py` | 14 | What is on the bill, and saving it |
 | `test_book_catalog.py` | 7 | The client for book-service, against a small real web server that answers like it |
@@ -126,7 +127,7 @@ Routes and services raise; `errors.py` answers every failure as `{ "error": "mes
 
 Built and verified on 2026-11-16:
 
-- All 88 tests pass, including the 8 against the real MySQL.
+- All 92 tests pass, including the 8 against the real MySQL.
 - Run for real with user-service, book-service, MySQL, and MongoDB: all 33 checks returned the expected result, and no service was left running.
 - Timings on the running service: the first order after a cold start took 93 ms; every other request took 6 to 44 ms. N1 allows 500 ms.
 - With book-service stopped, placing an order answered 503 in 2.0 seconds and order-service kept running.

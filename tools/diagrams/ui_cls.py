@@ -2,7 +2,7 @@
 import sys
 import flutter_cls as F  # also regenerates the two app diagrams (unchanged)
 
-COL, R = F.COL, [40, 330, 600, 830, 1080]
+COL, R = F.COL, [40, 330, 600, 830, 1080, 1340, 1580, 1840]
 PURPLE = ('#e1d5e7', '#9673a6')
 B = '+ build(context) : Widget'
 c = [
@@ -25,15 +25,30 @@ c = [
  F.cls('field', 'AppTextField', COL[0], R[3], ['+ label : String', '+ controller', '+ error : String?', '+ hint : String?', '+ password : bool  (show/hide button)', '+ onChanged, onSubmitted'], [B], F.BLUE, 'widget'),
  F.cls('error', 'ErrorMessage', COL[1], R[3], ['+ message : String', '+ small : bool'], [B, '(icon + sentence, read out', ' by screen readers)'], F.BLUE, 'widget'),
  F.cls('toast', 'ToastHost', COL[2], R[3], ['- message : String?', '- undo : VoidCallback?'], [B, '+ of(context) (static)', '+ show(message, undo, icon)', '+ hide()'], F.BLUE, 'widget'),
- F.cls('bill', 'BillView', COL[3], R[3], ['+ orderId : int', '+ createdAt : DateTime', '+ username, email : String', '+ lines : List<BillLine>', '+ total : double', '+ paid : bool'], [B], F.BLUE, 'widget'),
- F.cls('line', 'BillLine', COL[4], R[3], ['+ title, author : String', '+ rented : bool', '+ quantity : int', '+ unitPrice : double', '+ dueBack : DateTime?'], None, F.YELLOW),
+ F.cls('bill', 'BillView', COL[3], R[3], ['+ order : Order', '+ email : String?  (if the order has none)'], [B, '(the same parts as the HTML bill,', ' with the current payment status)'], F.BLUE, 'widget'),
  F.cls('auth', 'AuthLayout', COL[0], R[4], ['+ tagline, note : String', '+ coverTitles : List<String>', '+ child : Widget  (the form)', '+ actions : List<Widget>'], [B, '(form card, and a fan of', ' three BookCovers)'], F.BLUE, 'widget'),
+ F.cls('login', 'LoginForm', COL[1], R[4], ['+ users : UserApi', '+ role : String  (CUSTOMER / MANAGER)', '+ wrongRoleMessage : String', '+ onLoggedIn : VoidCallback', '+ note, initialUsername : String?', '+ footer : Widget?'], [B, '- onLogin() : Future<void>'], F.BLUE, 'widget'),
  F.cls('route', 'fadeRoute', COL[2], R[4], ['(page : Widget)'], ['returns a Route that fades and', 'rises into place (Motion.slow)'], F.GREY, 'function'),
+ F.cls('search', 'SearchField', COL[3], R[4], ['+ controller, focusNode', '+ searching : bool  (spinner)', '+ onChanged, onClear'], [B], F.BLUE, 'widget'),
+ F.cls('info', 'InfoNote', COL[4], R[4], ['+ text : String'], [B, '(a neutral message with an icon)'], F.BLUE, 'widget'),
+ # Talking to the services, shared by both apps (moved here from the customer app in M4).
+ F.cls('uapi', 'UserApi', COL[0], R[5], ['(user-service, port 8081)'], ['+ login(username, password)', '+ logout({reason})', '+ register(username, email, password)'], F.GREEN),
+ F.cls('bapi', 'BookApi', COL[1], R[5], ['(book-service, port 8082)'], ['+ search(keyword) : Future<List<Book>>', '+ add(book) : Future<Book>', '+ update(book) : Future<Book>'], F.GREEN),
+ F.cls('exc', 'ApiException', COL[0], R[6], ['+ message : String', '+ status : int  (0 = not answering)'], None, F.GREEN),
+ F.cls('api', 'ApiClient', COL[1], R[6], ['+ baseUrl : String', '+ session : Session', '+ serviceName : String', '+ timeout : Duration  (8 s)'], ['+ get(path) : Future<dynamic>', '+ post(path, body)', '+ put(path, body)', '+ patch(path, body)'], F.GREEN),
+ F.cls('sess', 'Session', COL[2], R[6], ['- token : String?', '+ userId, username, email, role', '+ endedMessage : String?'], ['+ isLoggedIn : bool', '+ start(...), clear({message})'], F.GREY, 'ChangeNotifier'),
+ F.cls('book', 'Book', COL[3], R[6], ['+ id, title, author : String', '+ price : double', '+ copiesAvailable : int', '+ coverUrl : String?'], ['+ fromJson, toJson', '+ rentPrice : double  (in cents)'], F.YELLOW),
+ F.cls('order', 'Order', COL[4], R[6], ['+ id : int', '+ username, email : String', '+ createdAt : DateTime', '+ paymentStatus : PENDING / PAID', '+ items : List<PlacedItem>', '+ total : double', '+ emailQueued : bool'], ['+ fromJson(json)', '+ copyWith(paymentStatus)'], F.YELLOW),
+ F.cls('type', 'ItemType', COL[3], R[7], ['buy (BUY)', 'rent (RENT)'], None, F.YELLOW, 'enumeration'),
+ F.cls('placed', 'PlacedItem', COL[4], R[7], ['+ title, author : String', '+ type : ItemType', '+ quantity : int', '+ unitPrice : double', '+ dueBack : DateTime?'], ['+ fromJson(json)'], F.YELLOW),
  F.edge('uses', 'theme', 'colors', 'builds from'),
  F.edge('opens', 'button', 'bstyle'),
  F.edge('uses', 'field', 'error', 'shows'),
- F.edge('has', 'bill', 'line', '1..*'),
- F.note(COL[4], R[2], 150, ['Purple: design tokens (tokens.dart)', 'Blue: reusable widgets', 'Grey: functions (theme, formatting, page change)', 'Yellow: plain data', '', 'Every widget reads its colors from', 'BookstoreColors.of(context), so it follows', 'light and dark mode automatically.']),
+ F.edge('uses', 'login', 'uapi', 'uses'),
+ F.edge('extends', 'uapi', 'api'), F.edge('extends', 'bapi', 'api'),
+ F.edge('uses', 'api', 'sess', 'sends token'), F.edge('uses', 'api', 'exc', 'throws'),
+ F.edge('has', 'order', 'placed', '1..*'),
+ F.note(COL[4], R[2], 170, ['Purple: design tokens (tokens.dart)', 'Blue: reusable widgets', 'Green: talking to the services', 'Grey: functions, the session', 'Yellow: plain data', '', 'Every widget reads its colors from', 'BookstoreColors.of(context), so it follows', 'light and dark mode automatically.', 'BillView draws an Order.']),
 ]
 F.write('class-bookstore-ui', 'Shared UI package classes', c)
 print('ui written')

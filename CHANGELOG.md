@@ -10,10 +10,14 @@ Work towards v0.4.0 (milestone M4, Desktop clients).
 - **Customer app** on the real services: log in, create an account (FR3), search as you type, covers or list view, buy or rent, review and place the order, the bill (FR1–FR8). 41 tests; its service clients checked against the three running services
 - Shared UI package: text fields with their problem under them, error messages, the toast with Undo, page transitions, the bill drawn in the app, the log-in layout, and money and date formatting
 - Screenshots of every customer-app screen in the style guide, drawn with the real typefaces
+- **Management app** on the real services: log in (managers only), every order with a Pending / Paid filter, mark as paid with Undo, an order's bill in the app and printed from the browser, search, add and edit books (FR1, FR2, FR8, FR9, FR11–FR14). 15 tests; its service clients checked against the running services
+- order-service: `GET /api/orders/{id}`, one order as JSON, for its customer or a manager; the order now includes the customer's email. 92 tests
+- `.gitattributes` marks the Flutter-generated `windows/` folders as generated, so GitHub does not count their C++ and CMake as project code
 
 ### Changed
 - The customer app's style preview on sample books is replaced by the real screens
 - The rent price is worked out in whole cents, exactly as order-service charges it; amounts show thousands separators
+- The log-in form, service clients, session, and book and order data moved from the customer app into the shared package, used by both apps
 
 ### Known problems
 - P-017: release builds are blocked by Windows Smart App Control; debug builds work

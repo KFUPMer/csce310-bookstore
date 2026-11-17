@@ -44,6 +44,10 @@ Each entry says whether the PRD required it. "No" means it was a choice, and cou
 | E-034 | 2026-11-17 | The order survives a failure, and the message says what to do | Customer app | No |
 | E-035 | 2026-11-17 | No plugins: the apps need no Developer Mode | Both apps | No |
 | E-036 | 2026-11-17 | Screens tested as a customer uses them, in a small window too, and drawn to images | Customer app | No |
+| E-037 | 2026-11-17 | The two apps share one log-in and one set of service clients | Both apps | Partly (N5) |
+| E-038 | 2026-11-17 | Marking an order as paid takes one click, and can be undone | Management app | No (FR13 needs the update) |
+| E-039 | 2026-11-17 | The manager can see and print any bill | Management app, order-service | No |
+| E-040 | 2026-11-17 | The management app is tested the same way, in a small window too | Management app | No |
 
 ## Details
 
@@ -254,3 +258,26 @@ The apps talk to the services with Dart's own HTTP client, and show the bill wit
 Eleven tests drive the real screens with stand-in services: log in, a wrong password, a manager refused, registering, adding books, placing an order, a failed order, Undo, an ended session, and one test that goes through every screen in a 1024 x 700 window and fails if anything overflows. A separate test draws each screen with the real typefaces into the style guide.
 **Why:** layout faults only show at certain sizes or with certain text, and this project's diagrams showed how easily they are missed (P-011).
 **Effect:** these tests found seven faults before the first commit (see P-013).
+
+### E-037 — The two apps share one log-in and one set of service clients
+
+The log-in form, the service clients, the session, and the book and order data were moved from the customer app into the shared package, and both apps use them. Each app passes the one role it lets in and the sentence that turns the other role away.
+**Why:** two copies of the same login or the same bill would drift apart; the PRD's N5 asks for one consistent interface.
+**Effect:** the management app needed no client code of its own for logging in or for books, only `OrderApi`. The tests of the moved code moved with it: 18 in the shared package, all passing.
+
+### E-038 — Marking an order as paid takes one click, and can be undone
+
+"Mark as paid" is on each pending row of the orders list, and the message that follows offers Undo. The list shows how many orders wait for payment, and filters All / Pending / Paid with a count on each. An order can also be put back to pending from its own page.
+**Why:** marking payment (FR13) is the manager's most frequent job; one click with Undo is quicker than a confirmation dialog and as safe (Nielsen 3 and 7).
+**Verified:** screen tests for marking, Undo, and the filter counts.
+
+### E-039 — The manager can see and print any bill
+
+An order opens its bill in the app, drawn by the same `BillView` the customer sees; Print opens the saved HTML bill, the same one that was emailed, in the browser. This needed one new endpoint, `GET /api/orders/{id}`, with the same rule as the bill: the customer who placed it, or a manager.
+**Why:** a manager answering a customer's question needs to see what the customer saw.
+**Verified:** four new order-service tests (manager, owner, another customer refused, unknown order); the app's live check read order 1050 from the running service in 17 ms.
+
+### E-040 — The management app is tested the same way, in a small window too
+
+Nine screen tests drive the management app with stand-in services, including one in a 1024 x 700 window that fails on any overflow; six book-rule tests; a live check of its clients against the running services; and drawn screenshots of each screen.
+**Effect:** the small-window test found an 84-pixel overflow in the orders row before anyone saw it (P-013).

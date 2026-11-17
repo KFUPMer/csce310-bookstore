@@ -2,7 +2,6 @@ import 'package:bookstore_ui/bookstore_ui.dart';
 import 'package:material_ui/material_ui.dart';
 
 import 'api/apis.dart';
-import 'api/session.dart';
 import 'models/order_draft.dart';
 import 'screens/login_screen.dart';
 

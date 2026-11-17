@@ -83,6 +83,15 @@ class OrderService:
         """FR12: every order, newest first."""
         return self._orders.list_all()
 
+    def get(self, order_id: int, user: CurrentUser) -> Order:
+        """One order with its items. N5: a customer may see only their own; a manager any."""
+        order = self._orders.find(order_id)
+        if order is None:
+            raise NotFoundError(NOT_FOUND)
+        if not user.is_manager and order.user_id != user.user_id:
+            raise ForbiddenError("This order belongs to another customer")
+        return order
+
     def bill_for(self, order_id: int, user: CurrentUser) -> str:
         """FR8, FR9: the bill of an order. N5: a customer may open only their own; a manager any."""
         order = self._orders.find(order_id)

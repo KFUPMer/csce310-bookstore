@@ -70,6 +70,7 @@ class ApiTest(unittest.TestCase):
         self.assertEqual(order, {
             "id": 1001,
             "username": "alice",
+            "email": "alice@example.com",
             "createdAt": "2026-11-13T10:05:00",
             "paymentStatus": "PENDING",
             "items": [
@@ -228,6 +229,28 @@ class ApiTest(unittest.TestCase):
         self.assert_error(self.client.get("/api/orders", headers=as_alice()), 403, "Only a manager can do this")
 
     # ------------------------------------------------------------ the bill (FR8, FR9)
+
+    # ------------------------------------------------------------ one order as JSON (FR8, FR12)
+
+    def test_a_manager_gets_one_order_with_its_items(self):
+        self.place((self.clean_code, "BUY"), (self.concurrency, "RENT"))
+        response = self.client.get("/api/orders/1001", headers=as_manager())
+        self.assertEqual(response.status_code, 200)
+        order = response.get_json()
+        self.assertEqual((order["id"], order["username"], order["email"], order["paymentStatus"], order["total"]), (1001, "alice", "alice@example.com", "PENDING", 48.0))
+        self.assertEqual([(i["title"], i["type"], i["unitPrice"], i["rentDueDate"]) for i in order["items"]], [("Clean Code", "BUY", 40.0, None), ("Java Concurrency in Practice", "RENT", 8.0, "2026-11-20")])
+        self.assertNotIn("billHtml", order)
+
+    def test_the_owner_gets_their_own_order(self):
+        self.place((self.clean_code, "BUY"))
+        self.assertEqual(self.client.get("/api/orders/1001", headers=as_alice()).status_code, 200)
+
+    def test_a_customer_cannot_get_someone_elses_order(self):
+        self.place((self.clean_code, "BUY"))
+        self.assert_error(self.client.get("/api/orders/1001", headers=as_omar()), 403, "This order belongs to another customer")
+
+    def test_an_unknown_order_is_404(self):
+        self.assert_error(self.client.get("/api/orders/9999", headers=as_manager()), 404, "This order does not exist")
 
     def test_the_owner_can_open_the_bill(self):
         bill_html = self.place((self.clean_code, "BUY")).get_json()["billHtml"]

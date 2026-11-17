@@ -17,9 +17,11 @@ The live plan is `docs/04-planning/milestones.md`; tasks are GitHub issues on `K
 | M1 Idea, M2 Design, M3 Backend | Closed. Released as v0.1.0, v0.2.0, v0.3.0 |
 | user-service (Java HttpServer, MySQL) | Done, verified against MySQL |
 | book-service (Python Flask, MongoDB) | Done, verified on the running service |
-| order-service (Python Flask, MySQL) | Done, verified on the running service with the other two. A real bill email was sent through Gmail (`email_check.py`) and the owner confirmed it looks right in the inbox |
-| customer-app (Flutter) | Built on the real services (issues 11, 15), 41 tests. **The owner has not tried the real window yet** |
-| **management-app (Flutter)** | **Next (issue 12).** Still the empty starter project. Reuse `bookstore-ui` (AuthLayout, AppTextField, BillView, ToastHost). Its "view bill" needs a new `GET /api/orders/{id}` (JSON) in order-service: decided 2026-11-17, not built yet |
+| order-service (Python Flask, MySQL) | Done, verified on the running service with the other two. A real bill email was sent through Gmail (`email_check.py`) and the owner confirmed it looks right in the inbox. `GET /api/orders/{id}` added in M4 (92 tests) |
+| bookstore-ui (shared) | The look, plus the shared log-in form, `ApiClient`, `Session`, `UserApi`, `BookApi`, `Book`, `Order` (18 tests) |
+| customer-app (Flutter) | Built on the real services (issues 11, 15), 25 tests. The owner ran it: it works |
+| management-app (Flutter) | Built (issue 12), 15 tests, checked against the running services. **The owner has not tried the real window yet** (`manager1` / `manager123`) |
+| **Customer account page + pretend checkout** | **Next.** Asked for by the owner 2026-11-17: order history, profile, preferences (kept locally), rentals due back; a checkout that marks the customer's own order Paid at once, with no real card details stored or sent. Needs order-service endpoints for "my orders" and "pay my order". Beyond the PRD (FR13 says a manager marks payment): document it as such |
 | Testing and final release | M5 |
 
 Known unfinished or unverified things: the "Known gaps" table at the end of `docs/03-problems/problem-log.md`.
@@ -76,6 +78,9 @@ These override any plugin or skill that says otherwise.
 | All three services, checked for real | `services/order-service`: `python manual_check.py` (starts and stops them itself; ports 8081–8083 must be free) |
 | Customer app | `clients/customer-app`: `flutter run -d windows` (needs the services running) |
 | Customer app tests | `clients/customer-app`: `flutter test` |
+| Management app, and its tests | `clients/management-app`: `flutter run -d windows`, `flutter test` |
+| Shared package tests | `clients/bookstore-ui`: `flutter test` |
+| Owner's Terminal panel cannot read the pub cache | Build with `flutter build windows --debug`, run `build\windows\x64\runner\Debug\<app>.exe` |
 | Redraw the app screenshots | `clients/customer-app`: `set BOOKSTORE_SCREENSHOTS=1 && flutter test test/screenshots_test.dart` |
 | Reset test data | repo root: `python database/seed.py` |
 

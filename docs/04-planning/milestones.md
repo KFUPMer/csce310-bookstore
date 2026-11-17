@@ -45,8 +45,9 @@ The live version of this plan is on GitHub: milestones hold the deadlines, issue
 ### M4 — Desktop Clients (due 2026-12-01)
 
 - [x] Install Flutter and create the two desktop projects
-- [x] customer-app in Flutter, asynchronous calls (N2): register (the app half of FR3, issue #15), login, search, select books, place order, see bill. 41 tests; checked against the running services. **Waiting for the owner to try the real window**
-- [ ] management-app in Flutter, asynchronous calls (N2): login, orders list, payment status, add and update books
+- [x] customer-app in Flutter, asynchronous calls (N2): register (the app half of FR3, issue #15), login, search, select books, place order, see bill. Checked against the running services; the owner ran it and it works
+- [x] management-app in Flutter, asynchronous calls (N2): login, orders list, payment status, an order's bill, add and update books (issue #12). 15 tests; checked against the running services. **Waiting for the owner to try the real window**
+- [ ] Asked for by the owner, beyond the PRD: an account page in the customer app (order history, profile, preferences, rentals due back) and a pretend checkout that marks an order paid (no real card details)
 
 ### M5 — Testing & Final Release (due 2026-12-04)
 
@@ -84,3 +85,4 @@ Add a short dated note whenever a milestone closes or a deadline moves, and say 
 | 2026-11-16 | A real bill was emailed through Gmail. The first one showed a broken layout in Gmail (P-016); after the fix the owner confirmed the second one looks right. |
 | 2026-11-17 | **M3 closed, v0.3.0 released**, nine days before its deadline. All 145 tests pass. Issue #15 (registration) moved to M4, because its remaining half is the register screen. Next: M4, the two desktop apps. |
 | 2026-11-17 | Customer app built on the real services: five screens, 41 tests, every screen drawn into the style guide. Release builds are blocked by Smart App Control (P-017); debug builds work. Next: the owner tries the app; then the management app. |
+| 2026-11-17 | The owner ran the customer app: it works. They asked for an account page and a way to pay; decided to build the management app first. Management app built: shared log-in and service clients moved into `bookstore-ui`, a new `GET /api/orders/{id}` in order-service (92 tests), 15 app tests, checked against the running services. Next: the owner tries it; then the account page and the pretend checkout. |

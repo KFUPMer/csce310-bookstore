@@ -41,6 +41,11 @@ def create_routes(orders: OrderService, sessions: SessionChecker) -> Blueprint:
         require_manager(current_user())
         return jsonify([order.to_summary_json() for order in orders.list_all()])
 
+    @routes.get("/<int:order_id>")
+    def get(order_id: int):
+        """GET /api/orders/{id}: one order with its items, as JSON. The customer who placed it, or a manager."""
+        return jsonify(orders.get(order_id, current_user()).to_json())
+
     @routes.get("/<int:order_id>/bill")
     def bill(order_id: int):
         """GET /api/orders/{id}/bill (FR8, FR9). The customer who placed the order, or a manager."""

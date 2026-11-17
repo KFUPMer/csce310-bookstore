@@ -39,18 +39,24 @@ Built in M4; the diagram shows the app as built.
 
 Source: [diagrams/class-manager-app.drawio](diagrams/class-manager-app.drawio)
 
+Built in M4; the diagram shows the app as built.
+
 | Class | Purpose | Requirements |
 |---|---|---|
-| `LoginScreen` | Log in; refuses anyone who is not a manager | FR1, FR11, N5 |
-| `OrdersScreen` | List all orders, mark an order as paid, view its bill | FR12, FR13 |
-| `BooksScreen` | Search books, open the add or edit dialog | FR14 |
-| `BookFormDialog` | Add a new book or edit an existing one | FR14 |
-| `UserApi`, `OrderApi`, `BookApi` | Calls to user-service, order-service, book-service | N2, N4 |
-| `Order`, `Book`, `PaymentStatus` | Data | FR12–FR14 |
+| `LoginScreen` | Log in with the shared `LoginForm`; refuses anyone who is not a manager | FR1, FR11, N5 |
+| `HomeScreen` | The glass bar with the Orders and Books tabs, light/dark, and log out | FR2 |
+| `OrdersView` | Every order, newest first, with a Pending/Paid filter; mark as paid (with Undo); open an order to see its bill, mark it paid or pending, and print it | FR8, FR9, FR12, FR13 |
+| `BooksView` | Search books; open the add or edit dialog | FR14 |
+| `BookFormDialog` | Add a new book or edit one, including its copies; each field's problem shown under it | FR14 |
+| `OrderApi` | The manager's calls to order-service: list, one order, payment status, the HTML bill | N2, N4 |
+| `ManagerServices`, `ManagerScope`, `ManagerApp` | Holds the session and the services, and gives them to every screen | — |
+| Shared: `UserApi`, `BookApi`, `ApiClient`, `Session`, `Order`, `Book` | From the shared package, the same classes as in the customer app | N2, N4 |
 
-## Shared UI package
+**Changes from the M2 design:** `OrdersScreen` and `BooksScreen` became two tabs (`OrdersView`, `BooksView`) of one `HomeScreen`, so switching keeps each tab's state. The bill is opened in a dialog in the app, through a new endpoint `GET /api/orders/{id}`, and "Print bill" opens the saved HTML in the browser (architecture decision 21). `PaymentStatus` is a plain `PENDING`/`PAID` text, as the service sends it. `UserApi`, `BookApi`, `ApiClient`, `Session`, `Order`, and `Book` are shared with the customer app instead of being written twice. Added: `book_rules.dart` (the same rules as book-service) and a filter with counts.
 
-Everything both apps have in common: the colors, typefaces, spacing, motion, and the reusable widgets. Explained in the [style guide](style-guide.md).
+## Shared package
+
+Everything both apps have in common: the colors, typefaces, spacing, motion, and the reusable widgets (explained in the [style guide](style-guide.md)), and, since M4, the way they talk to the services: the client, the session, and the book and order data. Engineering rule: no duplication between the two apps.
 
 ![Shared UI package class diagram](diagrams/class-bookstore-ui.png)
 
@@ -75,8 +81,15 @@ Every source file that exists so far, and the classes in it. Updated in the same
 | `lib/src/format.dart` | `money()`, `toCents()`, `formatDay()`, `formatMoment()` | Money and dates written the way the HTML bill writes them; money rounded to the cent half up |
 | `lib/src/app_text_field.dart` | `AppTextField`, `ErrorMessage` | A labelled field with its problem written under it; a problem said with an icon and a sentence |
 | `lib/src/toast.dart` | `ToastHost`, `fadeRoute()` | The toast that confirms an action and offers Undo; the page change used everywhere |
-| `lib/src/bill_view.dart` | `BillView`, `BillLine` | The bill drawn in the app, with the same parts as the HTML bill |
+| `lib/src/bill_view.dart` | `BillView` | The bill of an `Order` drawn in the app, with the same parts as the HTML bill |
 | `lib/src/auth_layout.dart` | `AuthLayout`, `_CoverFan` | The layout of the log-in and create-account screens |
+| `lib/src/login_form.dart` | `LoginForm`, `InfoNote` | The log-in form of both apps, letting in one role only; a neutral note with an icon |
+| `lib/src/search_field.dart` | `SearchField` | The round search field of both apps |
+| `lib/src/api/api_client.dart` | `ApiClient`, `ApiException` | Sends a request with the token, reads the answer, turns every failure into a readable message; uses dart:io, so no plugin is needed |
+| `lib/src/api/session.dart` | `Session` | Who is logged in |
+| `lib/src/api/apis.dart` | `UserApi`, `BookApi`, the services' addresses | user-service and book-service, as both apps use them |
+| `lib/src/models/book.dart` | `Book`, `ItemType`, `rentPercent`, `rentDays` | A book, with its rent price (10%, in whole cents) |
+| `lib/src/models/order.dart` | `Order`, `PlacedItem` | An order as order-service returns it: a list row, or a whole order with its items |
 | `test/bookstore_ui_test.dart` | — | Tests that a title always gets the same cover color |
 
 ### clients/customer-app
@@ -84,20 +97,18 @@ Every source file that exists so far, and the classes in it. Updated in the same
 | File | Classes | Purpose |
 |---|---|---|
 | `lib/main.dart` | `CustomerApp`, `AppServices`, `AppScope` | Starts the app at the login screen, holds light or dark mode, gives the screens the session, the order draft, and the services; returns to log in when the session ends |
-| `lib/api/session.dart` | `Session` | Who is logged in |
-| `lib/api/api_client.dart` | `ApiClient`, `ApiException` | Sends a request with the token, reads the answer, turns every failure into a readable message; uses dart:io, so no plugin is needed |
-| `lib/api/apis.dart` | `UserApi`, `BookApi`, `OrderApi` | One per service; also the services' addresses |
-| `lib/models/book.dart` | `Book`, `ItemType`, `rentPercent`, `rentDays` | A book, with its rent price (10%, in whole cents) |
+| `lib/api/apis.dart` | `OrderApi` | The customer's calls to order-service (the other clients are shared) |
 | `lib/models/order_draft.dart` | `OrderItem`, `OrderDraft` | The order being prepared |
-| `lib/models/order.dart` | `Order`, `PlacedItem` | A placed order, as order-service returns it |
 | `lib/models/account_rules.dart` | `checkRegistration()` | The account rules of user-service, checked in the app first |
-| `lib/screens/login_screen.dart` | `LoginScreen`, `_Note` | Log in |
+| `lib/screens/login_screen.dart` | `LoginScreen` | Log in, with the shared `LoginForm`; opens Create an account |
 | `lib/screens/register_screen.dart` | `RegisterScreen` | Create an account |
-| `lib/screens/search_screen.dart` | `SearchScreen`, and its private parts: `_Heading`, `_SearchField`, `_Availability`, `_BookCard`, `_PlaceholderCard`, `_BookRow`, `_DetailPanel`, `_Message` | Search and browse books, add them to the order |
+| `lib/screens/search_screen.dart` | `SearchScreen`, and its private parts: `_Heading`, `_Availability`, `_BookCard`, `_PlaceholderCard`, `_BookRow`, `_DetailPanel`, `_Message` | Search and browse books, add them to the order |
 | `lib/screens/order_screen.dart` | `OrderScreen`, `_ItemRow`, `_TypeChoice`, `_Segment`, `_Summary`, `_Empty` | Review and place the order |
 | `lib/screens/bill_screen.dart` | `BillScreen` | The bill of the order just placed |
 
-Tests (`clients/customer-app/test/`): `book_test.dart` (5: prices, money), `order_draft_test.dart` (9), `order_test.dart` (1), `account_rules_test.dart` (5), `api_client_test.dart` (10: against a small real web server), `screens_test.dart` (11: every screen driven as a customer uses it, including a 1024 x 700 window), `fakes.dart` (stand-ins for the services), plus two that are skipped unless asked for: `live_services_test.dart` (the app's clients against the real running services) and `screenshots_test.dart` (draws the screens to `docs/02-design/ui`).
+Tests (`clients/customer-app/test/`): `order_draft_test.dart` (9), `account_rules_test.dart` (5), `screens_test.dart` (11: every screen driven as a customer uses it, including a 1024 x 700 window), `fakes.dart` (stand-ins for the services), plus two that are skipped unless asked for: `live_services_test.dart` (the app's clients against the real running services) and `screenshots_test.dart` (draws the screens to `docs/02-design/ui`).
+
+Tests of the shared package (`clients/bookstore-ui/test/`): `book_test.dart` (5: prices, money), `order_test.dart` (1), `api_client_test.dart` (10: against a small real web server), `bookstore_ui_test.dart` (2).
 
 Private classes (names starting with `_`) are pieces of one screen and are used nowhere else, so they are listed here and not drawn as separate boxes.
 
@@ -105,7 +116,19 @@ Private classes (names starting with `_`) are pieces of one screen and are used 
 
 ### clients/management-app
 
-Still the empty Flutter starter project. Built in M4.
+| File | Classes | Purpose |
+|---|---|---|
+| `lib/main.dart` | `ManagerApp`, `ManagerServices`, `ManagerScope`, `FileOpener` | Starts the app at the login screen, holds light or dark mode, gives the screens the session and the services; returns to log in when the session ends |
+| `lib/api/order_api.dart` | `OrderApi` | The manager's calls to order-service |
+| `lib/models/book_rules.dart` | `checkBook()`, `BookCheck` | The book rules of book-service, checked in the form first |
+| `lib/screens/login_screen.dart` | `LoginScreen` | Manager log in, with the shared `LoginForm` |
+| `lib/screens/home_screen.dart` | `HomeScreen`, `Tabs`, `_Tab` | The glass bar and the two tabs; `Tabs` is also the order filter |
+| `lib/screens/orders_view.dart` | `OrdersView`, `_Table`, `_Row`, `_OrderDialog` | The orders, their payment status, and one order's bill |
+| `lib/screens/books_view.dart` | `BooksView`, `_BookRow` | The books |
+| `lib/screens/book_form_dialog.dart` | `BookFormDialog` | Add or edit a book |
+| `lib/screens/widgets.dart` | `Message` | The "nothing here" or "could not load" message of both tabs |
+
+Tests (`clients/management-app/test/`): `book_rules_test.dart` (6), `screens_test.dart` (9: every screen driven as a manager uses it, including a 1024 x 700 window), `fakes.dart`, plus `live_services_test.dart` and `screenshots_test.dart`, skipped unless asked for.
 
 ## Backend services
 

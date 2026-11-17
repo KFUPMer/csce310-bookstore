@@ -1,12 +1,9 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:customer_app/api/api_client.dart';
+import 'package:bookstore_ui/bookstore_ui.dart';
 import 'package:customer_app/api/apis.dart';
-import 'package:customer_app/api/session.dart';
 import 'package:customer_app/main.dart';
-import 'package:customer_app/models/book.dart';
-import 'package:customer_app/models/order.dart';
 import 'package:customer_app/models/order_draft.dart';
 
 /// Stand-ins for the three services, used by the screen tests and the screenshots.

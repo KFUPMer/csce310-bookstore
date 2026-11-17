@@ -2,9 +2,7 @@ import 'package:bookstore_ui/bookstore_ui.dart';
 import 'package:flutter/services.dart';
 import 'package:material_ui/material_ui.dart';
 
-import '../api/api_client.dart';
 import '../main.dart';
-import '../models/book.dart';
 import '../models/order_draft.dart';
 import 'bill_screen.dart';
 
@@ -116,7 +114,13 @@ class _OrderScreenState extends State<OrderScreen> {
                             );
                             // Below this the Buy / Rent choice no longer fits beside the summary.
                             if (box.maxWidth < 1000) {
-                              return Column(children: [items, const SizedBox(height: Space.md), summary]);
+                              return Column(
+                                children: [
+                                  items,
+                                  const SizedBox(height: Space.md),
+                                  summary,
+                                ],
+                              );
                             }
                             return Row(
                               crossAxisAlignment: CrossAxisAlignment.start,

@@ -472,4 +472,3 @@ Things that are known to be unfinished or unverified, so nobody is surprised lat
 | Sessions never expire; they end only at logout | M2 | The PRD asks for exactly this (FR2). Noted in case an expiry is wanted |
 | Returning a rented book is not built: a rented copy never comes back to the shelf by itself, and the account page keeps showing it as late | M2 | Not asked for by the PRD. A manager can raise the number of copies (FR14) |
 | `manual_check.py` does not call the two M4 endpoints (`GET /api/orders/mine`, `POST /api/orders/{id}/pay`). They are tested in `test_api.py` and were checked on the running service by the customer app's live check | M4 | Add them to `manual_check.py` in M5 |
-| The account page and the pretend checkout have not been tried by the owner in the real window | M4 | The owner tries them |

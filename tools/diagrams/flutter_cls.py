@@ -73,7 +73,7 @@ c = [
  cls('reg', 'RegisterScreen', COL[1], R[0], ['- username, email : TextEditingController', '- password, confirm : TextEditingController', '- problems : Map<String, String>', '- loading : bool', '- error : String?'], [BUILD, '- onRegister() : Future<void>'], BLUE),
  cls('search', 'SearchScreen', COL[2], R[0], ['- results : List<Book>', '- total : int?', '- query : String', '- selected : Book?', '- loading : bool', '- error : String?'], [BUILD, '- load() : Future<void>', '- add(book, type) : void', '- openOrder() : Future<void>', '- openAccount() : Future<void>', '- logout() : Future<void>'], BLUE),
  cls('orderc', 'OrderScreen', COL[3], R[0], ['- placing : bool', '- error : String?'], [BUILD, '- remove(item) : void  (with Undo)', '- onPlaceOrder() : Future<void>'], BLUE),
- cls('billc', 'BillScreen', COL[4], R[0], ['- order : Order'], [BUILD, '- pay() : Future<void>', '(Pay now, Continue shopping, Log out)'], BLUE),
+ cls('billc', 'BillScreen', COL[4], R[0], ['- order : Order'], [BUILD, '- pay() : Future<void>', '(Back, Pay now, Log out)'], BLUE),
  cls('pay', 'PayDialog', COL5, R[0], ['- order : Order', '- paying : bool', '- error : String?', '(no card details: OrderApi.pay)'], ['showPayDialog(context, order)', '    : Future<Order?>'], BLUE),
  cls('acct', 'AccountScreen', COL[4], R[1], ['- orders : List<Order>?', '- error : String?', '(profile, preferences, rentals,', ' orders with their bills)'], [BUILD, '- load() : Future<void>', '- pay(order) : Future<void>', '- openBill(order) : Future<void>'], BLUE),
  cls('prefs', 'Preferences', COL5, R[1], ['+ file : File?  (AppData)', '+ darkMode : bool', '+ listView : bool'], ['+ loadFor(username) : void', '+ update({darkMode, listView})', '+ forget() : void'], GREY, 'ChangeNotifier'),

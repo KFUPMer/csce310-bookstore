@@ -64,7 +64,7 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.byTooltip('Close (Esc)'));
     await tester.pumpAndSettle();
-    await tester.tap(find.widgetWithText(AppButton, 'Continue shopping'));
+    await tester.tap(find.byTooltip('Back to search (Esc)'));
     await tester.pumpAndSettle();
     await tester.tap(find.byTooltip('Your account'));
     await tester.pumpAndSettle();
@@ -102,7 +102,7 @@ void main() {
     await start(tester);
     await logIn(tester);
     await placeRental(tester);
-    await tester.tap(find.widgetWithText(AppButton, 'Continue shopping'));
+    await tester.tap(find.byTooltip('Back to search (Esc)'));
     await tester.pumpAndSettle();
 
     await tester.tap(find.byTooltip('Your account'));

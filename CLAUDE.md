@@ -19,7 +19,7 @@ The live plan is `docs/04-planning/milestones.md`; tasks are GitHub issues on `K
 | book-service (Python Flask, MongoDB) | Done, verified on the running service |
 | order-service (Python Flask, MySQL) | Done, verified on the running service with the other two. A real bill email was sent through Gmail (`email_check.py`) and the owner confirmed it looks right in the inbox. `GET /api/orders/{id}`, `GET /api/orders/mine`, `POST /api/orders/{id}/pay` added in M4 (101 tests) |
 | bookstore-ui (shared) | The look, plus the shared log-in form, `ApiClient`, `Session`, `UserApi`, `BookApi`, `Book`, `Order` (18 tests) |
-| customer-app (Flutter) | Built on the real services (issues 11, 15), 34 tests. The owner ran it: it works. Account page and pretend checkout added after: **not yet tried by the owner** |
+| customer-app (Flutter) | Built on the real services (issues 11, 15), 34 tests. The owner ran it: it works. Account page and pretend checkout added after; the owner tried them too |
 | management-app (Flutter) | Built (issue 12), 15 tests, checked against the running services. The owner tried it: it works (`manager1` / `manager123`) |
 | Customer account page + pretend checkout | Built 2026-11-17, beyond the PRD (asked for by the owner). No card details are ever asked for or stored. Preferences in `%APPDATA%\CSCE310 Bookstore\preferences.json` |
 | **Next** | M5: test every requirement end to end; add the two new endpoints to `manual_check.py`; final release |

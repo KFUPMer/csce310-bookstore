@@ -134,7 +134,7 @@ void main() {
     await shoot(tester, 'customer-bill-light');
     expect(services.draft.isEmpty, isTrue);
 
-    await tester.tap(find.widgetWithText(AppButton, 'Continue shopping'));
+    await tester.tap(find.byTooltip('Back to search (Esc)'));
     await tester.pumpAndSettle();
     await toggleDark(tester);
     await tester.enterText(find.byType(TextField).first, 'java');

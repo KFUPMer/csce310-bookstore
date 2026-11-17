@@ -48,6 +48,8 @@ class _BillScreenState extends State<BillScreen> {
                   children: [
                     Row(
                       children: [
+                        AppIconButton(icon: Icons.arrow_back_rounded, tooltip: 'Back to search (Esc)', onPressed: back),
+                        const SizedBox(width: Space.md),
                         Container(
                           width: 40,
                           height: 40,
@@ -84,12 +86,6 @@ class _BillScreenState extends State<BillScreen> {
                       runSpacing: Space.md,
                       children: [
                         if (!order.isPaid) AppButton(label: 'Pay now', icon: Icons.lock_outline_rounded, onPressed: _pay),
-                        AppButton(
-                          label: 'Continue shopping',
-                          icon: Icons.search_rounded,
-                          style: order.isPaid ? AppButtonStyle.primary : AppButtonStyle.secondary,
-                          onPressed: back,
-                        ),
                         AppButton(label: 'Log out', icon: Icons.logout_rounded, style: AppButtonStyle.secondary, onPressed: services.users.logout),
                       ],
                     ),

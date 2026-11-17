@@ -14,11 +14,11 @@ The live plan is `docs/04-planning/milestones.md`; tasks are GitHub issues on `K
 
 | Part | State |
 |---|---|
-| M1 Idea, M2 Design | Closed. Released as v0.1.0 and v0.2.0 |
+| M1 Idea, M2 Design, M3 Backend | Closed. Released as v0.1.0, v0.2.0, v0.3.0 |
 | user-service (Java HttpServer, MySQL) | Done, verified against MySQL |
 | book-service (Python Flask, MongoDB) | Done, verified on the running service |
-| order-service (Python Flask, MySQL) | Done, verified on the running service with the other two. A real bill email was sent through Gmail (`email_check.py`) and the owner confirmed it looks right in the inbox. M3 is complete except for releasing v0.3.0 |
-| **customer-app, management-app (Flutter)** | **This is next (M4).** Only a style preview of one screen exists (`SearchScreen`, on sample data) |
+| order-service (Python Flask, MySQL) | Done, verified on the running service with the other two. A real bill email was sent through Gmail (`email_check.py`) and the owner confirmed it looks right in the inbox |
+| **customer-app, management-app (Flutter)** | **This is next (M4)**: issues 11, 12, and 15 (the register screen). Only a style preview of one screen exists (`SearchScreen`, on sample data) |
 | Testing and final release | M5 |
 
 Known unfinished or unverified things: the "Known gaps" table at the end of `docs/03-problems/problem-log.md`.

@@ -8,7 +8,7 @@ The live version of this plan is on GitHub: milestones hold the deadlines, issue
 |---|---|---|---|
 | M1 — Idea & Requirements | Scope and requirements agreed | 2026-11-15 | v0.1.0 — **released 2026-11-13** |
 | M2 — Design | Architecture, database, API, and UI designed | 2026-11-19 | v0.2.0 — **released 2026-11-13** |
-| M3 — Backend Services | All three services working against their databases | 2026-11-26 | v0.3.0 |
+| M3 — Backend Services | All three services working against their databases | 2026-11-26 | v0.3.0 — **released 2026-11-17** |
 | M4 — Desktop Clients | Both GUI apps working against the services | 2026-12-01 | v0.4.0 |
 | M5 — Testing & Final Release | Tested, documented, ready to submit | 2026-12-04 | v1.0.0 |
 
@@ -40,12 +40,12 @@ The live version of this plan is on GitHub: milestones hold the deadlines, issue
 - [x] order-service in Python Flask (87 tests, verified on the running service): orders, HTML bill, order list, payment status (FR6–FR9, FR12, FR13)
 - [x] Try the bill email for real through Gmail: sent and accepted by Gmail on 2026-11-16
 - [x] Owner looks at the email in the inbox: the first showed a broken layout (P-016), the second, after the fix, looks as designed
-- [ ] Release v0.3.0
+- [x] Release v0.3.0
 
 ### M4 — Desktop Clients (due 2026-12-01)
 
 - [x] Install Flutter and create the two desktop projects
-- [ ] customer-app in Flutter, asynchronous calls (N2): register, login, search, select books, place order, see bill
+- [ ] customer-app in Flutter, asynchronous calls (N2): register (the app half of FR3, issue #15), login, search, select books, place order, see bill
 - [ ] management-app in Flutter, asynchronous calls (N2): login, orders list, payment status, add and update books
 
 ### M5 — Testing & Final Release (due 2026-12-04)
@@ -55,7 +55,7 @@ The live version of this plan is on GitHub: milestones hold the deadlines, issue
 
 ### Extra credit (all being done, +4% in total)
 
-- [ ] FR3: user registration (+1%) — with user-service in M3 and the customer app in M4
+- [ ] FR3: user registration (+1%) — the service half is done (user-service, M3); the register screen is left (customer app, M4)
 - [x] FR10: email the bill to the customer (+1%) — built in order-service; a real bill was sent through Gmail
 - [ ] Modern GUI framework (+2%) — both apps in Flutter, M4
 
@@ -81,3 +81,5 @@ Add a short dated note whenever a milestone closes or a deadline moves, and say 
 | 2026-11-13 | MySQL database created with a dedicated `bookstore_app` account; test accounts loaded. user-service verified against it. Measuring showed login too close to the 500 ms limit; fixed with a connection pool and a start-up warm-up (P-005). |
 | 2026-11-16 | book-service built and verified: 31 tests, every endpoint checked on the running service with user-service and MongoDB, 3–38 ms per request. order-service is next. |
 | 2026-11-16 | order-service built and verified: 87 tests, 33 checks on the three running services, 6–93 ms per request. A review before committing found ten things; five fixed, the rest recorded (P-015). All three services now work. M3 stays open until a bill has been emailed for real, which needs the owner's Gmail app password. |
+| 2026-11-16 | A real bill was emailed through Gmail. The first one showed a broken layout in Gmail (P-016); after the fix the owner confirmed the second one looks right. |
+| 2026-11-17 | **M3 closed, v0.3.0 released**, nine days before its deadline. All 145 tests pass. Issue #15 (registration) moved to M4, because its remaining half is the register screen. Next: M4, the two desktop apps. |

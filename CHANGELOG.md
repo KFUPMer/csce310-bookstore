@@ -2,9 +2,15 @@
 
 All versions and patches of the project, newest first.
 
-## Unreleased
+## v0.3.0 — 2026-11-17 — Backend services (M3)
 
-Work towards v0.3.0 (milestone M3, Backend services).
+All three backend services are built, tested, and verified running together against the real MySQL and MongoDB: 145 tests pass, every request answers well under the 500 ms limit (N1), and a real bill email was delivered through Gmail.
+
+| Service | Tests | Verified on the running service |
+|---|---|---|
+| user-service (Java HttpServer, MySQL) | 26 | Login 85–255 ms, session check 7–19 ms |
+| book-service (Python Flask, MongoDB) | 31 | 16 checks, 3–38 ms |
+| order-service (Python Flask, MySQL) | 88 | 33 checks, 6–93 ms; one real email |
 
 ### Added
 - **order-service**: place an order with books bought or rented, the HTML bill saved as a file and emailed in the background, the manager's order list, and the payment status (FR6–FR10, FR12, FR13), with 88 tests; verified on the running service with the other two (33 checks, first order after a cold start in 93 ms). A real bill email was sent through Gmail
@@ -13,7 +19,7 @@ Work towards v0.3.0 (milestone M3, Backend services).
 - Engineering rules: documentation, layers, error handling, tests (`docs/02-design/engineering-rules.md`)
 - `REFERENCES.md`: every third-party file, library, tool, and source, with its license
 - MIT License for the project's own work (`LICENSE`)
-- Enhancement log (`docs/03-problems/enhancement-log.md`): 20 improvements beyond the requirements, with reasons and measured effects
+- Enhancement log (`docs/03-problems/enhancement-log.md`): 30 improvements beyond the requirements, with reasons and measured effects
 - Problem log extended with the problems the AI assistant caused or ran into, an index, and a list of known gaps
 - Record of the development environment and how to reproduce it (`docs/05-setup/environment.md`)
 - Class diagram and file map for the shared UI package
@@ -33,6 +39,10 @@ Work towards v0.3.0 (milestone M3, Backend services).
 - Placing an order now takes the copies first and saves the order second, giving the copies back if anything fails (the design saved first). The response field `emailSent` is now `emailQueued`. API specification and the place-order sequence diagram updated
 - `CatalogScreen` renamed `SearchScreen`, to match the class diagram
 - Use case diagram: the mail server (Gmail) added as an external actor; actors defined in `use-cases.md`
+
+### Not done in this version
+- The two desktop apps: only the style preview of the search screen exists, on sample data (M4). This includes the register screen, the app half of FR3; issue #15 moved to M4
+- Known gaps, listed at the end of the problem log: a copy is not given back if book-service's answer is lost; the order-service MySQL tests use up real order numbers; the bill email is checked in Gmail only; `uml.py` still writes three removed diagrams, and two M2 diagrams show the old order of placing an order
 
 ## v0.2.0 — 2026-11-13 — Design (M2)
 

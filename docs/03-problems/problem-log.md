@@ -335,6 +335,8 @@ Problems that cost minutes, not hours. Listed so the record is complete.
 | The first timing check of the service reported "server not up" although it was | Assistant | The check itself was hitting the `localhost` delay that became P-004 |
 | The screen class was named `CatalogScreen` in code but `SearchScreen` in the approved class diagram | Assistant | Code renamed to match the diagram |
 | The use case diagram was missing the mail server as an actor | Assistant | Added after the owner questioned the actors |
+| Releasing v0.3.0, the script's safety check stopped it three times before anything was committed: GitHub's issue list lagged a few seconds behind a change; an empty JSON list counts as one item in Windows PowerShell; and a git line-ending warning was treated as an error | Assistant | Each fixed in the script and rerun. Nothing half-done reached GitHub, because the commit and tag came after the checks (as P-008 taught) |
+| The v0.3.0 release was published with `â€”` in its title instead of a dash: Windows PowerShell read the release script, saved as UTF-8 without a marker, in the old Windows encoding | Assistant | Found by reading the title back from GitHub character by character; corrected with an escaped character. The release notes were unaffected |
 
 ## P-014 — A manual check failed and left a service running
 

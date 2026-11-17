@@ -39,9 +39,9 @@ Collection `books` (FR4, FR5, FR14):
 - `title` and `unit_price` are copied into the order item, so the bill stays correct even if the book is changed later.
 - Renting costs 10% of the book price and lasts 7 days. Books have no separate rent price: order-service calculates it, so for a `RENT` item `unit_price` = 10% of the book price and `rent_due_date` = order date + 7 days. For a `BUY` item `rent_due_date` is empty.
 
-## Still to do in M2
+## Scripts
 
 - [x] SQL schema script — [database/mysql/schema.sql](../../database/mysql/schema.sql)
 - [x] Seed data, required by the PRD for testing — [database/seed.py](../../database/seed.py) and [books.json](../../database/mongodb/books.json): 15 books, one customer, one manager
 - [x] Indexes on `title` and `author` — created by the seed script
-- [ ] Run the scripts against real databases (M3, when MySQL and MongoDB are installed)
+- [x] Run against the real databases (M3): MySQL 8.0 and MongoDB, used by all three services

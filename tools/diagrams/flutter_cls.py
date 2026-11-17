@@ -33,6 +33,8 @@ STY = {
  'has': 'startArrow=diamond;startFill=1;startSize=14;endArrow=none;html=1;rounded=0;fontSize=11;',
  # Leaves the top of one box and enters the top of another, so it passes above the boxes between them.
  'over': 'endArrow=open;endSize=10;html=1;rounded=0;fontSize=11;edgeStyle=orthogonalEdgeStyle;exitX=0.5;exitY=0;entryX=0.5;entryY=0;',
+ # Leaves low on the right side and turns down into the top of a box further right and lower, below the boxes between.
+ 'right_down': 'endArrow=open;endSize=10;html=1;rounded=0;fontSize=11;edgeStyle=orthogonalEdgeStyle;exitX=1;exitY=0.9;entryX=0.5;entryY=0;',
 }
 _n = [0]
 def edge(kind, a, b, label=''):
@@ -62,19 +64,24 @@ SESSION = (['+ token : String?', '+ username : String?', '+ role : String?'], ['
 COLORS = ['Colors', 'Blue: screens (Flutter widgets)', 'Green: calls to the web services', 'Yellow: data', 'Grey: application, session, order draft']
 ASYNC = ['Every Api method is async and returns a', 'Future. Screens await it and show a loading', 'state, so the window never freezes (N2).']
 BUILD = '+ build(context) : Widget'
+COL5 = 1790  # a sixth column, for the account page and checkout (customer app)
 
 # ------------------------------------------------------------- customer app
 # As built in M4 (clients/customer-app/lib). Changes from the M2 design are listed in class-diagrams.md.
 c = [
  cls('login', 'LoginScreen', COL[0], R[0], ['- newUsername : String?', '- accountNote : String?', '(the shared LoginForm, role CUSTOMER;', ' a manager is refused, N5)'], [BUILD, '- openRegister() : Future<void>'], BLUE),
  cls('reg', 'RegisterScreen', COL[1], R[0], ['- username, email : TextEditingController', '- password, confirm : TextEditingController', '- problems : Map<String, String>', '- loading : bool', '- error : String?'], [BUILD, '- onRegister() : Future<void>'], BLUE),
- cls('search', 'SearchScreen', COL[2], R[0], ['- results : List<Book>', '- total : int?', '- query : String', '- selected : Book?', '- loading : bool', '- error : String?'], [BUILD, '- load() : Future<void>', '- add(book, type) : void', '- openOrder() : Future<void>', '- logout() : Future<void>'], BLUE),
+ cls('search', 'SearchScreen', COL[2], R[0], ['- results : List<Book>', '- total : int?', '- query : String', '- selected : Book?', '- loading : bool', '- error : String?'], [BUILD, '- load() : Future<void>', '- add(book, type) : void', '- openOrder() : Future<void>', '- openAccount() : Future<void>', '- logout() : Future<void>'], BLUE),
  cls('orderc', 'OrderScreen', COL[3], R[0], ['- placing : bool', '- error : String?'], [BUILD, '- remove(item) : void  (with Undo)', '- onPlaceOrder() : Future<void>'], BLUE),
- cls('billc', 'BillScreen', COL[4], R[0], ['+ order : Order'], [BUILD, '(Continue shopping, Log out)'], BLUE),
+ cls('billc', 'BillScreen', COL[4], R[0], ['- order : Order'], [BUILD, '- pay() : Future<void>', '(Pay now, Continue shopping, Log out)'], BLUE),
+ cls('pay', 'PayDialog', COL5, R[0], ['- order : Order', '- paying : bool', '- error : String?', '(no card details: OrderApi.pay)'], ['showPayDialog(context, order)', '    : Future<Order?>'], BLUE),
+ cls('acct', 'AccountScreen', COL[4], R[1], ['- orders : List<Order>?', '- error : String?', '(profile, preferences, rentals,', ' orders with their bills)'], [BUILD, '- load() : Future<void>', '- pay(order) : Future<void>', '- openBill(order) : Future<void>'], BLUE),
+ cls('prefs', 'Preferences', COL5, R[1], ['+ file : File?  (AppData)', '+ darkMode : bool', '+ listView : bool'], ['+ loadFor(username) : void', '+ update({darkMode, listView})', '+ forget() : void'], GREY, 'ChangeNotifier'),
+ cls('acctm', 'account.dart', COL[4], R[2], ['Rental: orderId, title, author,', '    dueBack'], ['rentalsOf(orders) : List<Rental>', 'dueText(dueBack, today) : String'], GREY, 'module'),
  cls('uapi', 'UserApi', COL[0], R[1], ['(user-service, port 8081)'], ['+ login(username, password) : Future<void>', '+ logout({reason}) : Future<void>', '+ register(username, email, password)'], GREEN, 'bookstore-ui'),
  cls('rules', 'account_rules.dart', COL[1], R[1], ['the same rules as user-service'], ['checkRegistration(username, email,', '    password, confirm) : Map'], GREY, 'module'),
  cls('bapi', 'BookApi', COL[2], R[1], ['(book-service, port 8082)'], ['+ search(keyword) : Future<List<Book>>', '+ add(book), update(book)  (manager)'], GREEN, 'bookstore-ui'),
- cls('oapi', 'OrderApi', COL[3], R[1], ['(order-service, port 8083)'], ['+ createOrder(draft) : Future<Order>'], GREEN),
+ cls('oapi', 'OrderApi', COL[3], R[1], ['(order-service, port 8083)'], ['+ createOrder(draft) : Future<Order>', '+ myOrders() : Future<List<Order>>', '+ pay(orderId) : Future<Order>'], GREEN),
  cls('exc', 'ApiException', COL[0], R[2], ['+ message : String', '+ status : int  (0 = not answering)', '(thrown by ApiClient for every failure)'], None, GREEN, 'bookstore-ui'),
  cls('sess', 'Session', COL[1], R[2], ['- token : String?', '+ userId, username, email, role', '+ endedMessage : String?'], ['+ isLoggedIn : bool', '+ start(token, userId, ...) : void', '+ clear({message}) : void'], GREY, 'bookstore-ui'),
  cls('api', 'ApiClient', COL[2], R[2], ['+ baseUrl : String', '+ session : Session', '+ serviceName : String', '+ timeout : Duration  (8 s)'], ['+ get(path) : Future<dynamic>', '+ post(path, body) : Future<dynamic>', '+ put(path, body) : Future<dynamic>', '+ patch(path, body) : Future<dynamic>'], GREEN, 'bookstore-ui'),
@@ -83,7 +90,7 @@ c = [
  cls('book', 'Book', COL[1], R[3], ['+ id, title, author : String', '+ price : double', '+ copiesAvailable : int', '+ coverUrl : String?'], ['+ Book.fromJson(json)', '+ toJson() : Map', '+ rentPrice : double  (in cents)'], YELLOW, 'bookstore-ui'),
  cls('item', 'OrderItem', COL[2], R[3], ['+ book : Book', '+ type : ItemType'], ['+ charge : double', '+ dueBack(orderDate) : DateTime?', '+ toJson() : Map'], YELLOW),
  cls('order', 'Order', COL[3], R[3], ['+ id : int', '+ username, email : String', '+ createdAt : DateTime', '+ paymentStatus : String', '+ items : List<PlacedItem>', '+ total : double', '+ emailQueued : bool'], ['+ Order.fromJson(json)', '+ copyWith(paymentStatus)'], YELLOW, 'bookstore-ui'),
- cls('services', 'AppServices', COL[0], R[4] + 50, ['+ session : Session', '+ draft : OrderDraft', '+ users, books, orders : ...Api'], ['(given to every screen by AppScope)'], GREY),
+ cls('services', 'AppServices', COL[0], R[4] + 50, ['+ session : Session', '+ draft : OrderDraft', '+ users, books, orders : ...Api', '+ preferences : Preferences', '+ now : DateTime Function()'], ['(given to every screen by AppScope)'], GREY),
  cls('type', 'ItemType', COL[2], R[4] + 50, ['buy (BUY)', 'rent (RENT)', '(an enumeration)'], None, YELLOW, 'bookstore-ui'),
  cls('placed', 'PlacedItem', COL[3], R[4] + 50, ['+ title, author : String', '+ type : ItemType', '+ quantity : int', '+ unitPrice : double', '+ dueBack : DateTime?'], ['+ PlacedItem.fromJson(json)'], YELLOW, 'bookstore-ui'),
  edge('opens', 'login', 'reg', 'opens'), edge('over', 'login', 'search', 'opens after log in'), edge('opens', 'search', 'orderc', 'opens'), edge('opens', 'orderc', 'billc', 'opens'),
@@ -92,7 +99,9 @@ c = [
  edge('uses', 'api', 'sess', 'sends token'),
  edge('has', 'draft', 'item', ''), edge('has', 'order', 'placed', '1..*'), edge('opens', 'item', 'book', '1'), edge('opens', 'item', 'type'),
  edge('has', 'app', 'services', ''),
- note(COL[4], R[1], 150, ASYNC + ['', 'Rent charge = 10% of the price, in cents.', 'Rent due date = order date + 7 days.', '<<bookstore-ui>>: shared with the manager', 'app, in clients/bookstore-ui.']),
+ edge('opens', 'billc', 'pay', 'opens'), edge('opens', 'acct', 'pay', 'opens'), edge('right_down', 'search', 'acct', 'opens'),
+ edge('uses', 'acct', 'oapi', 'uses'), edge('uses', 'acct', 'prefs', 'changes'), edge('uses', 'acct', 'acctm', 'uses'),
+ note(COL5, R[2], 150, ASYNC + ['', 'Rent charge = 10% of the price, in cents.', 'Rent due date = order date + 7 days.', '<<bookstore-ui>>: shared with the manager', 'app, in clients/bookstore-ui.']),
  note(COL[4], R[3], 110, COLORS),
 ]
 write('class-customer-app', 'Customer app classes', c)

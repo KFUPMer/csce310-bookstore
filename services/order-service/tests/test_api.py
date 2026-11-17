@@ -194,6 +194,8 @@ class ApiTest(unittest.TestCase):
             self.client.get("/api/orders"),
             self.client.get("/api/orders/1001/bill"),
             self.client.patch("/api/orders/1001/payment-status", json={"paymentStatus": "PAID"}),
+            self.client.get("/api/orders/mine"),
+            self.client.post("/api/orders/1001/pay"),
         ]:
             self.assert_error(response, 401, "You are not logged in")
 
@@ -228,7 +230,54 @@ class ApiTest(unittest.TestCase):
     def test_a_customer_cannot_list_orders(self):
         self.assert_error(self.client.get("/api/orders", headers=as_alice()), 403, "Only a manager can do this")
 
-    # ------------------------------------------------------------ the bill (FR8, FR9)
+    # ------------------------------------------------------------ a customer's own orders (account page, beyond the PRD)
+
+    def test_a_customer_sees_only_their_own_orders_newest_first_with_items(self):
+        self.place((self.clean_code, "BUY"))
+        self.place((self.database, "BUY"), headers=as_omar())
+        self.now = datetime(2026, 11, 14, 18, 40, 0)
+        self.place((self.concurrency, "RENT"))
+        response = self.client.get("/api/orders/mine", headers=as_alice())
+        self.assertEqual(response.status_code, 200)
+        orders = response.get_json()
+        self.assertEqual([(o["id"], o["username"], o["total"]) for o in orders], [(1003, "alice", 8.0), (1001, "alice", 40.0)])
+        self.assertEqual([(i["title"], i["rentDueDate"]) for i in orders[0]["items"]], [("Java Concurrency in Practice", "2026-11-21")])
+
+    def test_a_customer_with_no_orders_gets_an_empty_list(self):
+        self.place((self.clean_code, "BUY"), headers=as_omar())
+        self.assertEqual(self.client.get("/api/orders/mine", headers=as_alice()).get_json(), [])
+
+    def test_a_manager_has_no_orders_of_their_own(self):
+        self.assert_error(self.client.get("/api/orders/mine", headers=as_manager()), 403, "Only a customer can do this")
+
+    # ------------------------------------------------------------ pretend checkout (beyond the PRD)
+
+    def pay(self, order_id, headers=None):
+        return self.client.post(f"/api/orders/{order_id}/pay", headers=headers or as_alice())
+
+    def test_a_customer_pays_their_own_order(self):
+        self.place((self.clean_code, "BUY"))
+        response = self.pay(1001)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual((response.get_json()["id"], response.get_json()["paymentStatus"]), (1001, "PAID"))
+        self.assertEqual(self.repository.find(1001).payment_status, "PAID")
+
+    def test_paying_an_order_twice_is_409(self):
+        self.place((self.clean_code, "BUY"))
+        self.pay(1001)
+        self.assert_error(self.pay(1001), 409, "This order is already paid")
+
+    def test_a_customer_cannot_pay_someone_elses_order(self):
+        self.place((self.clean_code, "BUY"), headers=as_omar())
+        self.assert_error(self.pay(1001), 403, "This order belongs to another customer")
+        self.assertEqual(self.repository.find(1001).payment_status, "PENDING", "nothing was changed")
+
+    def test_a_manager_marks_payment_instead_of_paying(self):
+        self.place((self.clean_code, "BUY"))
+        self.assert_error(self.pay(1001, headers=as_manager()), 403, "Only a customer can do this")
+
+    def test_paying_an_unknown_order_is_404(self):
+        self.assert_error(self.pay(9999), 404, "This order does not exist")
 
     # ------------------------------------------------------------ one order as JSON (FR8, FR12)
 
@@ -251,6 +300,8 @@ class ApiTest(unittest.TestCase):
 
     def test_an_unknown_order_is_404(self):
         self.assert_error(self.client.get("/api/orders/9999", headers=as_manager()), 404, "This order does not exist")
+
+    # ------------------------------------------------------------ the bill (FR8, FR9)
 
     def test_the_owner_can_open_the_bill(self):
         bill_html = self.place((self.clean_code, "BUY")).get_json()["billHtml"]

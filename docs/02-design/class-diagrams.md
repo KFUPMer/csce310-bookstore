@@ -26,12 +26,16 @@ Built in M4; the diagram shows the app as built.
 | `RegisterScreen` | Create an account; each field's problem is shown under it before anything is sent | FR3 |
 | `SearchScreen` | Search as you type, show title/author/price as covers or a list, add books to the order, log out | FR2, FR4, FR5, FR6 |
 | `OrderScreen` | Review the selected books, choose buy or rent for each, remove (with Undo), place the order | FR6, FR7 |
-| `BillScreen` | Show the bill of the order just placed, and that a copy is being emailed | FR8, FR10 |
+| `BillScreen` | Show the bill of the order just placed, and that a copy is being emailed; Pay now | FR8, FR10 |
+| `PayDialog` (`showPayDialog`) | The pretend checkout: the total, a note that nothing is charged, and Pay; marks the order paid | Beyond the PRD |
+| `AccountScreen` | Profile, preferences, rentals due back, and every order with its bill and Pay | Beyond the PRD |
+| `Preferences` | Dark mode and covers-or-list for each customer, remembered on this computer | Beyond the PRD |
+| `account.dart` (`Rental`, `rentalsOf`, `dueText`) | The rented books of the orders, soonest due first, and "Due back in 3 days" | FR7 |
 | `OrderDraft` | The order being prepared, kept by the app so it survives moving between screens and a failed attempt | FR6 |
 | `Session` | Who is logged in; ending it sends the app back to the login screen | FR1, FR2, N4 |
 | `UserApi`, `BookApi`, `OrderApi`, `ApiClient`, `ApiException` | Calls to the three services; every failure becomes one readable `ApiException` | N2, N4 |
 | `Book`, `OrderItem`, `Order`, `PlacedItem`, `ItemType` | Data; `OrderItem` works out the charge (10% when rented, in whole cents) and the rent due date (7 days) | FR7, FR8 |
-| `AppServices`, `AppScope`, `CustomerApp` | Holds the session, the order draft, and the three services, and gives them to every screen | — |
+| `AppServices`, `AppScope`, `CustomerApp` | Holds the session, the order draft, the preferences, the clock, and the three services, and gives them to every screen | — |
 
 ## Manager app
 
@@ -96,23 +100,27 @@ Every source file that exists so far, and the classes in it. Updated in the same
 
 | File | Classes | Purpose |
 |---|---|---|
-| `lib/main.dart` | `CustomerApp`, `AppServices`, `AppScope` | Starts the app at the login screen, holds light or dark mode, gives the screens the session, the order draft, and the services; returns to log in when the session ends |
-| `lib/api/apis.dart` | `OrderApi` | The customer's calls to order-service (the other clients are shared) |
+| `lib/main.dart` | `CustomerApp`, `AppServices`, `AppScope` | Starts the app at the login screen, takes light or dark mode from the customer's preferences, gives the screens the session, the order draft, and the services; returns to log in when the session ends |
+| `lib/api/apis.dart` | `OrderApi` | The customer's calls to order-service: place an order, my orders, pay (the other clients are shared) |
 | `lib/models/order_draft.dart` | `OrderItem`, `OrderDraft` | The order being prepared |
+| `lib/models/preferences.dart` | `Preferences` | Each customer's dark mode and covers-or-list, in a JSON file in AppData |
+| `lib/models/account.dart` | `Rental`, `rentalsOf()`, `dueText()` | The rentals due back, and how long until each is due |
 | `lib/models/account_rules.dart` | `checkRegistration()` | The account rules of user-service, checked in the app first |
 | `lib/screens/login_screen.dart` | `LoginScreen` | Log in, with the shared `LoginForm`; opens Create an account |
 | `lib/screens/register_screen.dart` | `RegisterScreen` | Create an account |
 | `lib/screens/search_screen.dart` | `SearchScreen`, and its private parts: `_Heading`, `_Availability`, `_BookCard`, `_PlaceholderCard`, `_BookRow`, `_DetailPanel`, `_Message` | Search and browse books, add them to the order |
 | `lib/screens/order_screen.dart` | `OrderScreen`, `_ItemRow`, `_TypeChoice`, `_Segment`, `_Summary`, `_Empty` | Review and place the order |
-| `lib/screens/bill_screen.dart` | `BillScreen` | The bill of the order just placed |
+| `lib/screens/bill_screen.dart` | `BillScreen` | The bill of the order just placed, with Pay now |
+| `lib/screens/pay_dialog.dart` | `showPayDialog()`, `_PayDialog` | The pretend checkout |
+| `lib/screens/account_screen.dart` | `AccountScreen`, `_Card`, `_Field`, `_Preferences`, `_SwitchRow`, `_RentalRow`, `_OrderRow`, `_BillDialog` | The account page |
 
-Tests (`clients/customer-app/test/`): `order_draft_test.dart` (9), `account_rules_test.dart` (5), `screens_test.dart` (11: every screen driven as a customer uses it, including a 1024 x 700 window), `fakes.dart` (stand-ins for the services), plus two that are skipped unless asked for: `live_services_test.dart` (the app's clients against the real running services) and `screenshots_test.dart` (draws the screens to `docs/02-design/ui`).
+Tests (`clients/customer-app/test/`): `order_draft_test.dart` (9), `account_rules_test.dart` (5), `account_test.dart` (6: rentals, due dates, preferences), `screens_test.dart` (14: every screen driven as a customer uses it, including a 1024 x 700 window), `fakes.dart` (stand-ins for the services), plus two that are skipped unless asked for: `live_services_test.dart` (the app's clients against the real running services) and `screenshots_test.dart` (draws the screens to `docs/02-design/ui`).
 
 Tests of the shared package (`clients/bookstore-ui/test/`): `book_test.dart` (5: prices, money), `order_test.dart` (1), `api_client_test.dart` (10: against a small real web server), `bookstore_ui_test.dart` (2).
 
 Private classes (names starting with `_`) are pieces of one screen and are used nowhere else, so they are listed here and not drawn as separate boxes.
 
-**Changes from the M2 design:** `OrderApi.getBill` was dropped (the bill comes back with the order). `Order` holds `PlacedItem`s, because order-service returns what was charged, not the book. `OrderItem` lost `quantity` (a book cannot be added twice). Added: `ApiException`, `AppServices`/`AppScope`, `account_rules.dart`, and `Session.endedMessage`. `RegisterScreen` now returns to `LoginScreen` (use case UC3) instead of opening the search.
+**Changes from the M2 design:** `OrderApi.getBill` was dropped (the bill comes back with the order). `Order` holds `PlacedItem`s, because order-service returns what was charged, not the book. `OrderItem` lost `quantity` (a book cannot be added twice). Added: `ApiException`, `AppServices`/`AppScope`, `account_rules.dart`, and `Session.endedMessage`. `RegisterScreen` now returns to `LoginScreen` (use case UC3) instead of opening the search. Added at the owner's request, beyond the PRD: `AccountScreen`, `PayDialog`, `Preferences`, and `account.dart` (architecture decision 23).
 
 ### clients/management-app
 
@@ -218,10 +226,10 @@ File map (`services/order-service/order_service/`):
 | `__main__.py` | Start-up | `main()` | Starts the server on both loopback addresses; a clear message if MySQL or a setting is wrong |
 | `app.py` | HTTP | `create_app()`, `create_production_app()` | Puts the parts together; the only place that knows the concrete classes |
 | `config.py` | Settings | `Config` | Port, MySQL, the other services' addresses, service key, bills folder, mail settings. Secrets are never printed |
-| `routes.py` | HTTP | `create_routes()` | The four endpoints |
+| `routes.py` | HTTP | `create_routes()` | The seven endpoints |
 | `schemas.py` | Request | `OrderInput`, `OrderLine`, `PaymentStatusInput` | What a request must contain, with validation |
 | `auth.py` | Rules | `SessionChecker`, `UserServiceSessionChecker`, `token_from()`, `require_customer()`, `require_manager()` | Who is asking, and whether they may |
-| `services.py` | Rules | `OrderService`, `PlacedOrder` | Place an order (all or nothing), list, open a bill, set the payment status |
+| `services.py` | Rules | `OrderService`, `PlacedOrder` | Place an order (all or nothing), list all or a customer's own, get one, open a bill, set the payment status, pay (pretend checkout) |
 | `pricing.py` | Rules | `RENT_RATE`, `RENT_DAYS`, `charge_for()` | The renting rule (FR7), in one place |
 | `bill.py` | Rules, files | `render_bill()`, `bill_file_name()`, `money()`, `BillStore` | Makes the bill from an order; saves and reads bill files |
 | `catalog.py` | Other service | `BookCatalog`, `BookServiceCatalog` | Takes and gives back copies through book-service |
@@ -232,6 +240,6 @@ File map (`services/order-service/order_service/`):
 
 Also in `services/order-service/`: `manual_check.py`, which starts all three services and checks every endpoint for real, and `email_check.py`, which sends one real bill email.
 
-Tests (`services/order-service/tests/`): `test_api.py` (37: every endpoint, success and each error), `test_rules.py` (17: prices, validation, settings), `test_bill.py` (14), `test_book_catalog.py` (7: against a small real web server), `test_mailer.py` (5), `test_mysql_repository.py` (8: against the real MySQL), `fakes.py` (stand-ins for user-service, book-service, and the mail server).
+Tests (`services/order-service/tests/`): `test_api.py` (49: every endpoint, success and each error), `test_rules.py` (17: prices, validation, settings), `test_bill.py` (14), `test_book_catalog.py` (7: against a small real web server), `test_mailer.py` (5), `test_mysql_repository.py` (9: against the real MySQL), `fakes.py` (stand-ins for user-service, book-service, and the mail server).
 
 **Changes from the design overview:** the overview had `OrderService` with "repo, books, pricing, bills, mail" behind it; all five exist, each behind an interface or in its own module. Added: the request shapes with validation, the in-memory repository, the error classes, `Config`, `app.py`, and `PlacedOrder`. Changed: copies are taken before the order is saved, not after (architecture decision 16), and the email is sent in the background (decision 17).

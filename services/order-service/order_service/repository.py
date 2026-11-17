@@ -36,6 +36,10 @@ class OrderRepository(ABC):
         """Every order, newest first."""
 
     @abstractmethod
+    def list_for_user(self, user_id: int) -> list[Order]:
+        """One customer's orders, newest first."""
+
+    @abstractmethod
     def set_payment_status(self, order_id: int, payment_status: str) -> Optional[Order]:
         """Change an order's payment status. Returns the updated order, or None if it does not exist."""
 
@@ -107,12 +111,21 @@ class MySqlOrderRepository(OrderRepository):
             return self._find(connection, order_id)
 
     def list_all(self) -> list[Order]:
+        return self._list("", ())
+
+    def list_for_user(self, user_id: int) -> list[Order]:
+        return self._list("WHERE o.user_id = %s", (user_id,))
+
+    def _list(self, where: str, params: tuple) -> list[Order]:
+        """`where` is fixed text from this class, never user input; values go in `params`."""
         with self._transaction() as connection:
             cursor = connection.cursor()
-            cursor.execute(f"SELECT {_ORDER_COLUMNS} FROM orders o JOIN users u ON u.id = o.user_id ORDER BY o.created_at DESC, o.id DESC")
+            cursor.execute(f"SELECT {_ORDER_COLUMNS} FROM orders o JOIN users u ON u.id = o.user_id {where} ORDER BY o.created_at DESC, o.id DESC", params)
             orders = cursor.fetchall()
             # Two queries for the whole list, however many orders there are.
-            cursor.execute(f"SELECT {_ITEM_COLUMNS} FROM order_items ORDER BY id")
+            cursor.execute(
+                f"SELECT {_ITEM_COLUMNS} FROM order_items WHERE order_id IN (SELECT o.id FROM orders o {where}) ORDER BY id", params
+            )
             items: dict[int, list[OrderItem]] = {}
             for row in cursor.fetchall():
                 items.setdefault(row[0], []).append(self._to_item(row))
@@ -174,6 +187,9 @@ class InMemoryOrderRepository(OrderRepository):
 
     def list_all(self) -> list[Order]:
         return sorted(self._orders.values(), key=lambda order: (order.created_at, order.id), reverse=True)
+
+    def list_for_user(self, user_id: int) -> list[Order]:
+        return [order for order in self.list_all() if order.user_id == user_id]
 
     def set_payment_status(self, order_id: int, payment_status: str) -> Optional[Order]:
         if order_id not in self._orders:

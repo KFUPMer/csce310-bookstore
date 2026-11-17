@@ -37,6 +37,13 @@ void main() {
   /// Lets every toast and typing timer run out, so none is left when the test ends.
   Future<void> finish(WidgetTester tester) => tester.pumpAndSettle(const Duration(seconds: 7));
 
+  Future<void> addCleanCode(WidgetTester tester, {String button = 'Buy'}) async {
+    await tester.tap(find.bySemanticsLabel(RegExp('^Clean Code by')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(AppButton, button));
+    await tester.pumpAndSettle();
+  }
+
   testWidgets('every screen fits a small 1024 x 700 window without anything overflowing', (tester) async {
     await start(tester);
     tester.view.physicalSize = const Size(1024, 700);
@@ -53,6 +60,82 @@ void main() {
     await tester.tap(find.widgetWithText(AppButton, 'Place order'));
     await tester.pumpAndSettle();
     expect(find.text('Order 1042 placed'), findsOneWidget); // an overflow anywhere on the way fails the test
+    await tester.tap(find.widgetWithText(AppButton, 'Pay now'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byTooltip('Close (Esc)'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(AppButton, 'Continue shopping'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byTooltip('Your account'));
+    await tester.pumpAndSettle();
+    expect(find.text('Your account'), findsWidgets);
+    await finish(tester);
+  });
+
+  Future<void> placeRental(WidgetTester tester) async {
+    await addCleanCode(tester, button: 'Rent for 7 days');
+    await tester.tap(find.widgetWithText(AppButton, 'Your order (1)'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(AppButton, 'Place order'));
+    await tester.pumpAndSettle();
+  }
+
+  testWidgets('the customer pays for the order just placed with the pretend checkout', (tester) async {
+    await start(tester);
+    await logIn(tester);
+    await placeRental(tester);
+    expect(find.text('Payment pending'), findsOneWidget);
+
+    await tester.tap(find.widgetWithText(AppButton, 'Pay now'));
+    await tester.pumpAndSettle();
+    expect(find.textContaining('No card is needed'), findsOneWidget);
+    await tester.tap(find.widgetWithText(AppButton, 'Pay \$4.00'));
+    await tester.pumpAndSettle();
+    expect(find.text('Order 1042 is paid. Thank you!'), findsOneWidget);
+    expect(find.text('Paid'), findsOneWidget);
+    expect(find.widgetWithText(AppButton, 'Pay now'), findsNothing, reason: 'an order is paid once');
+    expect(orders().paid, [1042]);
+    await finish(tester);
+  });
+
+  testWidgets('the account page shows the profile, the rentals due back, and the orders, and pays one', (tester) async {
+    await start(tester);
+    await logIn(tester);
+    await placeRental(tester);
+    await tester.tap(find.widgetWithText(AppButton, 'Continue shopping'));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byTooltip('Your account'));
+    await tester.pumpAndSettle();
+    expect(find.text('alice@example.com'), findsOneWidget);
+    expect(find.text('Due back in 7 days'), findsOneWidget);
+    expect(find.text('Order 1042'), findsOneWidget);
+    expect(find.text('Payment pending'), findsOneWidget);
+
+    await tester.tap(find.widgetWithText(AppButton, 'Pay'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(AppButton, 'Pay \$4.00'));
+    await tester.pumpAndSettle();
+    expect(find.text('Paid'), findsOneWidget);
+    await finish(tester);
+  });
+
+  testWidgets('preferences are remembered for the customer\'s next log in', (tester) async {
+    await start(tester);
+    await logIn(tester);
+    await tester.tap(find.byTooltip('Your account'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.bySemanticsLabel('Dark mode'));
+    await tester.tap(find.bySemanticsLabel('Open search as a list'));
+    await tester.pumpAndSettle();
+    expect(AppScope.of(tester.element(find.byType(Scaffold).last)).isDark, isTrue);
+
+    await tester.tap(find.widgetWithText(AppButton, 'Log out'));
+    await tester.pumpAndSettle();
+    services.preferences.update(darkMode: false); // as if another customer had switched it back
+    await logIn(tester);
+    expect(services.preferences.darkMode, isTrue);
+    expect(find.byWidgetPredicate((w) => w is AppIconButton && w.tooltip == 'Show as a list' && w.selected), findsOneWidget);
     await finish(tester);
   });
 
@@ -109,13 +192,6 @@ void main() {
     expect(find.text('Account created. Log in with your new password.'), findsOneWidget);
     expect(find.text('newreader'), findsOneWidget);
   });
-
-  Future<void> addCleanCode(WidgetTester tester, {String button = 'Buy'}) async {
-    await tester.tap(find.bySemanticsLabel(RegExp('^Clean Code by')));
-    await tester.pumpAndSettle();
-    await tester.tap(find.widgetWithText(AppButton, button));
-    await tester.pumpAndSettle();
-  }
 
   testWidgets('the open book closes when a new search no longer finds it', (tester) async {
     await start(tester);

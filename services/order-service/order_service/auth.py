@@ -66,10 +66,10 @@ def token_from(authorization_header: str | None) -> str:
     return authorization_header[len(BEARER):].strip()
 
 
-def require_customer(user: CurrentUser) -> None:
-    """N5: only a customer places orders."""
+def require_customer(user: CurrentUser, message: str = "Only a customer can do this") -> None:
+    """N5: only a customer places, lists, and pays their own orders."""
     if not user.is_customer:
-        raise ForbiddenError("Only a customer can place an order")
+        raise ForbiddenError(message)
 
 
 def require_manager(user: CurrentUser) -> None:

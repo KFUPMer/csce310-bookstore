@@ -3,12 +3,26 @@ import 'package:flutter/services.dart';
 import 'package:material_ui/material_ui.dart';
 
 import '../main.dart';
+import 'pay_dialog.dart';
 
-/// The bill of the order just placed (FR8), and whether a copy was emailed (FR10).
-class BillScreen extends StatelessWidget {
+/// The bill of the order just placed (FR8), whether a copy was emailed (FR10),
+/// and the pretend checkout to pay it.
+class BillScreen extends StatefulWidget {
   const BillScreen({super.key, required this.order});
 
   final Order order;
+
+  @override
+  State<BillScreen> createState() => _BillScreenState();
+}
+
+class _BillScreenState extends State<BillScreen> {
+  late Order _order = widget.order;
+
+  Future<void> _pay() async {
+    final paid = await showPayDialog(context, _order);
+    if (paid != null && mounted) setState(() => _order = _order.copyWith(paymentStatus: paid.paymentStatus));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -16,6 +30,7 @@ class BillScreen extends StatelessWidget {
     final c = BookstoreColors.of(context);
     final t = Theme.of(context).textTheme;
     final email = services.session.email;
+    final order = _order;
     void back() => Navigator.of(context).pop();
 
     return CallbackShortcuts(
@@ -54,7 +69,7 @@ class BillScreen extends StatelessWidget {
                             child: Text(
                               order.emailQueued && email != null
                                   ? 'A copy of this bill is on its way to $email.'
-                                  : 'This bill is saved with your order. The store will mark it as paid once you have paid.',
+                                  : 'This bill is saved with your order. You can see it again on your account page.',
                               style: t.bodyLarge!.copyWith(color: c.textSecondary),
                             ),
                           ),
@@ -64,10 +79,17 @@ class BillScreen extends StatelessWidget {
                     const SizedBox(height: Space.xl),
                     BillView(order: order, email: email),
                     const SizedBox(height: Space.xl),
-                    Row(
+                    Wrap(
+                      spacing: Space.md,
+                      runSpacing: Space.md,
                       children: [
-                        AppButton(label: 'Continue shopping', icon: Icons.search_rounded, onPressed: back),
-                        const SizedBox(width: Space.md),
+                        if (!order.isPaid) AppButton(label: 'Pay now', icon: Icons.lock_outline_rounded, onPressed: _pay),
+                        AppButton(
+                          label: 'Continue shopping',
+                          icon: Icons.search_rounded,
+                          style: order.isPaid ? AppButtonStyle.primary : AppButtonStyle.secondary,
+                          onPressed: back,
+                        ),
                         AppButton(label: 'Log out', icon: Icons.logout_rounded, style: AppButtonStyle.secondary, onPressed: services.users.logout),
                       ],
                     ),

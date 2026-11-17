@@ -10,7 +10,9 @@ Requirements covered: FR6, FR7, FR8, FR9, FR10 (extra credit), FR12, FR13, N1, N
 |---|---|---|---|
 | POST | `/api/orders` | Customer | Places an order for the selected books, each bought or rented; answers with the order and its bill |
 | GET | `/api/orders` | Manager | All orders, newest first |
+| GET | `/api/orders/mine` | Customer | The customer's own orders with their items, newest first (added in M4 for the account page) |
 | GET | `/api/orders/{id}` | The customer who placed it, or a manager | One order with its items, as JSON (added in M4 for the manager app) |
+| POST | `/api/orders/{id}/pay` | The customer who placed it | The pretend checkout: marks the order paid. No card details; beyond the PRD (added in M4) |
 | GET | `/api/orders/{id}/bill` | The customer who placed it, or a manager | The bill, as HTML |
 | PATCH | `/api/orders/{id}/payment-status` | Manager | Sets `PENDING` or `PAID` |
 
@@ -38,16 +40,16 @@ Email: bills are emailed only when `SMTP_USER` and `SMTP_PASSWORD` are filled in
 python -m unittest discover -s tests -t .
 ```
 
-92 tests:
+101 tests:
 
 | File | Tests | What |
 |---|---|---|
-| `test_api.py` | 41 | Every endpoint, success and each error, with stand-ins for the other services |
+| `test_api.py` | 49 | Every endpoint, success and each error, with stand-ins for the other services |
 | `test_rules.py` | 17 | The renting price, request validation, settings |
 | `test_bill.py` | 14 | What is on the bill, and saving it |
 | `test_book_catalog.py` | 7 | The client for book-service, against a small real web server that answers like it |
 | `test_mailer.py` | 5 | The email message, and that a failed send is logged and never raised |
-| `test_mysql_repository.py` | 8 | The repository against the real MySQL; skipped if MySQL is not reachable |
+| `test_mysql_repository.py` | 9 | The repository against the real MySQL; skipped if MySQL is not reachable |
 
 The MySQL tests run in the real `bookstore` database, because the services' account is not allowed to create another one. They only touch the orders of their own temporary user (`order_repo_test`) and delete that user afterwards. One side effect: each run uses up a few order numbers, so real order ids do not stay consecutive.
 
@@ -71,7 +73,7 @@ Four layers; each only calls the one below ([engineering rules](../../docs/02-de
 
 | File | Layer | Holds |
 |---|---|---|
-| `routes.py` | Receives requests, checks who is asking, returns the answer | The four endpoints |
+| `routes.py` | Receives requests, checks who is asking, returns the answer | The seven endpoints |
 | `schemas.py` | The shape of a request, with its validation | `OrderInput`, `OrderLine`, `PaymentStatusInput` |
 | `services.py` | The rules | `OrderService`, `PlacedOrder` |
 | `pricing.py` | The renting rule, in one place | `RENT_RATE`, `RENT_DAYS`, `charge_for()` |
@@ -127,7 +129,7 @@ Routes and services raise; `errors.py` answers every failure as `{ "error": "mes
 
 Built and verified on 2026-11-16:
 
-- All 92 tests pass, including the 8 against the real MySQL.
+- All 101 tests pass, including the 9 against the real MySQL (re-run 2026-11-17 after the M4 endpoints).
 - Run for real with user-service, book-service, MySQL, and MongoDB: all 33 checks returned the expected result, and no service was left running.
 - Timings on the running service: the first order after a cold start took 93 ms; every other request took 6 to 44 ms. N1 allows 500 ms.
 - With book-service stopped, placing an order answered 503 in 2.0 seconds and order-service kept running.
@@ -138,6 +140,6 @@ The owner opened the second email in Gmail and it looks as designed.
 
 **Not verified:** how the bill looks in other mail programs (Outlook, phone apps).
 
-**Not built, on purpose:** there is no "Pay" button on the bill. The PRD says there is no real-time payment processing: a manager marks the order as paid by hand (FR13).
+**Payment:** the PRD says there is no real-time payment processing: a manager marks the order as paid by hand (FR13), and that still works. At the owner's request, the customer app also has a pretend checkout (`POST /api/orders/{id}/pay`) that marks the customer's own order paid. It handles no money and no card details. The emailed bill has no Pay button.
 
 Known limits are listed under "Known gaps" in the [problem log](../../docs/03-problems/problem-log.md).

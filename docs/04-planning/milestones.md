@@ -47,7 +47,7 @@ The live version of this plan is on GitHub: milestones hold the deadlines, issue
 - [x] Install Flutter and create the two desktop projects
 - [x] customer-app in Flutter, asynchronous calls (N2): register (the app half of FR3, issue #15), login, search, select books, place order, see bill. Checked against the running services; the owner ran it and it works
 - [x] management-app in Flutter, asynchronous calls (N2): login, orders list, payment status, an order's bill, add and update books (issue #12). 15 tests; checked against the running services; the owner tried it and everything works
-- [ ] Asked for by the owner, beyond the PRD: an account page in the customer app (order history, profile, preferences, rentals due back) and a pretend checkout that marks an order paid (no real card details)
+- [x] Asked for by the owner, beyond the PRD: an account page in the customer app (order history, profile, preferences, rentals due back) and a pretend checkout that marks an order paid (no real card details). Checked against the running services. **Waiting for the owner to try it**
 
 ### M5 — Testing & Final Release (due 2026-12-04)
 
@@ -87,3 +87,4 @@ Add a short dated note whenever a milestone closes or a deadline moves, and say 
 | 2026-11-17 | Customer app built on the real services: five screens, 41 tests, every screen drawn into the style guide. Release builds are blocked by Smart App Control (P-017); debug builds work. Next: the owner tries the app; then the management app. |
 | 2026-11-17 | The owner ran the customer app: it works. They asked for an account page and a way to pay; decided to build the management app first. Management app built: shared log-in and service clients moved into `bookstore-ui`, a new `GET /api/orders/{id}` in order-service (92 tests), 15 app tests, checked against the running services. Next: the owner tries it; then the account page and the pretend checkout. |
 | 2026-11-17 | The owner tried the management app: "everything seems good". Issue #12 closed. Next: the account page and the pretend checkout. |
+| 2026-11-17 | Account page and pretend checkout built: two new order-service endpoints (101 tests), 34 customer-app tests, checked against the running services. Next: the owner tries them; then M5, testing every requirement end to end. |

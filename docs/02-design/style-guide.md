@@ -78,6 +78,18 @@ Every screen of the customer app, in the approved style. Drawn by Flutter from t
 
 ![Bill, light](ui/customer-bill-light.png)
 
+**Your account**, opened from the customer's name in the top bar: profile, preferences, rentals due back, and orders. A late rental is told by a warning icon and the words "Was due back", not by its color alone. Paid and pending orders have the same height, so the list reads as one column.
+
+![Your account, light](ui/customer-account-light.png)
+
+**The pretend checkout.** It says plainly that it is a demonstration and charges nothing. One main button, with the amount on it.
+
+![Pay for an order, light](ui/customer-pay-light.png)
+
+**After paying**, dark mode switched on from the preferences, with the toast that confirms it.
+
+![Your account after paying, dark](ui/customer-account-dark-paid.png)
+
 ## Management app as built (M4)
 
 The same style, the same shared widgets. Drawn the same way as the customer app's screenshots, on sample orders and the 15 sample books.

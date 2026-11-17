@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:material_ui/material_ui.dart';
 
 import '../main.dart';
+import 'account_screen.dart';
 import 'order_screen.dart';
 
 /// Search the books and add them to the order (FR4, FR5, FR6). Also where
@@ -29,7 +30,8 @@ class _SearchScreenState extends State<SearchScreen> {
   final _searchFocus = FocusNode();
   final _scroll = ScrollController();
 
-  bool _list = false;
+  /// Covers or list: the customer's preference, remembered for next time.
+  bool get _list => _services.preferences.listView;
   String _query = '';
   Book? _selected;
 
@@ -135,6 +137,11 @@ class _SearchScreenState extends State<SearchScreen> {
     if (mounted) _load();
   }
 
+  Future<void> _openAccount() async {
+    await Navigator.of(context).push(fadeRoute(const AccountScreen()));
+    if (mounted) _load(); // copies may have changed meanwhile
+  }
+
   Future<void> _logout() => _services.users.logout(); // the app goes back to log in by itself
 
   @override
@@ -158,7 +165,7 @@ class _SearchScreenState extends State<SearchScreen> {
       child: Focus(
         autofocus: true,
         child: ListenableBuilder(
-          listenable: draft,
+          listenable: Listenable.merge([draft, scope.services.preferences]),
           builder: (context, _) => Scaffold(
             body: Stack(
               children: [
@@ -226,14 +233,14 @@ class _SearchScreenState extends State<SearchScreen> {
                           icon: Icons.grid_view_rounded,
                           tooltip: 'Show as covers',
                           selected: !_list,
-                          onPressed: () => setState(() => _list = false),
+                          onPressed: () => _services.preferences.update(listView: false),
                         ),
                         const SizedBox(width: Space.xs),
                         AppIconButton(
                           icon: Icons.view_list_rounded,
                           tooltip: 'Show as a list',
                           selected: _list,
-                          onPressed: () => setState(() => _list = true),
+                          onPressed: () => _services.preferences.update(listView: true),
                         ),
                         Container(
                           width: 1,
@@ -254,7 +261,15 @@ class _SearchScreenState extends State<SearchScreen> {
                           onPressed: _openOrder,
                         ),
                         const SizedBox(width: Space.md),
-                        Text(scope.services.session.username ?? '', style: Theme.of(context).textTheme.bodyMedium!.copyWith(color: c.textSecondary)),
+                        Tooltip(
+                          message: 'Your account',
+                          child: AppButton(
+                            label: scope.services.session.username ?? '',
+                            icon: Icons.person_outline_rounded,
+                            style: AppButtonStyle.secondary,
+                            onPressed: _openAccount,
+                          ),
+                        ),
                         const SizedBox(width: Space.xs),
                         AppIconButton(icon: Icons.logout_rounded, tooltip: 'Log out', onPressed: _logout),
                       ],

@@ -346,6 +346,10 @@ Problems that cost minutes, not hours. Listed so the record is complete.
 | The management app's check against the real services failed on its first run: order-service had been started before `GET /api/orders/{id}` was added, so the running copy did not know it | Assistant | Services restarted; every call then answered as expected. Lesson: restart a service after changing it, before checking it for real |
 | The orders row of the management app overflowed by 84 pixels in a 1024-wide window once "Mark as paid" appeared on it | Assistant | Found by the small-window test before the owner saw it; the payment column now has a fixed width |
 | The stand-in data of the management app's tests had an order whose total ($4.50) did not match its one item ($4.80) | Assistant | Found when the bill test showed both numbers; the stand-in data corrected |
+| The manager-app commit added `OrderService.get()` and `GET /api/orders/{id}`, but did not update the order-service class diagram, and left the test count in the file map at 37 and an API note saying the answer has no `billFile` (it has) | Assistant | Found while adding the account page; all three corrected in the next commit. Lesson: regenerate the class diagram of every service a change touches, not only the app's |
+| On the account page, the column holding "Payment pending" and Pay was 100 pixels too narrow, and a pending row was taller than a paid one | Assistant | The overflow was found by the 1024 x 700 test, the height by looking at the screenshot; the column is now 320 wide and 42 high |
+| After logging out, the preferences still belonged to the last customer, so a change made before the next log in would have been saved into that customer's settings | Assistant | Found by a screen test before it shipped. Logging out now lets go of them (`Preferences.forget()`), and a test checks it |
+| The account page's first diagram had its new line from SearchScreen cut across the OrderApi box (P-011 again) | Assistant | Found by looking at the exported image; the line now leaves SearchScreen's side and turns down |
 
 ## P-014 — A manual check failed and left a service running
 
@@ -466,4 +470,6 @@ Things that are known to be unfinished or unverified, so nobody is surprised lat
 | Trackpad scrolling, screen readers, and a color-blindness simulation are untested | M2 | Test during M5 |
 | The timing protection of E-013 has a test for the message but not for the timing | M3 | Add a timing test, or accept and document |
 | Sessions never expire; they end only at logout | M2 | The PRD asks for exactly this (FR2). Noted in case an expiry is wanted |
-| Returning a rented book is not built: a rented copy never comes back to the shelf by itself | M2 | Not asked for by the PRD. A manager can raise the number of copies (FR14) |
+| Returning a rented book is not built: a rented copy never comes back to the shelf by itself, and the account page keeps showing it as late | M2 | Not asked for by the PRD. A manager can raise the number of copies (FR14) |
+| `manual_check.py` does not call the two M4 endpoints (`GET /api/orders/mine`, `POST /api/orders/{id}/pay`). They are tested in `test_api.py` and were checked on the running service by the customer app's live check | M4 | Add them to `manual_check.py` in M5 |
+| The account page and the pretend checkout have not been tried by the owner in the real window | M4 | The owner tries them |

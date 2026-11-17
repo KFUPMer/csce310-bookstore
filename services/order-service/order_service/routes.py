@@ -31,8 +31,8 @@ def create_routes(orders: OrderService, sessions: SessionChecker) -> Blueprint:
     def place():
         """POST /api/orders (FR6-FR10). Customers only."""
         user = current_user()
-        require_customer(user)
-        placed = orders.place(user, OrderInput.from_json(json_body()))
+        require_customer(user, "Only a customer can place an order")
+        placed =orders.place(user, OrderInput.from_json(json_body()))
         return jsonify({**placed.order.to_json(), "billHtml": placed.bill_html, "emailQueued": placed.email_queued}), 201
 
     @routes.get("")
@@ -40,6 +40,21 @@ def create_routes(orders: OrderService, sessions: SessionChecker) -> Blueprint:
         """GET /api/orders (FR12). Managers only."""
         require_manager(current_user())
         return jsonify([order.to_summary_json() for order in orders.list_all()])
+
+    @routes.get("/mine")
+    def list_mine():
+        """GET /api/orders/mine: the customer's own orders with their items, newest first (account page)."""
+        user = current_user()
+        require_customer(user)
+        return jsonify([order.to_json() for order in orders.list_for(user)])
+
+    @routes.post("/<int:order_id>/pay")
+    def pay(order_id: int):
+        """POST /api/orders/{id}/pay: the pretend checkout. The customer pays their own pending order.
+        No card details are sent or kept: it only marks the order as paid."""
+        user = current_user()
+        require_customer(user)
+        return jsonify(orders.pay(order_id, user).to_json())
 
     @routes.get("/<int:order_id>")
     def get(order_id: int):

@@ -61,6 +61,20 @@ void main() {
     final after = await books.search('');
     expect(after.firstWhere((b) => b.id == book.id).copiesAvailable, book.copiesAvailable - 1);
 
+    // The account page: the new order is first, with its rented book. Then the pretend checkout pays it.
+    watch.reset();
+    final mine = await orders.myOrders();
+    stdout.writeln('my orders: ${mine.length} in ${watch.elapsedMilliseconds} ms');
+    expect(mine.first.id, order.id);
+    expect(mine.first.items.single.dueBack, order.items.single.dueBack);
+    expect(mine.every((o) => o.username == 'customer1'), isTrue, reason: 'only this customer\'s orders');
+
+    watch.reset();
+    final paid = await orders.pay(order.id);
+    stdout.writeln('pay: ${watch.elapsedMilliseconds} ms');
+    expect(paid.paymentStatus, 'PAID');
+    await expectLater(orders.pay(order.id), throwsA(isA<ApiException>().having((e) => e.status, 'status', 409)));
+
     await users.logout();
     expect(session.isLoggedIn, isFalse);
   });

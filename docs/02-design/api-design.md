@@ -43,7 +43,9 @@
 | book | PATCH | `/api/books/{id}/copies` | order-service only | FR7 |
 | order | POST | `/api/orders` | Customer | FR6–FR10 |
 | order | GET | `/api/orders` | Manager | FR12 |
+| order | GET | `/api/orders/mine` | Customer | Account page (beyond the PRD) |
 | order | GET | `/api/orders/{id}` | Owner or Manager | FR8, FR12 |
+| order | POST | `/api/orders/{id}/pay` | Owner (customer) | Pretend checkout (beyond the PRD) |
 | order | GET | `/api/orders/{id}/bill` | Owner or Manager | FR8, FR9 |
 | order | PATCH | `/api/orders/{id}/payment-status` | Manager | FR13 |
 
@@ -174,7 +176,7 @@ Response `200`: the updated book. Errors: `400` the change is not a whole number
 
 ## order-service — `http://localhost:8083`
 
-**Status: built, tested (92 tests), and verified on the running service.** The first order after a cold start answered in 93 ms; other requests in 6–44 ms. Also answers `503` when user-service, book-service, or MySQL is not available, and `404` / `405` for an unknown address or a wrong method.
+**Status: built, tested (101 tests), and verified on the running service.** The first order after a cold start answered in 93 ms; other requests in 6–44 ms. Also answers `503` when user-service, book-service, or MySQL is not available, and `404` / `405` for an unknown address or a wrong method.
 
 ### POST `/api/orders` — customer
 
@@ -238,7 +240,7 @@ Errors: `401` · `403` not a manager.
 
 Added in M4, so the manager app can show an order's bill in the app (architecture decision 21).
 
-Response `200`: the whole order, in the same shape as the answer to `POST /api/orders` but without `billFile`, `billHtml`, and `emailQueued`:
+Response `200`: the whole order, in the same shape as the answer to `POST /api/orders` but without `billHtml` and `emailQueued`:
 
 ```json
 { "id": 1042, "username": "alice", "email": "alice@example.com", "createdAt": "2026-11-13T10:05:00", "paymentStatus": "PENDING", "items": [ … ], "total": 103.00 }
@@ -247,6 +249,22 @@ Response `200`: the whole order, in the same shape as the answer to `POST /api/o
 Errors: `401` · `403` a customer asking for someone else's order ("This order belongs to another customer") · `404`.
 
 The answer to `POST /api/orders` also carries `email` since M4.
+
+### GET `/api/orders/mine` — customer
+
+Added in M4 for the customer's account page, at the owner's request (architecture decision 23). Not in the PRD.
+
+Response `200`: the customer's own orders, newest first, each a whole order with its items, in the shape of `GET /api/orders/{id}`. An empty list if they have none.
+
+Errors: `401` · `403` a manager ("Only a customer can do this").
+
+### POST `/api/orders/{id}/pay` — the customer who placed it
+
+The pretend checkout, added in M4 at the owner's request (architecture decision 23). Not in the PRD, which leaves payment to the manager (FR13); that endpoint is unchanged. No body: no card details are asked for, sent, or kept. The order is only marked `PAID`, as a manager would mark it.
+
+Response `200`: the whole order, now `"paymentStatus": "PAID"`.
+
+Errors: `401` · `403` a manager ("Only a customer can do this"), or another customer's order ("This order belongs to another customer") · `404` · `409` already paid ("This order is already paid").
 
 ### GET `/api/orders/{id}/bill` — owner or manager
 

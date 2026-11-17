@@ -144,4 +144,47 @@ void main() {
     await shoot(tester, 'customer-search-dark-list');
     await tester.pumpAndSettle(const Duration(seconds: 7));
   });
+
+  testWidgets('account page and the pretend checkout', (tester) async {
+    final services = await start(tester);
+    PlacedItem item(String title, String author, ItemType type, double price, {DateTime? due}) =>
+        PlacedItem(title: title, author: author, type: type, quantity: 1, unitPrice: price, dueBack: due);
+    (services.orders as FakeOrders).placed.addAll([
+      Order(
+        id: 1031,
+        username: 'alice',
+        createdAt: DateTime(2026, 11, 8, 16, 20),
+        paymentStatus: Order.paid,
+        total: 5.5,
+        items: [item('Refactoring', 'Martin Fowler', ItemType.rent, 5.5, due: DateTime(2026, 11, 15))],
+      ),
+      Order(
+        id: 1042,
+        username: 'alice',
+        createdAt: DateTime(2026, 11, 17, 10, 5),
+        paymentStatus: Order.pending,
+        total: 103,
+        items: [
+          item('Java Concurrency in Practice', 'Brian Goetz', ItemType.rent, 8, due: DateTime(2026, 11, 24)),
+          item('Clean Code', 'Robert C. Martin', ItemType.buy, 40),
+          item('Database System Concepts', 'Abraham Silberschatz', ItemType.buy, 55),
+        ],
+      ),
+    ]);
+    await logIn(tester);
+    await tester.tap(find.byTooltip('Your account'));
+    await tester.pumpAndSettle();
+    await shoot(tester, 'customer-account-light');
+
+    await tester.tap(find.widgetWithText(AppButton, 'Pay'));
+    await tester.pumpAndSettle();
+    await shoot(tester, 'customer-pay-light');
+    await tester.tap(find.widgetWithText(AppButton, 'Pay \$103.00'));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.bySemanticsLabel('Dark mode'));
+    await tester.pumpAndSettle();
+    await shoot(tester, 'customer-account-dark-paid');
+    await tester.pumpAndSettle(const Duration(seconds: 7));
+  });
 }

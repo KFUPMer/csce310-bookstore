@@ -12,6 +12,9 @@ Work towards v0.4.0 (milestone M4, Desktop clients).
 - Screenshots of every customer-app screen in the style guide, drawn with the real typefaces
 - **Management app** on the real services: log in (managers only), every order with a Pending / Paid filter, mark as paid with Undo, an order's bill in the app and printed from the browser, search, add and edit books (FR1, FR2, FR8, FR9, FR11–FR14). 15 tests; its service clients checked against the running services
 - order-service: `GET /api/orders/{id}`, one order as JSON, for its customer or a manager; the order now includes the customer's email. 92 tests
+- **Customer account page** (asked for by the owner, beyond the PRD): profile, preferences remembered per customer, rentals due back, every order with its bill
+- **Pretend checkout** (asked for by the owner, beyond the PRD): "Pay now" on the bill and "Pay" on the account page mark the customer's own order paid. No card details
+- order-service: `GET /api/orders/mine` and `POST /api/orders/{id}/pay`. 101 tests
 - `.gitattributes` marks the Flutter-generated `windows/` folders as generated, so GitHub does not count their C++ and CMake as project code
 
 ### Changed

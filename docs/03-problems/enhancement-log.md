@@ -48,6 +48,9 @@ Each entry says whether the PRD required it. "No" means it was a choice, and cou
 | E-038 | 2026-11-17 | Marking an order as paid takes one click, and can be undone | Management app | No (FR13 needs the update) |
 | E-039 | 2026-11-17 | The manager can see and print any bill | Management app, order-service | No |
 | E-040 | 2026-11-17 | The management app is tested the same way, in a small window too | Management app | No |
+| E-041 | 2026-11-17 | An account page: profile, rentals due back, every order and its bill | Customer app, order-service | No (asked for by the owner) |
+| E-042 | 2026-11-17 | A pretend checkout, with no card details | Customer app, order-service | No (asked for by the owner) |
+| E-043 | 2026-11-17 | Each customer's preferences are remembered on the computer | Customer app | No (asked for by the owner) |
 
 ## Details
 
@@ -281,3 +284,21 @@ An order opens its bill in the app, drawn by the same `BillView` the customer se
 
 Nine screen tests drive the management app with stand-in services, including one in a 1024 x 700 window that fails on any overflow; six book-rule tests; a live check of its clients against the running services; and drawn screenshots of each screen.
 **Effect:** the small-window test found an 84-pixel overflow in the orders row before anyone saw it (P-013).
+
+### E-041 — An account page: profile, rentals due back, every order and its bill
+
+The customer's name in the top bar opens "Your account": who they are and where bills are emailed; each rented book with "Due back in 7 days" or "Was due back 2 days ago" (with a warning icon, not color alone); and every order, newest first, with its status and its bill. This needed `GET /api/orders/mine` in order-service, which reads one customer's orders in two queries, however many there are.
+**Why:** the owner asked for a place to see history and orders. The PRD gives the customer no way to see an order again after leaving the bill screen.
+**Verified:** three new API tests, one against the real MySQL; on the running service the list answered in 64 ms.
+
+### E-042 — A pretend checkout, with no card details
+
+"Pay now" on the bill, and "Pay" on each pending order of the account page, open a dialog with the total, a note that this is a demonstration and nothing is charged, and one button. Paying calls `POST /api/orders/{id}/pay`, which marks the customer's own pending order as paid; paying twice is refused (409).
+**Why:** the owner asked for a way to complete payment. Asking for a card number would collect sensitive data the project has no business holding, so none is asked for, sent, or kept. The manager's FR13 controls are unchanged.
+**Verified:** five new API tests (pay, twice, someone else's, a manager, unknown), two screen tests; on the running service paying answered in 44 ms and a second attempt was refused.
+
+### E-043 — Each customer's preferences are remembered on the computer
+
+Dark mode, and whether search opens as covers or a list, are saved per username in `%APPDATA%\CSCE310 Bookstore\preferences.json`, and applied at log in. The top-bar buttons and the account page's switches change the same setting. A missing or damaged file falls back to the defaults.
+**Why:** the owner asked for preferences. They are only about how the app looks on this computer, so they stay on it and need no service.
+**Verified:** five tests (kept per customer, damaged file, logged out, no file, and the screen test that logs out and in again).

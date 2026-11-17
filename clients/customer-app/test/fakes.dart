@@ -5,6 +5,7 @@ import 'package:bookstore_ui/bookstore_ui.dart';
 import 'package:customer_app/api/apis.dart';
 import 'package:customer_app/main.dart';
 import 'package:customer_app/models/order_draft.dart';
+import 'package:customer_app/models/preferences.dart';
 
 /// Stand-ins for the three services, used by the screen tests and the screenshots.
 
@@ -55,10 +56,29 @@ class FakeOrders extends OrderApi {
   FakeOrders(super.session) : super(baseUrl: 'http://unused');
   ApiException? failure;
   DateTime now = DateTime(2026, 11, 17, 10, 5);
+  final List<Order> placed = [];
+  final List<int> paid = [];
+
+  @override
+  Future<List<Order>> myOrders() async => placed.reversed.toList();
+
+  @override
+  Future<Order> pay(int orderId) async {
+    final i = placed.indexWhere((o) => o.id == orderId);
+    if (placed[i].isPaid) throw const ApiException('This order is already paid', 409);
+    paid.add(orderId);
+    return placed[i] = placed[i].copyWith(paymentStatus: Order.paid);
+  }
 
   @override
   Future<Order> createOrder(OrderDraft draft) async {
     if (failure != null) throw failure!;
+    final order = _order(draft);
+    placed.add(order);
+    return order;
+  }
+
+  Order _order(OrderDraft draft) {
     return Order(
       id: 1042,
       username: session.username!,
@@ -83,5 +103,7 @@ AppServices fakeServices({String role = 'CUSTOMER', List<Book>? books}) {
     users: FakeUsers(session, role: role),
     books: FakeBooks(session, books ?? sampleBooks()),
     orders: FakeOrders(session),
+    preferences: Preferences(), // in memory only: tests never write to the real preferences file
+    now: () => DateTime(2026, 11, 17, 12),
   );
 }

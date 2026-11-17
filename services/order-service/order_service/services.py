@@ -7,9 +7,9 @@ from typing import Callable
 
 from .bill import BillStore, render_bill
 from .catalog import BookCatalog
-from .errors import ForbiddenError, NotFoundError
+from .errors import ConflictError, ForbiddenError, NotFoundError
 from .mailer import Mailer
-from .models import PENDING, RENT, CurrentUser, Order, OrderItem
+from .models import PAID, PENDING, RENT, CurrentUser, Order, OrderItem
 from .pricing import RENT_DAYS, charge_for
 from .repository import OrderRepository
 from .schemas import OrderInput
@@ -83,6 +83,10 @@ class OrderService:
         """FR12: every order, newest first."""
         return self._orders.list_all()
 
+    def list_for(self, user: CurrentUser) -> list[Order]:
+        """The customer's own orders, newest first (account page)."""
+        return self._orders.list_for_user(user.user_id)
+
     def get(self, order_id: int, user: CurrentUser) -> Order:
         """One order with its items. N5: a customer may see only their own; a manager any."""
         order = self._orders.find(order_id)
@@ -91,6 +95,14 @@ class OrderService:
         if not user.is_manager and order.user_id != user.user_id:
             raise ForbiddenError("This order belongs to another customer")
         return order
+
+    def pay(self, order_id: int, user: CurrentUser) -> Order:
+        """The pretend checkout: a customer pays their own pending order. Nothing is charged;
+        the order is only marked as paid, as a manager would (FR13)."""
+        order = self.get(order_id, user)
+        if order.payment_status == PAID:
+            raise ConflictError("This order is already paid")
+        return self.set_payment_status(order_id, PAID)
 
     def bill_for(self, order_id: int, user: CurrentUser) -> str:
         """FR8, FR9: the bill of an order. N5: a customer may open only their own; a manager any."""

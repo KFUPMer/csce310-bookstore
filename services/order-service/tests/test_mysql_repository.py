@@ -117,6 +117,14 @@ class MySqlOrderRepositoryTest(unittest.TestCase):
         self.assertEqual([order.id for order in mine], [newer.id, older.id])
         self.assertEqual([item.title for item in mine[0].items], ["Clean Code", "Java Concurrency in Practice"])
 
+    def test_list_for_user_is_only_that_users_orders_newest_first_with_items(self):
+        older = self.orders.save(self.new_order(datetime(2026, 11, 12, 18, 40, 0)))
+        newer = self.orders.save(self.new_order(datetime(2026, 11, 13, 10, 5, 0)))
+        mine = self.orders.list_for_user(self.user_id)
+        self.assertEqual([order.id for order in mine], [newer.id, older.id])
+        self.assertEqual([item.title for item in mine[1].items], ["Clean Code", "Java Concurrency in Practice"])
+        self.assertEqual(self.orders.list_for_user(-1), [])
+
     def test_set_payment_status_changes_it_and_returns_the_order(self):
         saved = self.orders.save(self.new_order())
         self.assertEqual(self.orders.set_payment_status(saved.id, "PAID").payment_status, "PAID")

@@ -22,7 +22,8 @@ The live plan is `docs/04-planning/milestones.md`; tasks are GitHub issues on `K
 | customer-app (Flutter) | Built on the real services (issues 11, 15), 34 tests. The owner ran it: it works. Account page and pretend checkout added after; the owner tried them too |
 | management-app (Flutter) | Built (issue 12), 15 tests, checked against the running services. The owner tried it: it works (`manager1` / `manager123`) |
 | Customer account page + pretend checkout | Built 2026-11-17, beyond the PRD (asked for by the owner). No card details are ever asked for or stored. Preferences in `%APPDATA%\CSCE310 Bookstore\preferences.json` |
-| **Next** | M5 (issue 13): test every requirement FR1–FR14, N1–N5 end to end; then issue 14, final docs and v1.0.0. `manual_check.py` now covers every order endpoint (41 checks) |
+| Requirements testing (issue 13) | Done: `docs/06-testing/requirements-test.md`. `manual_check.py` covers every order endpoint (41 checks) |
+| **Next** | Issue 14: final documentation and release v1.0.0. Open decision for the owner: whether the submission needs a release build (P-017) |
 | Testing and final release | M5 |
 
 Known unfinished or unverified things: the "Known gaps" table at the end of `docs/03-problems/problem-log.md`.

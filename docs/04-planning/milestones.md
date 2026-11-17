@@ -52,7 +52,7 @@ The live version of this plan is on GitHub: milestones hold the deadlines, issue
 
 ### M5 — Testing & Final Release (due 2026-12-04)
 
-- [ ] Test every requirement FR1–FR14 and N1–N5 end to end
+- [x] Test every requirement FR1–FR14 and N1–N5 end to end: [requirements test report](../06-testing/requirements-test.md)
 - [ ] Final documentation and release v1.0.0
 
 ### Extra credit (all being done, +4% in total)
@@ -91,3 +91,4 @@ Add a short dated note whenever a milestone closes or a deadline moves, and say 
 | 2026-11-17 | Account page and pretend checkout built: two new order-service endpoints (101 tests), 34 customer-app tests, checked against the running services. Next: the owner tries them; then M5, testing every requirement end to end. |
 | 2026-11-17 | The owner tried the account page and checkout: "everything is alright". At their request the bill screen's "Continue shopping" button became a back arrow, as on the account page. |
 | 2026-11-17 | **M4 closed, v0.4.0 released**, two weeks before its deadline. All 225 tests pass. Issues #11 and #15 closed. Next: M5, testing every requirement end to end. |
+| 2026-11-17 | Every requirement checked: 225 tests, 41 live checks on the running services (all passed after fixing one fault in the check script itself), and the apps' live checks; N3 confirmed in the real database. Report in `docs/06-testing`. Issue #13 closed. Next: issue #14, final documentation and v1.0.0. |

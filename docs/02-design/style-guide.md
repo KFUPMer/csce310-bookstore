@@ -217,4 +217,4 @@ Everything decelerates into place (ease-out). Nothing bounces or loops.
 - **Trackpad scrolling.** Written, but only testable on a real trackpad.
 - **Screen readers.** Labels are in place; they have not been tested with Windows Narrator.
 - **A color-blindness simulation** of the screenshots has not been run.
-- **The manager app's real window** has not been looked at by a person yet; its screenshots are drawn from its widgets. The owner has run the customer app.
+- **Both apps' real windows** have been run by the owner and work; how the motion feels has not been commented on yet.

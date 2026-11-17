@@ -456,7 +456,6 @@ Things that are known to be unfinished or unverified, so nobody is surprised lat
 | Gap | Since | Plan |
 |---|---|---|
 | `uml.py` still writes the three diagrams that were removed, and has not been run from `tools/diagrams`. (`flows.py` was run from there on 2026-11-16 and changed only the diagram that was meant to change) | M2 | Remove the three from `uml.py`; run it once and check `git status` shows no change |
-| The management app's real window has not been used by a person yet. The assistant checked it with widget tests, drawn screenshots, and its service clients against the real services, separately. (The owner has run the customer app and it worked) | M4 | The owner runs the management app and tries it |
 | Release builds are blocked (P-017) | M4 | Decide before v1.0.0 |
 | The bill email has been seen to look right in Gmail in a desktop browser only. Other mail programs (Outlook, phone apps) are untested | M3 | Test others in M5 if wanted |
 | If book-service takes copies for an order but its answer does not arrive within 3 seconds, the order fails and those copies are not given back. order-service logs an error naming the book | M3 | Accept and document; a manager can correct the number of copies (FR14). Rare on one machine |

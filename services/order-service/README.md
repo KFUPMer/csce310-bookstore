@@ -59,7 +59,7 @@ The MySQL tests run in the real `bookstore` database, because the services' acco
 python manual_check.py
 ```
 
-Starts all three services, calls every endpoint for real (33 checks, each stating what it expects), times each call from a cold start, cleans up what it created, stops the services, and confirms none is left running.
+Starts all three services, calls every endpoint for real (41 checks, each stating what it expects), times each call from a cold start, cleans up what it created, stops the services, and confirms none is left running.
 
 ```bash
 python email_check.py
@@ -130,7 +130,7 @@ Routes and services raise; `errors.py` answers every failure as `{ "error": "mes
 Built and verified on 2026-11-16:
 
 - All 101 tests pass, including the 9 against the real MySQL (re-run 2026-11-17 after the M4 endpoints).
-- Run for real with user-service, book-service, MySQL, and MongoDB: all 33 checks returned the expected result, and no service was left running.
+- Run for real with user-service, book-service, MySQL, and MongoDB: all 33 checks returned the expected result, and no service was left running. Run again on 2026-11-17 with the three M4 endpoints added: all 41 checks passed, slowest request 147 ms.
 - Timings on the running service: the first order after a cold start took 93 ms; every other request took 6 to 44 ms. N1 allows 500 ms.
 - With book-service stopped, placing an order answered 503 in 2.0 seconds and order-service kept running.
 

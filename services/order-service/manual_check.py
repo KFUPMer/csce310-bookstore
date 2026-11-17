@@ -112,7 +112,8 @@ def main() -> int:
         other = login({"username": temp_user, "password": password})
 
         books = requests.get(f"{BOOK}/api/books", headers=customer, timeout=10).json()
-        in_stock = [book for book in books if book["copiesAvailable"] >= 2]
+        # At least 4: the first book loses 1 + 2 copies to the two orders and needs one more for the 404 check.
+        in_stock = [book for book in books if book["copiesAvailable"] >= 4]
         first, second = in_stock[0], in_stock[1]
         before = {book["id"]: book["copiesAvailable"] for book in books}
 
@@ -181,6 +182,20 @@ def main() -> int:
         bill_path.unlink(missing_ok=True)
         check("after the file is deleted, the bill is made again, identical", requests.get(f"{ORDER}/api/orders/{order_id}/bill", headers=customer, timeout=10), 200,
               lambda r: r.content.decode("utf-8") == order["billHtml"] and bill_path.is_file())
+
+        print("\n--- one order as JSON, a customer's own orders, and the pretend checkout (added in M4)")
+        other_id = order_id + 1  # the temporary customer's order, placed above
+        check("a manager gets one order with its items", requests.get(f"{ORDER}/api/orders/{order_id}", headers=manager, timeout=10), 200,
+              lambda r: len(r.json()["items"]) == 2 and r.json()["email"] and "billHtml" not in r.json())
+        check("another customer cannot get it", requests.get(f"{ORDER}/api/orders/{order_id}", headers=other, timeout=10), 403)
+        check("a customer lists only their own orders", requests.get(f"{ORDER}/api/orders/mine", headers=other, timeout=10), 200,
+              lambda r: [o["id"] for o in r.json()] == [other_id] and r.json()[0]["items"][0]["quantity"] == 2)
+        check("a manager has no orders of their own", requests.get(f"{ORDER}/api/orders/mine", headers=manager, timeout=10), 403)
+        check("a customer cannot pay someone else's order", requests.post(f"{ORDER}/api/orders/{order_id}/pay", headers=other, timeout=10), 403)
+        check("a manager cannot use the customer's checkout", requests.post(f"{ORDER}/api/orders/{other_id}/pay", headers=manager, timeout=10), 403)
+        check("the customer pays their own order", requests.post(f"{ORDER}/api/orders/{other_id}/pay", headers=other, timeout=10), 200,
+              lambda r: r.json()["paymentStatus"] == "PAID")
+        check("...and cannot pay it twice", requests.post(f"{ORDER}/api/orders/{other_id}/pay", headers=other, timeout=10), 409)
 
         print("\n--- the manager's list and the payment status (FR12, FR13)")
         check("a manager lists all orders, newest first", requests.get(f"{ORDER}/api/orders", headers=manager, timeout=10), 200,

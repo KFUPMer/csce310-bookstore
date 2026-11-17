@@ -11,8 +11,8 @@ This repository records the **whole process** of the project, not only the final
 | 1. Idea & requirements | M1 | v0.1.0 | Done — released 2026-11-13 |
 | 2. Design | M2 | v0.2.0 | Done — released 2026-11-13 |
 | 3. Backend services | M3 | v0.3.0 | Done — released 2026-11-17 |
-| 4. Desktop clients | M4 | v0.4.0 | In progress |
-| 5. Testing & final release | M5 | v1.0.0 | Not started |
+| 4. Desktop clients | M4 | v0.4.0 | Done — released 2026-11-17 |
+| 5. Testing & final release | M5 | v1.0.0 | In progress |
 
 Dates and tasks: [docs/04-planning/milestones.md](docs/04-planning/milestones.md)
 
@@ -30,7 +30,7 @@ Dates and tasks: [docs/04-planning/milestones.md](docs/04-planning/milestones.md
 | `tools/diagrams/` | The scripts that generate the draw.io diagrams |
 | [CLAUDE.md](CLAUDE.md) | Notes for the AI assistant: the standing rules, where things stand, and what is next |
 | [services/](services/README.md) | The three backend RESTful web services, each with a README on how to run and test it |
-| `clients/` | The two desktop GUI applications |
+| [clients/](clients/README.md) | The two desktop GUI applications and their shared package |
 | [CHANGELOG.md](CHANGELOG.md) | What changed in every version and patch |
 | [REFERENCES.md](REFERENCES.md) | Everything that came from someone else, with its source and license |
 | [LICENSE](LICENSE) | The MIT License, which covers this project's own work |

@@ -4,23 +4,36 @@ All versions and patches of the project, newest first.
 
 ## Unreleased
 
-Work towards v0.4.0 (milestone M4, Desktop clients).
+Work towards v1.0.0 (milestone M5, Testing & final release).
+
+## v0.4.0 — 2026-11-17 — Desktop clients (M4)
+
+Both desktop apps are built in Flutter on the three real services, and the owner has run both and tried every screen. The owner also asked for a customer account page and a pretend checkout, beyond the PRD; both are built. All 225 tests pass.
+
+| Part | Tests | Verified |
+|---|---|---|
+| Customer app | 34 | Run by the owner; its service clients against the running services: my orders 64 ms, paying 44 ms |
+| Management app | 15 | Run by the owner; its service clients against the running services: one order 17 ms |
+| Shared package `bookstore-ui` | 18 | The service client against a small real web server |
+| order-service | 101 | Including 9 against the real MySQL |
+| user-service, book-service | 26, 31 | Unchanged since v0.3.0, run again |
 
 ### Added
-- **Customer app** on the real services: log in, create an account (FR3), search as you type, covers or list view, buy or rent, review and place the order, the bill (FR1–FR8). 41 tests; its service clients checked against the three running services
+- **Customer app** on the real services: log in, create an account (FR3), search as you type, covers or list view, buy or rent, review and place the order, the bill (FR1–FR8). Its service clients checked against the three running services
 - Shared UI package: text fields with their problem under them, error messages, the toast with Undo, page transitions, the bill drawn in the app, the log-in layout, and money and date formatting
 - Screenshots of every customer-app screen in the style guide, drawn with the real typefaces
-- **Management app** on the real services: log in (managers only), every order with a Pending / Paid filter, mark as paid with Undo, an order's bill in the app and printed from the browser, search, add and edit books (FR1, FR2, FR8, FR9, FR11–FR14). 15 tests; its service clients checked against the running services
-- order-service: `GET /api/orders/{id}`, one order as JSON, for its customer or a manager; the order now includes the customer's email. 92 tests
+- **Management app** on the real services: log in (managers only), every order with a Pending / Paid filter, mark as paid with Undo, an order's bill in the app and printed from the browser, search, add and edit books (FR1, FR2, FR8, FR9, FR11–FR14). Its service clients checked against the running services
+- order-service: `GET /api/orders/{id}`, one order as JSON, for its customer or a manager; the order now includes the customer's email
 - **Customer account page** (asked for by the owner, beyond the PRD): profile, preferences remembered per customer, rentals due back, every order with its bill
 - **Pretend checkout** (asked for by the owner, beyond the PRD): "Pay now" on the bill and "Pay" on the account page mark the customer's own order paid. No card details
-- order-service: `GET /api/orders/mine` and `POST /api/orders/{id}/pay`. 101 tests
+- order-service: `GET /api/orders/mine` and `POST /api/orders/{id}/pay`
 - `.gitattributes` marks the Flutter-generated `windows/` folders as generated, so GitHub does not count their C++ and CMake as project code
 
 ### Changed
 - The customer app's style preview on sample books is replaced by the real screens
 - The rent price is worked out in whole cents, exactly as order-service charges it; amounts show thousands separators
 - The log-in form, service clients, session, and book and order data moved from the customer app into the shared package, used by both apps
+- The bill screen has a back arrow instead of a "Continue shopping" button, at the owner's request
 
 ### Known problems
 - P-017: release builds are blocked by Windows Smart App Control; debug builds work

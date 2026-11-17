@@ -9,7 +9,7 @@ The live version of this plan is on GitHub: milestones hold the deadlines, issue
 | M1 — Idea & Requirements | Scope and requirements agreed | 2026-11-15 | v0.1.0 — **released 2026-11-13** |
 | M2 — Design | Architecture, database, API, and UI designed | 2026-11-19 | v0.2.0 — **released 2026-11-13** |
 | M3 — Backend Services | All three services working against their databases | 2026-11-26 | v0.3.0 — **released 2026-11-17** |
-| M4 — Desktop Clients | Both GUI apps working against the services | 2026-12-01 | v0.4.0 |
+| M4 — Desktop Clients | Both GUI apps working against the services | 2026-12-01 | v0.4.0 — **released 2026-11-17** |
 | M5 — Testing & Final Release | Tested, documented, ready to submit | 2026-12-04 | v1.0.0 |
 
 ## Tasks
@@ -48,6 +48,7 @@ The live version of this plan is on GitHub: milestones hold the deadlines, issue
 - [x] customer-app in Flutter, asynchronous calls (N2): register (the app half of FR3, issue #15), login, search, select books, place order, see bill. Checked against the running services; the owner ran it and it works
 - [x] management-app in Flutter, asynchronous calls (N2): login, orders list, payment status, an order's bill, add and update books (issue #12). 15 tests; checked against the running services; the owner tried it and everything works
 - [x] Asked for by the owner, beyond the PRD: an account page in the customer app (order history, profile, preferences, rentals due back) and a pretend checkout that marks an order paid (no real card details). Checked against the running services; the owner tried it ("everything is alright")
+- [x] Release v0.4.0
 
 ### M5 — Testing & Final Release (due 2026-12-04)
 
@@ -56,9 +57,9 @@ The live version of this plan is on GitHub: milestones hold the deadlines, issue
 
 ### Extra credit (all being done, +4% in total)
 
-- [ ] FR3: user registration (+1%) — the service half is done (user-service, M3); the register screen is left (customer app, M4)
+- [x] FR3: user registration (+1%) — user-service (M3) and the register screen of the customer app (M4)
 - [x] FR10: email the bill to the customer (+1%) — built in order-service; a real bill was sent through Gmail
-- [ ] Modern GUI framework (+2%) — both apps in Flutter, M4
+- [x] Modern GUI framework (+2%) — both apps in Flutter (M4)
 
 ## Progress notes
 
@@ -88,4 +89,5 @@ Add a short dated note whenever a milestone closes or a deadline moves, and say 
 | 2026-11-17 | The owner ran the customer app: it works. They asked for an account page and a way to pay; decided to build the management app first. Management app built: shared log-in and service clients moved into `bookstore-ui`, a new `GET /api/orders/{id}` in order-service (92 tests), 15 app tests, checked against the running services. Next: the owner tries it; then the account page and the pretend checkout. |
 | 2026-11-17 | The owner tried the management app: "everything seems good". Issue #12 closed. Next: the account page and the pretend checkout. |
 | 2026-11-17 | Account page and pretend checkout built: two new order-service endpoints (101 tests), 34 customer-app tests, checked against the running services. Next: the owner tries them; then M5, testing every requirement end to end. |
-| 2026-11-17 | The owner tried the account page and checkout: "everything is alright". At their request the bill screen's "Continue shopping" button became a back arrow, as on the account page. M5 started. |
+| 2026-11-17 | The owner tried the account page and checkout: "everything is alright". At their request the bill screen's "Continue shopping" button became a back arrow, as on the account page. |
+| 2026-11-17 | **M4 closed, v0.4.0 released**, two weeks before its deadline. All 225 tests pass. Issues #11 and #15 closed. Next: M5, testing every requirement end to end. |

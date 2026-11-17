@@ -14,7 +14,7 @@ The live plan is `docs/04-planning/milestones.md`; tasks are GitHub issues on `K
 
 | Part | State |
 |---|---|
-| M1 Idea, M2 Design, M3 Backend | Closed. Released as v0.1.0, v0.2.0, v0.3.0 |
+| M1 Idea, M2 Design, M3 Backend, M4 Clients | Closed. Released as v0.1.0, v0.2.0, v0.3.0, v0.4.0 |
 | user-service (Java HttpServer, MySQL) | Done, verified against MySQL |
 | book-service (Python Flask, MongoDB) | Done, verified on the running service |
 | order-service (Python Flask, MySQL) | Done, verified on the running service with the other two. A real bill email was sent through Gmail (`email_check.py`) and the owner confirmed it looks right in the inbox. `GET /api/orders/{id}`, `GET /api/orders/mine`, `POST /api/orders/{id}/pay` added in M4 (101 tests) |

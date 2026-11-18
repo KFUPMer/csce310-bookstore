@@ -78,7 +78,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
     return AuthLayout(
       tagline: 'Make an account in a minute.',
       note: 'You need one to place orders. Your password is stored only as a secure hash.',
-      coverTitles: const ['Introduction to Algorithms', 'The Pragmatic Programmer', 'Design Patterns'],
+      coverTitles: const ['Pride and Prejudice', 'Charlotte’s Web', 'Sapiens'],
+      coverUrls: const [
+        'https://covers.openlibrary.org/b/isbn/9780141439518-L.jpg',
+        'https://covers.openlibrary.org/b/id/8461797-L.jpg',
+        'https://covers.openlibrary.org/b/id/8634250-L.jpg',
+      ],
       actions: [AppIconButton(icon: Icons.close_rounded, tooltip: 'Back to log in (Esc)', onPressed: () => Navigator.of(context).pop())],
       child: CallbackShortcuts(
         bindings: {const SingleActivator(LogicalKeyboardKey.escape): () => Navigator.of(context).pop()},

@@ -46,7 +46,7 @@ class BuildMessageTest(unittest.TestCase):
     def test_is_addressed_to_the_customer(self):
         self.assertEqual(self.message["To"], "alice@example.com")
         self.assertEqual(self.message["From"], "Bookstore <shop@example.com>")
-        self.assertEqual(self.message["Subject"], "Your bookstore bill: order 1042")
+        self.assertEqual(self.message["Subject"], "Your Mooney's bill: order 1042")
 
     def test_the_bill_is_the_html_body_with_a_plain_text_version(self):
         plain = self.message.get_body(preferencelist=("plain",)).get_content()

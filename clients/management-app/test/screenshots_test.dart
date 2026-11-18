@@ -31,7 +31,12 @@ Future<void> _loadFonts() async {
   }
 
   const fonts = '../bookstore-ui/fonts';
-  await family('packages/bookstore_ui/Inter', ['$fonts/Inter-Regular.ttf', '$fonts/Inter-Medium.ttf', '$fonts/Inter-SemiBold.ttf', '$fonts/Inter-Bold.ttf']);
+  await family('packages/bookstore_ui/Inter', [
+    '$fonts/Inter-Regular.ttf',
+    '$fonts/Inter-Medium.ttf',
+    '$fonts/Inter-SemiBold.ttf',
+    '$fonts/Inter-Bold.ttf',
+  ]);
   await family('packages/bookstore_ui/SourceSerif4', ['$fonts/SourceSerif4-Regular.ttf', '$fonts/SourceSerif4-Semibold.ttf']);
   final flutterRoot = File(Platform.resolvedExecutable).parent.parent.parent.parent.parent.parent.path; // .../flutter
   await family('MaterialIcons', ['$flutterRoot/bin/cache/artifacts/material_fonts/materialicons-regular.otf']);
@@ -56,11 +61,17 @@ void main() {
   }
 
   Future<void> start(WidgetTester tester) async {
+    await useCachedCovers(tester);
     await tester.runAsync(_loadFonts);
     tester.view.physicalSize = _size;
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.reset);
-    await tester.pumpWidget(RepaintBoundary(key: frame, child: ManagerApp(services: fakeServices())));
+    await tester.pumpWidget(
+      RepaintBoundary(
+        key: frame,
+        child: ManagerApp(services: fakeServices()),
+      ),
+    );
     await tester.pumpAndSettle();
   }
 
@@ -87,7 +98,7 @@ void main() {
     await tester.pumpAndSettle();
     await shoot(tester, 'manager-books-light');
 
-    await tester.tap(find.bySemanticsLabel(RegExp('^Effective Java by')));
+    await tester.tap(find.bySemanticsLabel(RegExp('^Clean Code by'))); // near the top of the 27 books
     await tester.pumpAndSettle();
     await tester.enterText(find.descendant(of: find.byType(Dialog), matching: find.byType(TextField)).at(2), '');
     await tester.tap(find.widgetWithText(AppButton, 'Save changes'));

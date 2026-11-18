@@ -58,6 +58,13 @@ class MongoBookRepositoryTest(unittest.TestCase):
         self.assertEqual(self.books.search(".*"), [])
         self.assertEqual(self.books.search("("), [])
 
+    def test_a_category_is_stored_and_filters_the_search(self):
+        gatsby = self.books.insert(BookInput("The Great Gatsby", "F. Scott Fitzgerald", 14.0, 4, None, "Fiction"))
+        self.assertEqual(self.books.find(gatsby.id).category, "Fiction")
+        self.assertEqual([b.title for b in self.books.search("", "Fiction")], ["The Great Gatsby"])
+        self.assertEqual([b.title for b in self.books.search("gatsby", "Technology")], [])
+        self.assertEqual(len(self.books.search("", None)), 4, "no category: every book")
+
     def test_find_by_id_and_unknown_ids(self):
         self.assertEqual(self.books.find(self.effective_java.id).cover_url, "https://example.com/cover.jpg")
         self.assertIsNone(self.books.find("ffffffffffffffffffffffff"))

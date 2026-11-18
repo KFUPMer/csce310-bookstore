@@ -8,7 +8,7 @@ from flask import Blueprint, jsonify, request
 
 from .auth import SessionChecker, require_manager, require_service_key, token_from
 from .models import CurrentUser
-from .schemas import BookInput, CopiesChange
+from .schemas import BookInput, CopiesChange, category_filter
 from .services import BookService
 
 SERVICE_KEY_HEADER = "X-Service-Key"
@@ -27,9 +27,9 @@ def create_routes(books: BookService, sessions: SessionChecker, service_key: str
 
     @routes.get("")
     def search():
-        """GET /api/books?keyword= (FR4, FR5). Any logged-in user."""
+        """GET /api/books?keyword=&category= (FR4, FR5; the category is beyond the PRD). Any logged-in user."""
         current_user()
-        found = books.search(request.args.get("keyword", ""))
+        found = books.search(request.args.get("keyword", ""), category_filter(request.args.get("category")))
         return jsonify([book.to_json() for book in found])
 
     @routes.get("/<book_id>")

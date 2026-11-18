@@ -9,8 +9,9 @@ import 'fakes.dart';
 /// three services (no server needed).
 
 const books = [
-  Book(id: 'aaaaaaaaaaaaaaaaaaaaaaaa', title: 'Clean Code', author: 'Robert C. Martin', price: 40, copiesAvailable: 4),
-  Book(id: 'bbbbbbbbbbbbbbbbbbbbbbbb', title: 'Effective Java', author: 'Joshua Bloch', price: 50, copiesAvailable: 2),
+  Book(id: 'aaaaaaaaaaaaaaaaaaaaaaaa', title: 'Clean Code', author: 'Robert C. Martin', price: 40, copiesAvailable: 4, category: 'Technology'),
+  Book(id: 'bbbbbbbbbbbbbbbbbbbbbbbb', title: 'Effective Java', author: 'Joshua Bloch', price: 50, copiesAvailable: 2, category: 'Technology'),
+  Book(id: 'cccccccccccccccccccccccc', title: 'The Great Gatsby', author: 'F. Scott Fitzgerald', price: 14, copiesAvailable: 4, category: 'Fiction'),
 ];
 
 void main() {
@@ -160,7 +161,28 @@ void main() {
     await logIn(tester);
     expect(find.text('All books'), findsOneWidget);
     expect(find.text('Clean Code'), findsWidgets); // the card, and the title printed on its cover
-    expect(find.text('2 books. Search by title or author, or pick a cover.'), findsOneWidget);
+    expect(find.text('3 books. Search by title or author, or pick a cover.'), findsOneWidget);
+    await finish(tester);
+  });
+
+  testWidgets('a shelf shows only its books, a search stays on it, and All shows every book again', (tester) async {
+    await start(tester);
+    await logIn(tester);
+    await tester.tap(find.bySemanticsLabel('Fiction shelf'));
+    await tester.pumpAndSettle();
+    expect(find.text('1 book on this shelf. Search by title or author, or pick a cover.'), findsOneWidget);
+    expect(find.bySemanticsLabel(RegExp('^The Great Gatsby by')), findsOneWidget);
+    expect(find.bySemanticsLabel(RegExp('^Clean Code by')), findsNothing);
+
+    await tester.enterText(find.byType(TextField).first, 'java');
+    await tester.pumpAndSettle(const Duration(seconds: 1));
+    expect(find.text('No books match "java" in Fiction'), findsOneWidget);
+    await tester.tap(find.widgetWithText(AppButton, 'Search every shelf'));
+    await tester.pumpAndSettle();
+    expect(find.bySemanticsLabel(RegExp('^Effective Java by')), findsOneWidget, reason: 'the same search, on every shelf');
+
+    await tester.tap(find.bySemanticsLabel('All books'));
+    await tester.pumpAndSettle();
     await finish(tester);
   });
 

@@ -21,6 +21,18 @@ void main() {
     expect(book(copies: 0).isAvailable, isFalse);
   });
 
+  test('a book has its shelf, read from and sent back to book-service', () {
+    final b = Book.fromJson({'id': 'abc', 'title': 'Matilda', 'author': 'Roald Dahl', 'price': 8.99, 'copiesAvailable': 4, 'category': 'Kids'});
+    expect(b.category, 'Kids');
+    expect(b.toJson()['category'], 'Kids');
+    final old = Book.fromJson({'id': 'abc', 'title': 'Old', 'author': 'Someone', 'price': 1, 'copiesAvailable': 1});
+    expect(old.category, isNull, reason: 'a book stored before shelves existed');
+  });
+
+  test('the shelves are the five book-service accepts, in the order the apps show them', () {
+    expect(categories, ['Fiction', 'Nonfiction', 'Kids', 'Science', 'Technology']);
+  });
+
   test('a book is built from the JSON that book-service returns', () {
     final b = Book.fromJson({'id': 'abc', 'title': 'Clean Code', 'author': 'Robert C. Martin', 'price': 40, 'copiesAvailable': 4, 'coverUrl': null});
     expect(b.title, 'Clean Code');

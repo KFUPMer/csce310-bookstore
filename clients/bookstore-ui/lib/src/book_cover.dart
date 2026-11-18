@@ -18,6 +18,10 @@ class BookCover extends StatelessWidget {
   /// Faded, for a book that cannot be ordered.
   final bool dimmed;
 
+  /// Where a cover photo is loaded from: the internet. The screenshot tests point it at
+  /// photos downloaded beforehand, because tests have no internet.
+  static ImageProvider Function(String url) imageFor = NetworkImage.new;
+
   /// A hue between 0 and 360 that depends only on the title.
   static double hueFor(String title) {
     var hash = 7;
@@ -38,7 +42,24 @@ class BookCover extends StatelessWidget {
 
     Widget face;
     if (imageUrl != null) {
-      face = Image.network(imageUrl!, fit: BoxFit.cover, width: width, height: height, errorBuilder: (_, _, _) => _generated(top, bottom, scale));
+      // The drawn cover shows until the photo has arrived, then the photo fades in over it:
+      // never an empty slot. Without internet, or for a broken address, the drawn cover stays.
+      face = Image(
+        image: imageFor(imageUrl!),
+        fit: BoxFit.cover,
+        width: width,
+        height: height,
+        frameBuilder: (context, child, frame, wasSynchronouslyLoaded) => wasSynchronouslyLoaded
+            ? child
+            : Stack(
+                fit: StackFit.expand,
+                children: [
+                  _generated(top, bottom, scale),
+                  AnimatedOpacity(opacity: frame == null ? 0 : 1, duration: Motion.base, curve: Motion.curve, child: child),
+                ],
+              ),
+        errorBuilder: (_, _, _) => _generated(top, bottom, scale),
+      );
     } else {
       face = _generated(top, bottom, scale);
     }
@@ -103,7 +124,13 @@ class BookCover extends StatelessWidget {
                 title,
                 maxLines: 5,
                 overflow: TextOverflow.ellipsis,
-                style: TextStyle(fontFamily: Fonts.display, fontSize: 14.5 * scale, height: 1.2, fontWeight: FontWeight.w600, color: const Color(0xFFFFFFFF)),
+                style: TextStyle(
+                  fontFamily: Fonts.display,
+                  fontSize: 14.5 * scale,
+                  height: 1.2,
+                  fontWeight: FontWeight.w600,
+                  color: const Color(0xFFFFFFFF),
+                ),
               ),
             ),
             Text(

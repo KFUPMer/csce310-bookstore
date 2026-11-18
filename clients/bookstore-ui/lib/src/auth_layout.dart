@@ -1,15 +1,24 @@
 import 'package:material_ui/material_ui.dart';
 
 import 'book_cover.dart';
+import 'mooneys_sign.dart';
 import 'tokens.dart';
 
 /// The layout of the log-in and create-account screens of both apps.
 ///
-/// A form card on the right; on the left, the app's name, one sentence about
-/// it, and a fan of generated book covers, the only color on the screen
-/// (style guide). In a narrow window the left side is left out.
+/// A form card on the right; on the left, the store's sign, a fan of book covers,
+/// and one sentence about the app. The sign and the covers are the only color on the
+/// screen (style guide). In a narrow window the left side is left out.
 class AuthLayout extends StatelessWidget {
-  const AuthLayout({super.key, required this.tagline, required this.note, required this.coverTitles, required this.child, this.actions = const []});
+  const AuthLayout({
+    super.key,
+    required this.tagline,
+    required this.note,
+    required this.coverTitles,
+    required this.child,
+    this.actions = const [],
+    this.coverUrls = const [],
+  });
 
   /// One sentence about the app, in the serif.
   final String tagline;
@@ -19,6 +28,9 @@ class AuthLayout extends StatelessWidget {
 
   /// Three titles for the fanned covers.
   final List<String> coverTitles;
+
+  /// Photos for those covers, in the same order. Without internet the covers are drawn instead.
+  final List<String> coverUrls;
 
   /// The form.
   final Widget child;
@@ -75,10 +87,10 @@ class AuthLayout extends StatelessWidget {
                                   mainAxisSize: MainAxisSize.min,
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    _CoverFan(titles: coverTitles),
+                                    const MooneysSign(height: 62, line: 'BOOKSELLERS  ·  EST. 2026'),
                                     const SizedBox(height: Space.xxl),
-                                    Text('Bookstore', style: t.labelSmall!.copyWith(letterSpacing: 2.4, fontSize: 12)),
-                                    const SizedBox(height: Space.sm),
+                                    _CoverFan(titles: coverTitles, urls: coverUrls),
+                                    const SizedBox(height: Space.xl),
                                     Text(tagline, style: t.displaySmall),
                                     const SizedBox(height: Space.md),
                                     Text(note, style: t.bodyLarge!.copyWith(color: c.textSecondary)),
@@ -110,9 +122,10 @@ class AuthLayout extends StatelessWidget {
 
 /// Three covers fanned out like books on a table.
 class _CoverFan extends StatelessWidget {
-  const _CoverFan({required this.titles});
+  const _CoverFan({required this.titles, required this.urls});
 
   final List<String> titles;
+  final List<String> urls;
 
   @override
   Widget build(BuildContext context) {
@@ -135,7 +148,12 @@ class _CoverFan extends StatelessWidget {
                 child: Transform.rotate(
                   angle: angles[i],
                   alignment: Alignment.bottomCenter,
-                  child: BookCover(title: titles[i % titles.length], author: '', width: i == 1 ? width + 8 : width),
+                  child: BookCover(
+                    title: titles[i % titles.length],
+                    author: '',
+                    imageUrl: i < urls.length ? urls[i] : null,
+                    width: i == 1 ? width + 8 : width,
+                  ),
                 ),
               ),
           ],

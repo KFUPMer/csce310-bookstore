@@ -23,17 +23,17 @@ c = [
  F.cls('errh', 'errors.py', C[3], R[0], ['one error shape for every failure'], ['register_error_handlers(app)'], RED, 'module'),
  # http
  F.cls('checker', 'SessionChecker', C[0], R[1], ['(abstract)'], ['+ check(token) : CurrentUser'], F.GREEN, 'interface'),
- F.cls('routes', 'routes.py', C[1], R[1], ['create_routes(books, sessions, service_key)'], ['GET /api/books?keyword=', 'GET /api/books/<id>', 'POST /api/books  (manager)', 'PUT /api/books/<id>  (manager)', 'PATCH /api/books/<id>/copies  (services)'], F.BLUE, 'module'),
+ F.cls('routes', 'routes.py', C[1], R[1], ['create_routes(books, sessions, service_key)'], ['GET /api/books?keyword=&category=', 'GET /api/books/<id>', 'POST /api/books  (manager)', 'PUT /api/books/<id>  (manager)', 'PATCH /api/books/<id>/copies  (services)'], F.BLUE, 'module'),
  F.cls('authf', 'auth.py', C[2], R[1], ['TIMEOUT = (2 s, 3 s)'], ['token_from(header) : str', 'require_manager(user)', 'require_service_key(given, expected)'], F.GREEN, 'module'),
- F.cls('input', 'BookInput', C[3], R[1], ['+ title, author : str', '+ price : float', '+ copies_available : int', '+ cover_url : str | None'], ['+ from_json(body) : BookInput'], PURPLE, 'dataclass'),
+ F.cls('input', 'BookInput', C[3], R[1], ['+ title, author : str', '+ price : float', '+ copies_available : int', '+ cover_url : str | None', '+ category : str  (one of 5)'], ['+ from_json(body) : BookInput', 'category_filter(value)  (module)'], PURPLE, 'dataclass'),
  F.cls('change', 'CopiesChange', C[4], R[1], ['+ change : int'], ['+ from_json(body) : CopiesChange'], PURPLE, 'dataclass'),
  # service
  F.cls('realchecker', 'UserServiceSessionChecker', C[0], R[2], ['- url : str', '- http : requests.Session'], ['+ check(token) : CurrentUser', '(asks user-service; 503 if it is down)'], F.GREEN),
- F.cls('service', 'BookService', C[1], R[2], ['- books : BookRepository'], ['+ search(keyword) : list[Book]', '+ get(book_id) : Book', '+ add(book) : Book', '+ update(book_id, book) : Book', '+ change_copies(book_id, change) : Book'], F.GREEN),
- F.cls('book', 'Book', C[3], R[2], ['+ id : str', '+ title, author : str', '+ price : float', '+ copies_available : int', '+ cover_url : str | None'], ['+ to_json() : dict'], F.GREY, 'dataclass'),
+ F.cls('service', 'BookService', C[1], R[2], ['- books : BookRepository'], ['+ search(keyword, category) : list[Book]', '+ get(book_id) : Book', '+ add(book) : Book', '+ update(book_id, book) : Book', '+ change_copies(book_id, change) : Book'], F.GREEN),
+ F.cls('book', 'Book', C[3], R[2], ['+ id : str', '+ title, author : str', '+ price : float', '+ copies_available : int', '+ cover_url : str | None', '+ category : str | None', '(CATEGORIES: the 5 shelves)'], ['+ to_json() : dict'], F.GREY, 'dataclass'),
  F.cls('cuser', 'CurrentUser', C[4], R[2], ['+ user_id : int', '+ username, email, role : str'], ['+ is_manager : bool'], F.GREY, 'dataclass'),
  # repository
- F.cls('repo', 'BookRepository', C[1], R[3], ['(abstract)'], ['+ search(keyword) : list[Book]', '+ find(book_id) : Book | None', '+ insert(book) : Book', '+ replace(book_id, book) : Book | None', '+ change_copies(book_id, change)'], F.YELLOW, 'interface'),
+ F.cls('repo', 'BookRepository', C[1], R[3], ['(abstract)'], ['+ search(keyword, category) : list[Book]', '+ find(book_id) : Book | None', '+ insert(book) : Book', '+ replace(book_id, book) : Book | None', '+ change_copies(book_id, change)'], F.YELLOW, 'interface'),
  F.cls('mongo', 'MongoBookRepository', C[0], R[4] + 30, ['- books : Collection'], ['(MongoDB collection books)', '- object_id(book_id)', '- to_document(book)', '- to_book(doc)'], F.YELLOW),
  F.cls('mem', 'InMemoryBookRepository', C[2], R[4] + 30, ['- books : dict[str, Book]', '- next_id : int'], ['(tests only)'], F.YELLOW),
  # errors

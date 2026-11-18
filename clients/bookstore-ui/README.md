@@ -18,8 +18,9 @@ Everything the two bookstore desktop apps share, so they cannot drift apart: the
 | `lib/src/auth_layout.dart` | The layout of the log-in and create-account screens |
 | `lib/src/login_form.dart` | The log-in form, letting in one role only; a neutral info note |
 | `lib/src/search_field.dart` | The round search field |
+| `lib/src/mooneys_sign.dart` | The store's sign, MOONEY'S in gold on deep green |
 | `lib/src/api/` | `ApiClient` (requests, readable errors), `Session`, `UserApi`, `BookApi` |
-| `lib/src/models/` | `Book`, `Order`, `PlacedItem`, `ItemType`, and the renting rule |
+| `lib/src/models/` | `Book` (with its shelf), `Order`, `PlacedItem`, `ItemType`, the five shelves, and the renting rule |
 | `fonts/` | Inter and Source Serif 4, with their SIL Open Font License files. Sources and versions: [REFERENCES.md](../../REFERENCES.md) |
 
 The reasoning behind every visual value is in [docs/02-design/style-guide.md](../../docs/02-design/style-guide.md).
@@ -28,4 +29,4 @@ The reasoning behind every visual value is in [docs/02-design/style-guide.md](..
 flutter test
 ```
 
-18 tests: the book's rent price and money, an order read from JSON, the cover colors, and the service client against a small real web server.
+21 tests: the book's rent price and money, an order read from JSON, the cover colors, and the service client against a small real web server.

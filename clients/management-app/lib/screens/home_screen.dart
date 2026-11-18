@@ -43,9 +43,9 @@ class _HomeScreenState extends State<HomeScreen> {
               padding: const EdgeInsets.symmetric(horizontal: Space.lg),
               child: Row(
                 children: [
-                  Text('Bookstore', style: t.titleLarge),
+                  const MooneysSign(height: 38),
                   const SizedBox(width: Space.sm),
-                  Text('MANAGEMENT', style: t.labelSmall!.copyWith(letterSpacing: 1.6)),
+                  Text('MANAGER', style: t.labelSmall!.copyWith(letterSpacing: 1.6)),
                   const SizedBox(width: Space.xl),
                   Tabs(
                     labels: const ['Orders', 'Books'],

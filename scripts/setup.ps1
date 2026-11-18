@@ -48,7 +48,7 @@ function Install-WithWinget($id, $what) {
     Update-Path
 }
 
-Write-Host "Bookstore services: setup" -ForegroundColor Cyan
+Write-Host "Mooney's bookstore services: setup" -ForegroundColor Cyan
 Write-Host "Folder: $root"
 Update-Path
 
@@ -147,12 +147,12 @@ if (-not (Test-Path $jar)) {
         Info 'Building it with Maven (about a minute)...'
         mvn -q -f services\user-service\pom.xml package -DskipTests
     }
-    if (-not (Test-Path $jar)) { Stop-Setup "$jar is missing. Use the Bookstore-Server zip from the GitHub release, which includes it, or install Maven." }
+    if (-not (Test-Path $jar)) { Stop-Setup "$jar is missing. Use the Mooneys-Server zip from the GitHub release, which includes it, or install Maven." }
 }
 Ok $jar
 
 Write-Host ""
 Write-Host "Setup is complete." -ForegroundColor Green
-Write-Host "Next: double-click start-services.cmd, then open Bookstore from the Start menu."
+Write-Host "Next: double-click start-services.cmd, then open Mooney's from the Start menu."
 Write-Host "Bills are saved, but not emailed until a Gmail app password is put in services\.env (INSTALL.md, optional)."
 exit 0

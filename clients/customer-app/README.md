@@ -1,6 +1,6 @@
 # Customer app
 
-The bookstore's desktop app for customers. Flutter (Dart), Windows.
+**Mooney's**: the bookstore's desktop app for customers. Flutter (Dart), Windows.
 
 Requirements covered: FR1–FR8 and FR10 (shows that the bill is emailed), FR3 (extra credit), N2, N4, N5.
 
@@ -8,7 +8,7 @@ Requirements covered: FR1–FR8 and FR10 (shows that the bill is emailed), FR3 (
 |---|---|
 | Log in | Logs in. A manager account is refused: managers use the management app |
 | Create an account | Username, email, password; each problem is shown under its field before anything is sent |
-| Search | Searches by title or author as they type; sees covers or a list with title, author, price; opens a book; buys or rents it |
+| Search | Searches by title or author as they type; picks a shelf (Fiction, Nonfiction, Kids, Science, Technology); sees the real covers or a list with title, author, price; opens a book; buys or rents it |
 | Your order | Switches each book between buy and rent, removes books (with Undo), sees the total, places the order |
 | Bill | Sees the bill of the order just placed, and that a copy is being emailed; can pay at once |
 | Pay | The pretend checkout: shows the total, says nothing is charged, marks the order paid. No card details |
@@ -36,14 +36,14 @@ Or, in VS Code: Run and Debug, "Customer app", F5.
 flutter test
 ```
 
-34 tests, no server needed: the rules (the order draft, the account rules, rentals and due dates, preferences), and every screen driven the way a customer uses it, with stand-in services. One of them checks that every screen fits a 1024 x 700 window. The shared service client and data have their own tests in `../bookstore-ui`.
+35 tests, no server needed: the rules (the order draft, the account rules, rentals and due dates, preferences), and every screen driven the way a customer uses it, with stand-in services. One of them checks that every screen fits a 1024 x 700 window. The shared service client and data have their own tests in `../bookstore-ui`.
 
 Two more are skipped unless asked for:
 
 | Command | Does |
 |---|---|
 | `set BOOKSTORE_LIVE=1 && flutter test test/live_services_test.dart` | The app's own service clients against the three real running services: log in, search, place a real order, find it under "my orders", pay it (remove it afterwards) |
-| `set BOOKSTORE_SCREENSHOTS=1 && flutter test test/screenshots_test.dart` | Draws each screen with the real typefaces into `docs/02-design/ui/customer-*.png` |
+| `set BOOKSTORE_SCREENSHOTS=1 && flutter test test/screenshots_test.dart` | First, once: `python tools/screenshots/fetch_covers.py` in the repository root, for the real cover photos. Draws each screen with the real typefaces into `docs/02-design/ui/customer-*.png` |
 
 ## How it is built
 

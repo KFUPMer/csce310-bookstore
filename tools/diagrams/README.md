@@ -13,6 +13,7 @@ They were written quickly while the diagrams were being made, and are kept as th
 | `order_cls.py` | `class-order-service` |
 | `flows.py` | The four sequence diagrams, `activity-login`, `activity-manager-payment`, and the two wireframes |
 | `uml.py` | `use-case`, `activity-place-order`, `state-machine`, `component`, `object`, `profile`, `class-services` |
+| `bill_sample.py` | `docs/02-design/bill/bill-sample.html`, written by order-service's own bill code (render the PNG with Edge, as in bill-design.md) |
 
 ## Use
 

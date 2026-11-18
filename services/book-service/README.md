@@ -8,7 +8,7 @@ Requirements covered: FR4, FR5, FR6, FR14, N1, N4, N5.
 
 | Method | Path | Who | Does |
 |---|---|---|---|
-| GET | `/api/books?keyword=` | Logged in | Books whose title or author contains the keyword; all books without one |
+| GET | `/api/books?keyword=&category=` | Logged in | Books whose title or author contains the keyword; all books without one. `category` keeps one shelf (Fiction, Nonfiction, Kids, Science, Technology; added in M5) |
 | GET | `/api/books/{id}` | Logged in | One book |
 | POST | `/api/books` | Manager | Adds a book |
 | PUT | `/api/books/{id}` | Manager | Updates a book |
@@ -36,7 +36,7 @@ Listens on port 8082 (change with `BOOK_SERVICE_PORT`), on this machine only.
 python -m unittest discover -s tests -t .
 ```
 
-31 tests. 24 call every endpoint with an in-memory repository and a stand-in for user-service, so they need nothing running. 7 test the MongoDB repository against a real MongoDB, in a separate `bookstore_test` database that is dropped afterwards; they are skipped if MongoDB is not running.
+37 tests. 29 call every endpoint with an in-memory repository and a stand-in for user-service, so they need nothing running. 8 test the MongoDB repository against a real MongoDB, in a separate `bookstore_test` database that is dropped afterwards; they are skipped if MongoDB is not running.
 
 ## How it is built
 
@@ -80,6 +80,6 @@ Routes and services raise; `errors.py` answers every failure as `{ "error": "mes
 
 Built and verified on 2026-11-16:
 
-- All 31 tests pass.
+- All 31 tests pass. After shelves were added (M5): all 37 pass, and the apps' live checks found the Fiction shelf on the running service in 25 ms.
 - Run for real with user-service, MySQL, and MongoDB: all 16 checks (every endpoint, success and errors) returned the expected result.
 - Timings on the running service: 3 to 38 ms per request, including the session check with user-service. N1 allows 500 ms.

@@ -83,7 +83,7 @@ jobs:
 
       - name: Unzip the server and run setup.cmd's script
         run: |
-          Expand-Archive (Get-ChildItem "$env:GRADER\Bookstore-Server-*.zip").FullName "$env:GRADER\server"
+          Expand-Archive (Get-ChildItem "$env:GRADER\*-Server-*.zip").FullName "$env:GRADER\server"
           powershell -NoProfile -ExecutionPolicy Bypass -File "$env:GRADER\server\scripts\setup.ps1"
           if ($LASTEXITCODE) { exit 1 }
           # Running it again must change nothing and ask nothing.
@@ -100,7 +100,7 @@ jobs:
         run: |
           powershell -NoProfile -ExecutionPolicy Bypass -File "$env:GRADER\server\scripts\start-services.ps1"
           if ($LASTEXITCODE) { exit 1 }
-          $setup = (Get-ChildItem "$env:GRADER\Bookstore-Apps-Setup-*.exe").FullName
+          $setup = (Get-ChildItem "$env:GRADER\*-Apps-Setup-*.exe").FullName
           & "$env:GRADER\server\installer\test-installer.ps1" -Setup $setup
           $result = $LASTEXITCODE
           powershell -NoProfile -ExecutionPolicy Bypass -File "$env:GRADER\server\scripts\stop-services.ps1"

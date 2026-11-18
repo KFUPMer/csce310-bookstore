@@ -1,6 +1,6 @@
 # CSCE310 Project — Bookstore
 
-An online bookstore: customers search for books and place orders from a desktop app, and managers handle books, orders, and payment status from a second desktop app. Behind them are RESTful web services (Java HttpServer and Python Flask) using MySQL and MongoDB.
+An online bookstore, **Mooney's**: customers search for books and place orders from a desktop app, and managers handle books, orders, and payment status from a second desktop app. Behind them are RESTful web services (Java HttpServer and Python Flask) using MySQL and MongoDB.
 
 This repository records the **whole process** of the project, not only the final code: the idea, the design, the problems we hit and how we solved them, and the plan (milestones, tasks, deadlines, versions).
 
@@ -14,7 +14,7 @@ This repository records the **whole process** of the project, not only the final
 | 2. Design | M2 | v0.2.0 | Done — released 2026-11-13 |
 | 3. Backend services | M3 | v0.3.0 | Done — released 2026-11-17 |
 | 4. Desktop clients | M4 | v0.4.0 | Done — released 2026-11-17 |
-| 5. Testing & final release | M5 | v1.0.0 | In progress — v1.0.0-beta.1 published 2026-11-17 |
+| 5. Testing & final release | M5 | v1.0.0 | Done — released 2026-11-17 |
 
 Dates and tasks: [docs/04-planning/milestones.md](docs/04-planning/milestones.md)
 

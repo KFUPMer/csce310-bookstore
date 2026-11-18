@@ -41,6 +41,9 @@ class _BookFormDialogState extends State<BookFormDialog> {
   late final _copies = TextEditingController(text: widget.book?.copiesAvailable.toString());
   late final _cover = TextEditingController(text: widget.book?.coverUrl);
 
+  /// The shelf; a new book (or one stored before shelves existed) has none until the manager picks one.
+  late String? _category = widget.book?.category;
+
   bool _saving = false;
   String? _error;
   Map<String, String> _problems = {};
@@ -58,7 +61,13 @@ class _BookFormDialogState extends State<BookFormDialog> {
     super.dispose();
   }
 
-  BookCheck _check() => checkBook(title: _title.text, author: _author.text, price: _price.text, copies: _copies.text, coverUrl: _cover.text);
+  BookCheck _check() =>
+      checkBook(title: _title.text, author: _author.text, price: _price.text, copies: _copies.text, coverUrl: _cover.text, category: _category);
+
+  void _pickShelf(String shelf) {
+    setState(() => _category = shelf);
+    _recheck('');
+  }
 
   void _recheck(String _) {
     if (_tried) setState(() => _problems = _check().problems);
@@ -80,6 +89,7 @@ class _BookFormDialogState extends State<BookFormDialog> {
       price: check.price!,
       copiesAvailable: check.copies!,
       coverUrl: check.coverUrl,
+      category: _category,
     );
     final books = ManagerScope.of(context).services.books;
     setState(() => _saving = true);
@@ -107,7 +117,7 @@ class _BookFormDialogState extends State<BookFormDialog> {
         insetPadding: const EdgeInsets.all(Space.xxl),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(Radii.panel)),
         child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 560),
+          constraints: const BoxConstraints(maxWidth: 620), // the five shelves fit on one row
           child: SingleChildScrollView(
             padding: const EdgeInsets.all(Space.xxl),
             child: Column(
@@ -171,6 +181,8 @@ class _BookFormDialogState extends State<BookFormDialog> {
                   ],
                 ),
                 const SizedBox(height: Space.lg),
+                _ShelfChoice(selected: _category, error: _problems['category'], onPick: _pickShelf),
+                const SizedBox(height: Space.lg),
                 AppTextField(
                   label: 'Cover image address (optional)',
                   controller: _cover,
@@ -201,6 +213,49 @@ class _BookFormDialogState extends State<BookFormDialog> {
           ),
         ),
       ),
+    );
+  }
+}
+
+/// The shelf of the book: one button per shelf. The chosen one is filled and shows a check,
+/// so the choice is not told by color alone. Its problem is shown under it, like a field's.
+class _ShelfChoice extends StatelessWidget {
+  const _ShelfChoice({required this.selected, required this.error, required this.onPick});
+
+  final String? selected;
+  final String? error;
+  final ValueChanged<String> onPick;
+
+  @override
+  Widget build(BuildContext context) {
+    final c = BookstoreColors.of(context);
+    final t = Theme.of(context).textTheme;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('Shelf', style: t.labelMedium!.copyWith(color: c.textSecondary)),
+        const SizedBox(height: Space.sm),
+        Wrap(
+          spacing: Space.sm,
+          runSpacing: Space.sm,
+          children: [
+            for (final shelf in categories)
+              Semantics(
+                button: true,
+                selected: shelf == selected,
+                label: '$shelf shelf',
+                excludeSemantics: true,
+                child: AppButton(
+                  label: shelf,
+                  icon: shelf == selected ? Icons.check_rounded : null,
+                  style: shelf == selected ? AppButtonStyle.primary : AppButtonStyle.secondary,
+                  onPressed: () => onPick(shelf),
+                ),
+              ),
+          ],
+        ),
+        if (error != null) ...[const SizedBox(height: Space.sm), ErrorMessage(error!)],
+      ],
     );
   }
 }

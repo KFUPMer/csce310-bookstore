@@ -201,6 +201,7 @@ class _BooksViewState extends State<BooksView> {
                         const SizedBox(width: 34 + Space.lg),
                         Expanded(flex: 5, child: Text('TITLE', style: t.labelSmall)),
                         Expanded(flex: 4, child: Text('AUTHOR', style: t.labelSmall)),
+                        Expanded(flex: 2, child: Text('SHELF', style: t.labelSmall)),
                         SizedBox(
                           width: 90,
                           child: Text('PRICE', textAlign: TextAlign.right, style: t.labelSmall),
@@ -258,7 +259,7 @@ class _BookRowState extends State<_BookRow> {
 
     return Semantics(
       button: true,
-      label: '${b.title} by ${b.author}, ${money(b.price)}, $stock. Edit.',
+      label: '${b.title} by ${b.author}, ${money(b.price)}, $stock, ${b.category ?? 'no shelf yet'}. Edit.',
       excludeSemantics: true,
       child: FocusableActionDetector(
         mouseCursor: SystemMouseCursors.click,
@@ -292,6 +293,18 @@ class _BookRowState extends State<_BookRow> {
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: t.bodyMedium!.copyWith(color: c.textSecondary),
+                  ),
+                ),
+                Expanded(
+                  flex: 2,
+                  // A book stored before shelves existed says so, so the manager knows to choose one.
+                  child: Text(
+                    b.category ?? 'No shelf yet',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: b.category == null
+                        ? t.bodyMedium!.copyWith(color: c.textTertiary, fontStyle: FontStyle.italic)
+                        : t.bodyMedium!.copyWith(color: c.textSecondary),
                   ),
                 ),
                 SizedBox(

@@ -114,7 +114,7 @@ void main() {
     await start(tester);
     await logIn(tester);
     await openBooks(tester);
-    expect(find.text('15 books. Click a book to change it, including its copies.'), findsOneWidget);
+    expect(find.text('27 books. Click a book to change it, including its copies.'), findsOneWidget);
 
     await tester.tap(find.widgetWithText(AppButton, 'Add book'));
     await tester.pumpAndSettle();
@@ -122,13 +122,16 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('Enter the title'), findsOneWidget);
     expect(find.text('Enter the price'), findsOneWidget);
+    expect(find.text('Choose a shelf'), findsOneWidget);
 
     final fields = find.descendant(of: find.byType(Dialog), matching: find.byType(TextField));
     await tester.enterText(fields.at(0), 'Clean Architecture');
     await tester.enterText(fields.at(1), 'Robert C. Martin');
     await tester.enterText(fields.at(2), '42');
     await tester.enterText(fields.at(3), '3');
+    await tester.tap(find.bySemanticsLabel('Technology shelf'));
     await tester.pump();
+    expect(find.text('Choose a shelf'), findsNothing);
     expect(find.text('Enter the title'), findsNothing, reason: 'a fixed problem disappears as the manager types');
     await tester.tap(find.widgetWithText(AppButton, 'Add book').last);
     await tester.pumpAndSettle();

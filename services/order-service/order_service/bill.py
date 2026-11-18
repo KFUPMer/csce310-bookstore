@@ -87,7 +87,7 @@ def render_bill(order: Order) -> str:
 <body>
 <div class="bill">
   <table class="head">
-    <tr><td><h1>Bookstore</h1></td><td class="doc">Bill</td></tr>
+    <tr><td><h1>Mooney&rsquo;s</h1></td><td class="doc">Bill</td></tr>
   </table>
 
   <table class="meta">

@@ -3,8 +3,14 @@ import 'package:management_app/models/book_rules.dart';
 
 /// The same rules book-service applies to a new or changed book (api-design.md).
 void main() {
-  BookCheck check({String title = 'Clean Code', String author = 'Robert C. Martin', String price = '40', String copies = '4', String cover = ''}) =>
-      checkBook(title: title, author: author, price: price, copies: copies, coverUrl: cover);
+  BookCheck check({
+    String title = 'Clean Code',
+    String author = 'Robert C. Martin',
+    String price = '40',
+    String copies = '4',
+    String cover = '',
+    String? shelf = 'Technology',
+  }) => checkBook(title: title, author: author, price: price, copies: copies, coverUrl: cover, category: shelf);
 
   test('a correct book has no problems, and its values are read', () {
     final c = check(price: ' 42.5 ', cover: 'https://example.com/c.jpg');
@@ -36,6 +42,12 @@ void main() {
     expect(check(copies: '-1').problems['copies'], 'Copies cannot be negative');
     expect(check(copies: '1000001').problems['copies'], 'At most 1,000,000 copies');
     expect(check(copies: '0').problems, isEmpty, reason: 'a sold-out book is allowed');
+  });
+
+  test('a book needs one of the shelves', () {
+    expect(check(shelf: null).problems['category'], 'Choose a shelf');
+    expect(check(shelf: 'Poetry').problems['category'], 'Choose a shelf');
+    expect(check(shelf: 'Kids').problems, isEmpty);
   });
 
   test('a cover address must start with http:// or https://', () {

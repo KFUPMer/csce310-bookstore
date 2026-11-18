@@ -39,7 +39,12 @@ class _LoginScreenState extends State<LoginScreen> {
     return AuthLayout(
       tagline: 'Find a book. Buy it, or rent it for a week.',
       note: 'Search the catalog by title or author. Renting costs 10% of the price.',
-      coverTitles: const ['Effective Java', 'Clean Code', 'Database System Concepts'],
+      coverTitles: const ['Nineteen Eighty-Four', 'Matilda', 'Cosmos'],
+      coverUrls: const [
+        'https://covers.openlibrary.org/b/isbn/9780451524935-L.jpg',
+        'https://covers.openlibrary.org/b/id/12889769-L.jpg',
+        'https://covers.openlibrary.org/b/id/8283901-L.jpg',
+      ],
       actions: [
         AppIconButton(
           icon: scope.isDark ? Icons.light_mode_outlined : Icons.dark_mode_outlined,

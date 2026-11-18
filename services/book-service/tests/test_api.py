@@ -11,7 +11,7 @@ from book_service.schemas import BookInput
 
 from .fakes import SERVICE_KEY, FakeSessionChecker, as_customer, as_manager
 
-NEW_BOOK = {"title": "Clean Architecture", "author": "Robert C. Martin", "price": 42.0, "copiesAvailable": 3}
+NEW_BOOK = {"title": "Clean Architecture", "author": "Robert C. Martin", "price": 42.0, "copiesAvailable": 3, "category": "Technology"}
 
 
 class ApiTest(unittest.TestCase):
@@ -19,9 +19,10 @@ class ApiTest(unittest.TestCase):
         self.repository = InMemoryBookRepository()
         self.sessions = FakeSessionChecker()
         self.client = create_app(self.repository, self.sessions, SERVICE_KEY).test_client()
-        self.clean_code = self.repository.insert(BookInput("Clean Code", "Robert C. Martin", 40.0, 4, None))
-        self.effective_java = self.repository.insert(BookInput("Effective Java", "Joshua Bloch", 50.0, 2, None))
-        self.sold_out = self.repository.insert(BookInput("MongoDB: The Definitive Guide", "Shannon Bradshaw", 44.0, 0, None))
+        self.clean_code = self.repository.insert(BookInput("Clean Code", "Robert C. Martin", 40.0, 4, None, "Technology"))
+        self.effective_java = self.repository.insert(BookInput("Effective Java", "Joshua Bloch", 50.0, 2, None, "Technology"))
+        self.sold_out = self.repository.insert(BookInput("MongoDB: The Definitive Guide", "Shannon Bradshaw", 44.0, 0, None, "Technology"))
+        self.gatsby = self.repository.insert(BookInput("The Great Gatsby", "F. Scott Fitzgerald", 14.0, 4, None, "Fiction"))
 
     def assert_error(self, response, status, message):
         self.assertEqual(response.status_code, status, response.get_data(as_text=True))
@@ -40,11 +41,11 @@ class ApiTest(unittest.TestCase):
 
     def test_search_results_show_title_author_and_price(self):
         book = self.client.get("/api/books?keyword=clean", headers=as_customer()).get_json()[0]
-        self.assertEqual(book, {"id": self.clean_code.id, "title": "Clean Code", "author": "Robert C. Martin", "price": 40.0, "copiesAvailable": 4, "coverUrl": None})
+        self.assertEqual(book, {"id": self.clean_code.id, "title": "Clean Code", "author": "Robert C. Martin", "price": 40.0, "copiesAvailable": 4, "coverUrl": None, "category": "Technology"})
 
     def test_no_keyword_lists_every_book_sorted_by_title(self):
         titles = [b["title"] for b in self.client.get("/api/books", headers=as_manager()).get_json()]
-        self.assertEqual(titles, ["Clean Code", "Effective Java", "MongoDB: The Definitive Guide"])
+        self.assertEqual(titles, ["Clean Code", "Effective Java", "MongoDB: The Definitive Guide", "The Great Gatsby"])
 
     def test_a_search_with_no_match_is_an_empty_list_not_an_error(self):
         response = self.client.get("/api/books?keyword=cooking", headers=as_customer())
@@ -56,6 +57,31 @@ class ApiTest(unittest.TestCase):
             response = self.client.get("/api/books", query_string={"keyword": keyword}, headers=as_customer())
             self.assertEqual(response.status_code, 200, keyword)
             self.assertEqual(response.get_json(), [], keyword)
+
+    # ------------------------------------------------------------ categories (shelves, beyond the PRD)
+
+    def test_a_category_lists_only_its_books(self):
+        response = self.client.get("/api/books?category=Fiction", headers=as_customer())
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual([b["title"] for b in response.get_json()], ["The Great Gatsby"])
+
+    def test_a_category_and_a_keyword_together(self):
+        found = self.client.get("/api/books?category=Technology&keyword=java", headers=as_customer()).get_json()
+        self.assertEqual([b["title"] for b in found], ["Effective Java"])
+        self.assertEqual(self.client.get("/api/books?category=Fiction&keyword=java", headers=as_customer()).get_json(), [])
+
+    def test_an_empty_category_means_every_shelf(self):
+        self.assertEqual(len(self.client.get("/api/books?category=", headers=as_customer()).get_json()), 4)
+
+    def test_an_unknown_category_is_400(self):
+        self.assert_error(
+            self.client.get("/api/books?category=Poetry", headers=as_customer()), 400,
+            "Choose a category: Fiction, Nonfiction, Kids, Science, or Technology",
+        )
+
+    def test_a_book_stored_before_categories_has_none(self):
+        old = self.repository.insert(BookInput("Old Book", "Someone", 10.0, 1, None))
+        self.assertIsNone(self.client.get(f"/api/books/{old.id}", headers=as_customer()).get_json()["category"])
 
     # ------------------------------------------------------------ who may ask (N4, N5)
 
@@ -99,6 +125,7 @@ class ApiTest(unittest.TestCase):
         self.assertEqual(created["title"], "Clean Architecture")
         self.assertEqual(created["copiesAvailable"], 3)
         self.assertIsNone(created["coverUrl"])
+        self.assertEqual(created["category"], "Technology")
         found = self.client.get("/api/books?keyword=architecture", headers=as_customer()).get_json()
         self.assertEqual([b["id"] for b in found], [created["id"]], "the new book can be found by search")
 
@@ -115,11 +142,13 @@ class ApiTest(unittest.TestCase):
             ({"copiesAvailable": 1.5}, "Enter the number of copies as a whole number"),
             ({"copiesAvailable": -1}, "The number of copies cannot be negative"),
             ({"coverUrl": "javascript:alert(1)"}, "The cover address must start with http:// or https://"),
+            ({"category": None}, "Choose a category: Fiction, Nonfiction, Kids, Science, or Technology"),
+            ({"category": "Poetry"}, "Choose a category: Fiction, Nonfiction, Kids, Science, or Technology"),
         ]
         for change, message in cases:
             with self.subTest(change=change):
                 self.assert_error(self.client.post("/api/books", json={**NEW_BOOK, **change}, headers=as_manager()), 400, message)
-        self.assertEqual(len(self.repository.search("")), 3, "no invalid book was stored")
+        self.assertEqual(len(self.repository.search("")), 4, "no invalid book was stored")
 
     def test_a_body_that_is_not_json_is_400(self):
         response = self.client.post("/api/books", data="this is not json", headers=as_manager())
@@ -135,10 +164,11 @@ class ApiTest(unittest.TestCase):
     # ------------------------------------------------------------ update (FR14)
 
     def test_a_manager_updates_the_number_of_copies(self):
-        body = {"title": "Clean Code", "author": "Robert C. Martin", "price": 40.0, "copiesAvailable": 10}
+        body = {"title": "Clean Code", "author": "Robert C. Martin", "price": 40.0, "copiesAvailable": 10, "category": "Science"}
         response = self.client.put(f"/api/books/{self.clean_code.id}", json=body, headers=as_manager())
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.get_json()["copiesAvailable"], 10)
+        self.assertEqual(response.get_json()["category"], "Science", "the shelf can be changed too")
         self.assertEqual(self.repository.find(self.clean_code.id).copies_available, 10)
 
     def test_updating_an_unknown_book_is_404_and_a_bad_field_is_400(self):

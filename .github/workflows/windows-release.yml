@@ -7,9 +7,9 @@
 # (then the files are only kept as a download on the run, not released).
 #
 # Produces:
-#   Bookstore-Apps-Setup-<version>.exe       installer for both apps (no administrator needed)
-#   Bookstore-Apps-<version>-portable.zip    the same two apps, to unzip and run
-#   Bookstore-Server-<version>.zip           the whole project with user-service.jar already built,
+#   Mooneys-Apps-Setup-<version>.exe         installer for both apps (no administrator needed)
+#   Mooneys-Apps-<version>-portable.zip      the same two apps, to unzip and run
+#   Mooneys-Server-<version>.zip             the whole project with user-service.jar already built,
 #                                            plus setup.cmd / start-services.cmd / stop-services.cmd
 
 name: Windows release build
@@ -95,7 +95,7 @@ jobs:
 
       - name: Test the installer (install, open both apps, uninstall)
         run: |
-          ./installer/test-installer.ps1 -Setup (Resolve-Path "dist/Bookstore-Apps-Setup-$env:VERSION.exe")
+          ./installer/test-installer.ps1 -Setup (Resolve-Path "dist/Mooneys-Apps-Setup-$env:VERSION.exe")
           if ($LASTEXITCODE) { exit 1 }
 
       - name: Portable apps zip and server zip
@@ -104,19 +104,19 @@ jobs:
           Copy-Item -Recurse clients\customer-app\build\windows\x64\runner\Release stage\apps\Customer
           Copy-Item -Recurse clients\management-app\build\windows\x64\runner\Release stage\apps\Manager
           Copy-Item INSTALL.md stage\apps\
-          Compress-Archive stage\apps\* "dist\Bookstore-Apps-$env:VERSION-portable.zip"
+          Compress-Archive stage\apps\* "dist\Mooneys-Apps-$env:VERSION-portable.zip"
 
           # The server: exactly the committed files, plus the built jar.
           git archive --format=zip -o stage\source.zip HEAD
           Expand-Archive stage\source.zip stage\server
           New-Item -ItemType Directory -Force stage\server\services\user-service\target | Out-Null
           Copy-Item services\user-service\target\user-service.jar stage\server\services\user-service\target\
-          Compress-Archive stage\server\* "dist\Bookstore-Server-$env:VERSION.zip"
+          Compress-Archive stage\server\* "dist\Mooneys-Server-$env:VERSION.zip"
           Get-ChildItem dist | ForEach-Object { "{0}  {1:N1} MB" -f $_.Name, ($_.Length / 1MB) }
 
       - uses: actions/upload-artifact@v4
         with:
-          name: bookstore-${{ env.VERSION }}
+          name: mooneys-${{ env.VERSION }}
           path: dist/*
 
       - name: Publish the GitHub release

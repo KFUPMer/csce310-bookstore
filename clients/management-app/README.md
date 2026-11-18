@@ -1,6 +1,6 @@
 # Management app
 
-The bookstore's desktop app for managers. Flutter (Dart), Windows.
+**Mooney's Manager**: the bookstore's desktop app for managers. Flutter (Dart), Windows.
 
 Requirements covered: FR1, FR2, FR8, FR9, FR11–FR14, N2, N4, N5.
 
@@ -10,7 +10,7 @@ Requirements covered: FR1, FR2, FR8, FR9, FR11–FR14, N2, N4, N5.
 | Orders tab | Sees every order, newest first, with how many wait for payment; filters Pending / Paid; marks an order as paid (with Undo) |
 | An order | Opens its bill in the app; marks it paid, or back to pending; prints it (the saved HTML bill opens in the browser) |
 | Books tab | Searches the catalog by title or author as they type |
-| Add / edit book | Title, author, price, copies, an optional cover image; each problem shown under its field |
+| Add / edit book | Title, author, price, copies, its shelf, an optional cover image; each problem shown under its field |
 
 Screenshots: [style guide](../../docs/02-design/style-guide.md#management-app-as-built-m4).
 
@@ -30,12 +30,12 @@ Or, in VS Code: Run and Debug, "Management app", F5. Release builds are blocked 
 flutter test
 ```
 
-15 tests, no server needed: the book rules, and every screen driven the way a manager uses it with stand-in services, including one test in a 1024 x 700 window. Two more are skipped unless asked for:
+16 tests, no server needed: the book rules, and every screen driven the way a manager uses it with stand-in services, including one test in a 1024 x 700 window. Two more are skipped unless asked for:
 
 | Command | Does |
 |---|---|
 | `set BOOKSTORE_LIVE=1 && flutter test test/live_services_test.dart` | The app's own service clients against the real running services. Changes nothing: it reads, and saves one book with the values it already has |
-| `set BOOKSTORE_SCREENSHOTS=1 && flutter test test/screenshots_test.dart` | Draws each screen with the real typefaces into `docs/02-design/ui/manager-*.png` |
+| `set BOOKSTORE_SCREENSHOTS=1 && flutter test test/screenshots_test.dart` | First, once: `python tools/screenshots/fetch_covers.py` in the repository root, for the real cover photos. Draws each screen with the real typefaces into `docs/02-design/ui/manager-*.png` |
 
 ## How it is built
 

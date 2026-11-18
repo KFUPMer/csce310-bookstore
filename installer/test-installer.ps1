@@ -5,7 +5,7 @@
 param([Parameter(Mandatory)][string]$Setup)
 
 $ErrorActionPreference = 'Continue'
-$dir = Join-Path $env:LOCALAPPDATA 'Programs\CSCE310 Bookstore'
+$dir = Join-Path $env:LOCALAPPDATA 'Programs\Mooneys'
 $menu = Join-Path $env:APPDATA 'Microsoft\Windows\Start Menu\Programs'
 $failed = 0
 function Expect($what, $ok) {
@@ -19,8 +19,8 @@ foreach ($f in 'Customer\customer_app.exe', 'Customer\flutter_windows.dll', 'Cus
                'Customer\data\flutter_assets\AssetManifest.bin', 'Manager\management_app.exe', 'Manager\flutter_windows.dll', 'INSTALL.md') {
     Expect "it installs $f" (Test-Path (Join-Path $dir $f))
 }
-Expect 'the Start menu has Bookstore' (Test-Path (Join-Path $menu 'Bookstore.lnk'))
-Expect 'the Start menu has Bookstore Manager' (Test-Path (Join-Path $menu 'Bookstore Manager.lnk'))
+Expect 'the Start menu has Mooney''s' (Test-Path (Join-Path $menu 'Mooney''s.lnk'))
+Expect 'the Start menu has Mooney''s Manager' (Test-Path (Join-Path $menu 'Mooney''s Manager.lnk'))
 "      installed size: {0:N1} MB" -f ((Get-ChildItem $dir -Recurse -File | Measure-Object Length -Sum).Sum / 1MB)
 
 foreach ($exe in 'Customer\customer_app.exe', 'Manager\management_app.exe') {
@@ -36,7 +36,7 @@ $p = Start-Process (Join-Path $dir 'unins000.exe') -ArgumentList '/VERYSILENT', 
 Start-Sleep -Seconds 3
 Expect "the uninstaller finishes with exit code 0 (got $($p.ExitCode))" ($p.ExitCode -eq 0)
 Expect 'it removes the apps' (-not (Test-Path (Join-Path $dir 'Customer\customer_app.exe')))
-Expect 'it removes the Start menu entries' (-not (Test-Path (Join-Path $menu 'Bookstore.lnk')))
+Expect 'it removes the Start menu entries' (-not (Test-Path (Join-Path $menu 'Mooney''s.lnk')))
 
 if ($failed) { "$failed check(s) failed"; exit 1 }
 'All installer checks passed'

@@ -73,6 +73,29 @@ def seed_books():
     print(f"MongoDB: {len(books)} books loaded")
 
 
+def upgrade_books():
+    """Bring an existing catalog up to date without resetting it.
+
+    Books already there keep everything a manager changed. They only get a
+    category and a cover if they have none. Sample books that are missing are added.
+    """
+    books = json.loads((Path(__file__).parent / "mongodb" / "books.json").read_text(encoding="utf-8"))
+    collection = MongoClient(os.getenv("MONGO_URL", "mongodb://localhost:27017"))["bookstore"]["books"]
+    added = updated = 0
+    for book in books:
+        if collection.find_one({"title": book["title"]}) is None:
+            collection.insert_one(dict(book))
+            added += 1
+        else:
+            # $ifNull: keep the stored value when there is one; null and missing both count as none.
+            result = collection.update_one(
+                {"title": book["title"]},
+                [{"$set": {"category": {"$ifNull": ["$category", book["category"]]}, "coverUrl": {"$ifNull": ["$coverUrl", book["coverUrl"]]}}}],
+            )
+            updated += result.modified_count
+    print(f"MongoDB: {added} sample books added, {updated} given a category or a cover; nothing else changed")
+
+
 def is_seeded() -> bool:
     """True when the test accounts and the books are already there."""
     db = mysql.connector.connect(
@@ -95,7 +118,8 @@ if __name__ == "__main__":
     load_env_file()
     # --if-empty: used by setup.cmd, so running setup again never resets data that is already there.
     if "--if-empty" in sys.argv and is_seeded():
-        print("Test data already there: left as it is (run without --if-empty to reset it)")
+        print("Test data already there: kept (run without --if-empty to reset it)")
+        upgrade_books()
     else:
         seed_users()
         seed_books()

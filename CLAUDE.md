@@ -24,7 +24,8 @@ The live plan is `docs/04-planning/milestones.md`; tasks are GitHub issues on `K
 | Customer account page + pretend checkout | Built 2026-11-17, beyond the PRD (asked for by the owner). No card details are ever asked for or stored. Preferences in `%APPDATA%\CSCE310 Bookstore\preferences.json` |
 | Requirements testing (issue 13) | Done: `docs/06-testing/requirements-test.md`. `manual_check.py` covers every order endpoint (41 checks) |
 | Installable build | `setup.cmd` etc., `INSTALL.md`, `HANDOVER.md` (for the instructor). The release build, installer, and installer test run on GitHub Actions on each `v*` tag. The installer cannot run on this machine (Smart App Control, P-017) |
-| **Next** | Issue 14: someone tries the installer and setup.cmd on another computer, then v1.0.0. The repo is **public** since 2026-11-17 (history checked: no secret file or value was ever committed), so never commit anything from `services/.env` |
+| Mooney's (M5) | The store's name and sign (`MooneysSign`), five shelves (`category` in book-service, `categories` in bookstore-ui), real covers linked from Open Library (never stored in git). Screenshot tests need `python tools/screenshots/fetch_covers.py` first |
+| **Next** | v1.0.0 released; issue 14 closed. Anything new is a patch (v1.0.x) on a fix branch, per versioning.md. The repo is **public** since 2026-11-17 (history checked: no secret file or value was ever committed), so never commit anything from `services/.env` |
 | Testing and final release | M5 |
 
 Known unfinished or unverified things: the "Known gaps" table at the end of `docs/03-problems/problem-log.md`.

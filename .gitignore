@@ -45,3 +45,6 @@ stage/
 
 # Machine-specific database setup (contains a generated password)
 *.local.sql
+
+# Cover photos downloaded for the screenshot tests (publishers' artwork; not stored in git)
+clients/build-cover-cache/

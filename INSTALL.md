@@ -1,11 +1,11 @@
-# Installing the Bookstore
+# Installing Mooney's
 
 Everything needed to run the project on a Windows 10 or 11 computer (64-bit). About 15 minutes, most of it downloads.
 
 The project has two parts:
 
 - **Three services** (user, book, order), which hold the data, run on this computer.
-- **Two desktop apps**: **Bookstore**, for customers, and **Bookstore Manager**, for managers.
+- **Two desktop apps**: **Mooney's**, for customers, and **Mooney's Manager**, for managers.
 
 ## Get the files
 
@@ -13,10 +13,10 @@ From the [latest release](https://github.com/KFUPMer/csce310-bookstore/releases)
 
 | File | What it is |
 |---|---|
-| `Bookstore-Server-<version>.zip` | The services and the whole source, ready to set up |
-| `Bookstore-Apps-Setup-<version>.exe` | The installer for both apps |
+| `Mooneys-Server-<version>.zip` | The services and the whole source, ready to set up |
+| `Mooneys-Apps-Setup-<version>.exe` | The installer for both apps |
 
-(`Bookstore-Apps-<version>-portable.zip` holds the same two apps, to unzip and run without installing.)
+(`Mooneys-Apps-<version>-portable.zip` holds the same two apps, to unzip and run without installing.)
 
 ## 1. MySQL, if it is not installed yet
 
@@ -28,7 +28,7 @@ The only thing to install by hand. If MySQL Server 8 is already on the computer,
 
 ## 2. Set up the services
 
-1. Unzip `Bookstore-Server-<version>.zip`, for example to your Desktop.
+1. Unzip `Mooneys-Server-<version>.zip`, for example to your Desktop.
 2. In the unzipped folder, double-click **`setup.cmd`**.
 
 It checks each part and installs what is missing: Java 21, Python 3.12, and MongoDB, through winget (Windows may ask for permission). It then creates the `bookstore` database and the test data. If anything is missing it says exactly what, and running it again continues where it stopped.
@@ -41,7 +41,7 @@ Double-click **`start-services.cmd`**. Three minimized windows open, one per ser
 
 ## 4. Install the apps
 
-Double-click **`Bookstore-Apps-Setup-<version>.exe`**. It needs no administrator rights. It adds **Bookstore** and **Bookstore Manager** to the Start menu.
+Double-click **`Mooneys-Apps-Setup-<version>.exe`**. It needs no administrator rights. It adds **Mooney's** and **Mooney's Manager** to the Start menu.
 
 Windows may warn about an "unknown publisher", because the installer is not code-signed (signing costs money). Choose **More info**, then **Run anyway**.
 
@@ -49,20 +49,20 @@ Windows may warn about an "unknown publisher", because the installer is not code
 
 | App | Username | Password |
 |---|---|---|
-| Bookstore (customer) | `customer1` | `customer123` |
-| Bookstore Manager | `manager1` | `manager123` |
+| Mooney's (customer) | `customer1` | `customer123` |
+| Mooney's Manager | `manager1` | `manager123` |
 
-You can also create a new customer account from the Bookstore login screen.
+You can also create a new customer account from the Mooney's login screen.
 
 ## Things to try
 
-- **Bookstore:**
-  - search as you type;
+- **Mooney's:**
+  - search as you type, and browse the shelves under the sign;
   - buy or rent books (renting costs 10% of the price, for 7 days);
   - place the order and see the bill;
   - pay it with the demonstration checkout (no card is needed);
   - open **your account** from your name in the top bar.
-- **Bookstore Manager:**
+- **Mooney's Manager:**
   - see every order;
   - mark one as paid;
   - open its bill and print it;

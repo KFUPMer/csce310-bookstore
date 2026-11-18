@@ -56,6 +56,7 @@ void main() {
   }
 
   Future<AppServices> start(WidgetTester tester) async {
+    await useCachedCovers(tester);
     await tester.runAsync(_loadFonts);
     tester.view.physicalSize = _size;
     tester.view.devicePixelRatio = 1;
@@ -110,7 +111,7 @@ void main() {
     await logIn(tester);
     await shoot(tester, 'customer-search-light');
 
-    await tester.tap(find.bySemanticsLabel(RegExp('^Java Concurrency in Practice by')));
+    await tester.tap(find.bySemanticsLabel(RegExp('^Charlotte')));
     await tester.pumpAndSettle();
     await tester.tap(find.widgetWithText(AppButton, 'Rent for 7 days'));
     await tester.pumpAndSettle();
@@ -120,7 +121,7 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.widgetWithText(AppButton, 'Buy'));
     await tester.pumpAndSettle();
-    await tester.tap(find.bySemanticsLabel(RegExp('^Database System Concepts by')));
+    await tester.tap(find.bySemanticsLabel(RegExp('^Cosmos by')));
     await tester.pumpAndSettle();
     await tester.tap(find.widgetWithText(AppButton, 'Buy'));
     await tester.pumpAndSettle(const Duration(seconds: 7));

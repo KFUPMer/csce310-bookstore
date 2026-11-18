@@ -1,5 +1,10 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:ui' as ui;
+
+import 'package:flutter/foundation.dart';
+import 'package:flutter/painting.dart';
+import 'package:flutter_test/flutter_test.dart';
 
 import 'package:bookstore_ui/bookstore_ui.dart';
 import 'package:customer_app/api/apis.dart';
@@ -8,6 +13,45 @@ import 'package:customer_app/models/order_draft.dart';
 import 'package:customer_app/models/preferences.dart';
 
 /// Stand-ins for the three services, used by the screen tests and the screenshots.
+
+/// For the screenshots: the real cover photos of books.json, from the cache that
+/// tools/screenshots/fetch_covers.py fills (tests have no internet). Each photo is
+/// decoded here, up front, so the covers show it at once; a missing one keeps its drawn cover.
+Future<void> useCachedCovers(WidgetTester tester) async {
+  final ready = <String, ui.Image>{};
+  await tester.runAsync(() async {
+    final books = jsonDecode(File('../../database/mongodb/books.json').readAsStringSync()) as List;
+    for (final b in books) {
+      final url = (b as Map<String, dynamic>)['coverUrl'] as String?;
+      final file = File('../build-cover-cache/${url?.replaceAll(RegExp('[^A-Za-z0-9]'), '_')}.jpg');
+      if (url == null || !file.existsSync()) continue;
+      final codec = await ui.instantiateImageCodec(file.readAsBytesSync());
+      ready[url] = (await codec.getNextFrame()).image;
+    }
+  });
+  BookCover.imageFor = (url) => ready.containsKey(url) ? _ReadyImage(url, ready[url]!) : NetworkImage(url);
+}
+
+/// An image that is already decoded, so it is shown in the very first frame.
+class _ReadyImage extends ImageProvider<_ReadyImage> {
+  const _ReadyImage(this.url, this.image);
+
+  final String url;
+  final ui.Image image;
+
+  @override
+  Future<_ReadyImage> obtainKey(ImageConfiguration configuration) => SynchronousFuture(this);
+
+  @override
+  ImageStreamCompleter loadImage(_ReadyImage key, ImageDecoderCallback decode) =>
+      OneFrameImageStreamCompleter(SynchronousFuture(ImageInfo(image: image.clone())));
+
+  @override
+  bool operator ==(Object other) => other is _ReadyImage && other.url == url;
+
+  @override
+  int get hashCode => url.hashCode;
+}
 
 /// The sample books of database/mongodb/books.json, with made-up ids.
 List<Book> sampleBooks() {
@@ -42,11 +86,11 @@ class FakeBooks extends BookApi {
   final List<Book> books;
 
   @override
-  Future<List<Book>> search(String keyword) async {
+  Future<List<Book>> search(String keyword, {String? category}) async {
     final k = keyword.trim().toLowerCase();
     final found = [
       for (final b in books)
-        if (b.title.toLowerCase().contains(k) || b.author.toLowerCase().contains(k)) b,
+        if ((b.title.toLowerCase().contains(k) || b.author.toLowerCase().contains(k)) && (category == null || b.category == category)) b,
     ];
     return found..sort((a, b) => a.title.compareTo(b.title));
   }

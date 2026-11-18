@@ -19,9 +19,9 @@ from .schemas import BookInput
 
 class BookRepository(ABC):
     @abstractmethod
-    def search(self, keyword: str) -> list[Book]:
+    def search(self, keyword: str, category: Optional[str] = None) -> list[Book]:
         """Books whose title or author contains `keyword`, ignoring case, sorted by title.
-        An empty keyword returns every book."""
+        An empty keyword returns every book. A category keeps only the books on that shelf."""
 
     @abstractmethod
     def find(self, book_id: str) -> Optional[Book]:
@@ -47,7 +47,7 @@ class MongoBookRepository(BookRepository):
     def __init__(self, collection: Collection):
         self._books = collection
 
-    def search(self, keyword: str) -> list[Book]:
+    def search(self, keyword: str, category: Optional[str] = None) -> list[Book]:
         keyword = keyword.strip()
         query = {}
         if keyword:
@@ -55,6 +55,8 @@ class MongoBookRepository(BookRepository):
             # "(" or "+" typed by a user cannot change or break the search.
             pattern = {"$regex": re.escape(keyword), "$options": "i"}
             query = {"$or": [{"title": pattern}, {"author": pattern}]}  # FR4: title AND author
+        if category:
+            query["category"] = category  # checked against CATEGORIES before it gets here
         return [self._to_book(doc) for doc in self._books.find(query).sort("title", 1)]
 
     def find(self, book_id: str) -> Optional[Book]:
@@ -97,7 +99,7 @@ class MongoBookRepository(BookRepository):
 
     @staticmethod
     def _to_document(book: BookInput) -> dict:
-        return {"title": book.title, "author": book.author, "price": book.price, "copiesAvailable": book.copies_available, "coverUrl": book.cover_url}
+        return {"title": book.title, "author": book.author, "price": book.price, "copiesAvailable": book.copies_available, "coverUrl": book.cover_url, "category": book.category}
 
     @staticmethod
     def _to_book(doc: dict) -> Book:
@@ -108,6 +110,7 @@ class MongoBookRepository(BookRepository):
             price=float(doc["price"]),
             copies_available=int(doc["copiesAvailable"]),
             cover_url=doc.get("coverUrl"),
+            category=doc.get("category"),
         )
 
 
@@ -118,9 +121,12 @@ class InMemoryBookRepository(BookRepository):
         self._books: dict[str, Book] = {}
         self._next_id = 1
 
-    def search(self, keyword: str) -> list[Book]:
+    def search(self, keyword: str, category: Optional[str] = None) -> list[Book]:
         keyword = keyword.strip().lower()
-        found = [b for b in self._books.values() if not keyword or keyword in b.title.lower() or keyword in b.author.lower()]
+        found = [
+            b for b in self._books.values()
+            if (not keyword or keyword in b.title.lower() or keyword in b.author.lower()) and (not category or b.category == category)
+        ]
         return sorted(found, key=lambda b: b.title)
 
     def find(self, book_id: str) -> Optional[Book]:
@@ -129,19 +135,19 @@ class InMemoryBookRepository(BookRepository):
     def insert(self, book: BookInput) -> Book:
         book_id = f"{self._next_id:024x}"
         self._next_id += 1
-        self._books[book_id] = Book(book_id, book.title, book.author, book.price, book.copies_available, book.cover_url)
+        self._books[book_id] = Book(book_id, book.title, book.author, book.price, book.copies_available, book.cover_url, book.category)
         return self._books[book_id]
 
     def replace(self, book_id: str, book: BookInput) -> Optional[Book]:
         if book_id not in self._books:
             return None
-        self._books[book_id] = Book(book_id, book.title, book.author, book.price, book.copies_available, book.cover_url)
+        self._books[book_id] = Book(book_id, book.title, book.author, book.price, book.copies_available, book.cover_url, book.category)
         return self._books[book_id]
 
     def change_copies(self, book_id: str, change: int) -> Optional[Book]:
         current = self._books.get(book_id)
         if current is None or current.copies_available + change < 0:
             return None
-        updated = Book(current.id, current.title, current.author, current.price, current.copies_available + change, current.cover_url)
+        updated = Book(current.id, current.title, current.author, current.price, current.copies_available + change, current.cover_url, current.category)
         self._books[book_id] = updated
         return updated

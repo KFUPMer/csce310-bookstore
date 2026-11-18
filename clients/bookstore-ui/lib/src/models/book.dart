@@ -1,6 +1,14 @@
 /// A book as returned by book-service.
 class Book {
-  const Book({required this.id, required this.title, required this.author, required this.price, required this.copiesAvailable, this.coverUrl});
+  const Book({
+    required this.id,
+    required this.title,
+    required this.author,
+    required this.price,
+    required this.copiesAvailable,
+    this.coverUrl,
+    this.category,
+  });
 
   final String id;
   final String title;
@@ -11,6 +19,9 @@ class Book {
   /// Address of the cover image, if the book has one.
   final String? coverUrl;
 
+  /// Its shelf, one of [categories]; null for a book stored before shelves existed.
+  final String? category;
+
   factory Book.fromJson(Map<String, dynamic> json) => Book(
     id: json['id'] as String,
     title: json['title'] as String,
@@ -18,10 +29,18 @@ class Book {
     price: (json['price'] as num).toDouble(),
     copiesAvailable: json['copiesAvailable'] as int,
     coverUrl: json['coverUrl'] as String?,
+    category: json['category'] as String?,
   );
 
   /// The body of POST and PUT /api/books (FR14). The id is in the address, not the body.
-  Map<String, dynamic> toJson() => {'title': title, 'author': author, 'price': price, 'copiesAvailable': copiesAvailable, 'coverUrl': coverUrl};
+  Map<String, dynamic> toJson() => {
+    'title': title,
+    'author': author,
+    'price': price,
+    'copiesAvailable': copiesAvailable,
+    'coverUrl': coverUrl,
+    'category': category,
+  };
 
   bool get isAvailable => copiesAvailable > 0;
 
@@ -32,6 +51,10 @@ class Book {
     return ((priceCents * rentPercent + 50) ~/ 100) / 100;
   }
 }
+
+/// The store's shelves, in the order the apps show them. book-service accepts exactly these
+/// (CATEGORIES in book_service/models.py). Added at the owner's request, beyond the PRD.
+const categories = ['Fiction', 'Nonfiction', 'Kids', 'Science', 'Technology'];
 
 /// The renting rule (FR7), as order-service applies it.
 const rentPercent = 10;

@@ -29,7 +29,7 @@ def build_message(order: Order, bill_html: str, mail_from: str) -> EmailMessage:
     message = EmailMessage()
     message["From"] = mail_from
     message["To"] = order.email
-    message["Subject"] = f"Your bookstore bill: order {order.id}"
+    message["Subject"] = f"Your Mooney's bill: order {order.id}"
     message.set_content(
         f"Hello {order.username},\n\n"
         f"Thank you for your order. This is the bill for order {order.id}.\n"

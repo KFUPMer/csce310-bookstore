@@ -13,9 +13,14 @@ class LoginScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final scope = ManagerScope.of(context);
     return AuthLayout(
-      tagline: 'Run the bookstore.',
+      tagline: 'Run Mooney’s.',
       note: 'Orders and payments, and the books on the shelf.',
-      coverTitles: const ['Refactoring', 'Design Patterns', 'Fluent Python'],
+      coverTitles: const ['Clean Code', 'Atomic Habits', 'The Selfish Gene'],
+      coverUrls: const [
+        'https://covers.openlibrary.org/b/id/8065615-L.jpg',
+        'https://covers.openlibrary.org/b/id/12539702-L.jpg',
+        'https://covers.openlibrary.org/b/id/133936-L.jpg',
+      ],
       actions: [
         AppIconButton(
           icon: scope.isDark ? Icons.light_mode_outlined : Icons.dark_mode_outlined,

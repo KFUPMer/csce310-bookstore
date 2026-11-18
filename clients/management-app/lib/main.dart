@@ -52,7 +52,7 @@ class _ManagerAppState extends State<ManagerApp> {
       isDark: _mode == ThemeMode.dark,
       toggleTheme: () => setState(() => _mode = _mode == ThemeMode.dark ? ThemeMode.light : ThemeMode.dark),
       child: MaterialApp(
-        title: 'Bookstore Management',
+        title: '${MooneysSign.name} Manager',
         debugShowCheckedModeBanner: false,
         theme: buildBookstoreTheme(Brightness.light),
         darkTheme: buildBookstoreTheme(Brightness.dark),

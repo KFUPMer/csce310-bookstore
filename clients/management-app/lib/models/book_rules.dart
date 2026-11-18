@@ -1,3 +1,5 @@
+import 'package:bookstore_ui/bookstore_ui.dart';
+
 /// The result of checking the book form: the problems, one per field, and
 /// the values read from the text the manager typed.
 class BookCheck {
@@ -13,7 +15,14 @@ class BookCheck {
 ///
 /// Checked in the app first so each problem appears next to its field before
 /// anything is sent. book-service still checks again: the app is not trusted.
-BookCheck checkBook({required String title, required String author, required String price, required String copies, required String coverUrl}) {
+BookCheck checkBook({
+  required String title,
+  required String author,
+  required String price,
+  required String copies,
+  required String coverUrl,
+  required String? category,
+}) {
   final problems = <String, String>{};
 
   String? text(String value, String field, String label) {
@@ -50,6 +59,9 @@ BookCheck checkBook({required String title, required String author, required Str
   } else if (copiesValue > 1000000) {
     problems['copies'] = 'At most 1,000,000 copies';
   }
+
+  // The shelf: one of the five book-service accepts (beyond the PRD, asked for by the owner).
+  if (!categories.contains(category)) problems['category'] = 'Choose a shelf';
 
   final cover = coverUrl.trim();
   if (cover.isNotEmpty && !(cover.startsWith('http://') || cover.startsWith('https://'))) {

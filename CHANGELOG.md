@@ -4,7 +4,39 @@ All versions and patches of the project, newest first.
 
 ## Unreleased
 
-Work towards v1.0.0 (milestone M5, Testing & final release).
+Nothing yet.
+
+## v1.0.0 — 2026-11-17 — Mooney's: the final version (M5)
+
+The submittable system. Every requirement FR1–FR14 and N1–N5 is met and tested ([requirements test report](docs/06-testing/requirements-test.md)), with every extra-credit item. The store now has a name, **Mooney's**, with shelves and real cover photos, at the owner's request. Install: [INSTALL.md](INSTALL.md). For the instructor: [HANDOVER.md](HANDOVER.md).
+
+| Part | Tests |
+|---|---|
+| user-service (Java HttpServer, MySQL) | 26 |
+| book-service (Python Flask, MongoDB) | 37 |
+| order-service (Python Flask, MySQL) | 101 |
+| Shared package `bookstore-ui` | 21 |
+| Customer app (Mooney's) | 35 |
+| Management app (Mooney's Manager) | 16 |
+| **Total** | **236, all passing** |
+
+| File | What it is |
+|---|---|
+| `Mooneys-Apps-Setup-1.0.0.exe` | Installs both apps for the current user (no administrator needed) |
+| `Mooneys-Apps-1.0.0-portable.zip` | The same two apps, to unzip and run |
+| `Mooneys-Server-1.0.0.zip` | The services and the whole source, with `user-service.jar` built; `setup.cmd`, `start-services.cmd`, `stop-services.cmd` |
+
+### Added
+- **Mooney's**: the store's name and sign, gold capitals on deep green, in the top bar of both apps, large on the login screens, on the bill and the email subject, in the window titles, the installer, and the Start menu
+- **Shelves**: Fiction, Nonfiction, Kids, Science, Technology. A row of shelf tabs under the sign in the customer app; a shelf choice in the manager's book form and a Shelf column in the books list; `?category=` in book-service, which also requires a shelf for every book added or changed
+- **Real cover photos** for every book, linked from Open Library; the drawn cover shows until the photo arrives, and stays without internet
+- 12 general books, so every shelf has books (27 in all)
+- `seed.py --if-empty` brings an existing catalog up to date (missing books, shelves, covers) without changing anything a manager did
+- `tools/screenshots/fetch_covers.py` (cover photos for the screenshot tests, kept out of git) and `tools/diagrams/bill_sample.py`
+
+### Changed
+- In a narrow window, the search field drops its "Ctrl F" hint and the account button shows only its icon, so the search field keeps its room
+- The release files are named `Mooneys-…`
 
 ## v1.0.0-beta.2 — 2026-11-17 — Tested on a second computer
 

@@ -46,11 +46,19 @@ The catalog screen of the customer app, running on sample data. These are real s
 
 To run it: open the repository in VS Code, choose "Customer app" in Run and Debug, press F5. The screen is `SearchScreen` in `clients/customer-app/lib/screens/search_screen.dart`.
 
+## Mooney's: the sign, the shelves, and real covers (M5)
+
+Added at the owner's request after M4, from a bookstore website they liked and the shop sign of **Mooney's** in the series *You*.
+
+- **The sign.** MOONEY'S in gold capitals on deep green, with wide letter spacing and a gold-leaf shading, like a painted shopfront. Small in the top bar of both apps; large on the login screens, with the line "BOOKSELLERS · EST. 2026". It is the one colored thing besides the covers, so the rule "only the books bring color" still holds. It looks the same in light and dark mode, as a painted sign would.
+- **The shelves.** All, Fiction, Nonfiction, Kids, Science, Technology, as a row under the sign, like a bookshop's sections. The chosen one is bold with a short accent underline: weight and line, not color alone (color-blind users). Tab and Enter work.
+- **Real covers.** Every book shows its real cover photo. The drawn cover shows first and the photo fades in over it (Motion.base), so a slot is never empty. Without internet the drawn cover stays.
+
 ## Customer app as built (M4)
 
-Every screen of the customer app, in the approved style. Drawn by Flutter from the app's real widgets, with the real typefaces, on the 15 sample books and stand-in services, at 1440 x 900 (`test/screenshots_test.dart`). They are not captures of the running window; that the app works against the real services was checked separately.
+Every screen of the customer app, in the approved style. Drawn by Flutter from the app's real widgets, with the real typefaces, on the 27 sample books, with their real cover photos, and stand-in services, at 1440 x 900 (`test/screenshots_test.dart`). They are not captures of the running window; that the app works against the real services was checked separately.
 
-**Log in**, and **a wrong password** in dark mode. The fan of covers is the only color on the screen.
+**Log in**, and **a wrong password** in dark mode. The sign and the fan of covers are the only color on the screen.
 
 ![Log in, light](ui/customer-login-light.png)
 
@@ -92,7 +100,7 @@ Every screen of the customer app, in the approved style. Drawn by Flutter from t
 
 ## Management app as built (M4)
 
-The same style, the same shared widgets. Drawn the same way as the customer app's screenshots, on sample orders and the 15 sample books.
+The same style, the same shared widgets. Drawn the same way as the customer app's screenshots, on sample orders and the 27 sample books.
 
 **Log in**: the same form as the customer app, for managers only.
 
@@ -130,6 +138,8 @@ Warm neutrals only. Every value lives in one file: [tokens.dart](../../clients/b
 | Ink | `#1F1B17` | `#F2EDE6` | The main button of a screen |
 | Accent | `#8F4721` | `#E5A078` | Focus ring, selection outline. Used sparingly |
 | Danger | `#9E2A1F` | `#F0A79C` | Error text, always with an icon |
+| Sign green | `#1D3B31` to `#2A5141` | the same | The Mooney's sign only |
+| Sign gold | `#D9B871`, shaded `#F2DDA2` to `#AE8840` | the same | The letters on the sign. The main gold on the dark green is 6.4 : 1; the gold-leaf shading goes lower, down to about 2.7 : 1 (deepest gold on the lighter green). WCAG 1.4.3 does not apply to a logo, and the name is also in the window title and read out by screen readers |
 
 **Book covers** are the color. A book with a cover image shows it. A book without one gets a generated cover: a muted color picked from its title (so the same book always looks the same), the title in a serif, and a sheen.
 

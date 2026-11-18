@@ -36,7 +36,7 @@ do {
 } while ($up.Count -lt 3 -and (Get-Date) -lt $deadline)
 
 if ($up.Count -eq 3) {
-    Write-Host 'All three services are running. Open Bookstore or Bookstore Manager from the Start menu.' -ForegroundColor Green
+    Write-Host 'All three services are running. Open Mooney''s or Mooney''s Manager from the Start menu.' -ForegroundColor Green
     Write-Host 'Leave their three minimized windows open; stop them with stop-services.cmd.'
     exit 0
 }

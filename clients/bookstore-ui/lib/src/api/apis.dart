@@ -44,9 +44,13 @@ class BookApi extends ApiClient {
   BookApi(Session session, {String baseUrl = bookServiceUrl}) : super(baseUrl, session, serviceName: 'The book catalog');
 
   /// Books whose title or author contains [keyword]; every book when it is empty.
-  Future<List<Book>> search(String keyword) async {
-    final query = keyword.trim().isEmpty ? '' : '?keyword=${Uri.encodeQueryComponent(keyword.trim())}';
-    final json = await get('/api/books$query') as List;
+  /// A [category] keeps only that shelf (one of [categories]).
+  Future<List<Book>> search(String keyword, {String? category}) async {
+    final params = [
+      if (keyword.trim().isNotEmpty) 'keyword=${Uri.encodeQueryComponent(keyword.trim())}',
+      if (category != null && category.isNotEmpty) 'category=${Uri.encodeQueryComponent(category)}',
+    ];
+    final json = await get('/api/books${params.isEmpty ? '' : '?${params.join('&')}'}') as List;
     return [for (final b in json) Book.fromJson(b as Map<String, dynamic>)];
   }
 

@@ -1,4 +1,6 @@
 """The rules about books. Knows nothing about HTTP or MongoDB."""
+from typing import Optional
+
 from .errors import ConflictError, NotFoundError
 from .models import Book
 from .repository import BookRepository
@@ -11,9 +13,10 @@ class BookService:
     def __init__(self, books: BookRepository):
         self._books = books
 
-    def search(self, keyword: str) -> list[Book]:
-        """FR4, FR5: books whose title or author contains the keyword. No keyword lists them all."""
-        return self._books.search(keyword or "")
+    def search(self, keyword: str, category: Optional[str] = None) -> list[Book]:
+        """FR4, FR5: books whose title or author contains the keyword. No keyword lists them all.
+        A category keeps only that shelf."""
+        return self._books.search(keyword or "", category)
 
     def get(self, book_id: str) -> Book:
         book = self._books.find(book_id)

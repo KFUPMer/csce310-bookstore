@@ -47,6 +47,19 @@ void main() {
     expect(seen.single.headers.value('authorization'), 'Bearer tok');
   });
 
+  test('a search asks for the keyword and the shelf, and leaves out what is empty', () async {
+    answer = (r) => reply(r, 200, []);
+    final books = BookApi(session, baseUrl: 'http://127.0.0.1:${server.port}');
+    await books.search('head first', category: 'Kids');
+    await books.search('', category: 'Fiction');
+    await books.search('java');
+    await books.search('');
+    expect(
+      [for (final r in seen) r.uri.toString()],
+      ['/api/books?keyword=head+first&category=Kids', '/api/books?category=Fiction', '/api/books?keyword=java', '/api/books'],
+    );
+  });
+
   test('sends a JSON body', () async {
     String? received;
     answer = (r) async {

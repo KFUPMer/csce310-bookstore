@@ -49,6 +49,13 @@ void main() {
     stdout.writeln('search "java": ${java.map((b) => b.title).join(', ')} in ${watch.elapsedMilliseconds} ms');
     expect(java.every((b) => '${b.title} ${b.author}'.toLowerCase().contains('java')), isTrue);
 
+    watch.reset();
+    final fiction = await books.search('', category: 'Fiction');
+    stdout.writeln('Fiction shelf: ${fiction.map((b) => b.title).join(', ')} in ${watch.elapsedMilliseconds} ms');
+    expect(fiction, isNotEmpty);
+    expect(fiction.every((b) => b.category == 'Fiction'), isTrue, reason: 'only that shelf');
+    expect(all.where((b) => b.coverUrl != null), isNotEmpty, reason: 'the books have their cover photos');
+
     final book = all.firstWhere((b) => b.copiesAvailable >= 1);
     final draft = OrderDraft()..add(book, ItemType.rent);
     watch.reset();

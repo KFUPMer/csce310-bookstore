@@ -52,6 +52,9 @@ Each entry says whether the PRD required it. "No" means it was a choice, and cou
 | E-042 | 2026-11-17 | A pretend checkout, with no card details | Customer app, order-service | No (asked for by the owner) |
 | E-043 | 2026-11-17 | Each customer's preferences are remembered on the computer | Customer app | No (asked for by the owner) |
 | E-044 | 2026-11-17 | Installable on a new computer with three double-clicks | Whole project | No (asked for by the owner) |
+| E-045 | 2026-11-17 | Shelves: books by category, like a bookshop's sections | book-service, both apps | No (asked for by the owner) |
+| E-046 | 2026-11-17 | Real cover photos, never an empty slot | Both apps, sample data | No (asked for by the owner) |
+| E-047 | 2026-11-17 | The store has a name and a sign: Mooney's | Both apps, the bill, the installer | No (asked for by the owner) |
 
 ## Details
 
@@ -309,3 +312,20 @@ Dark mode, and whether search opens as covers or a list, are saved per username 
 `setup.cmd` checks every part, installs Java, Python, and MongoDB with winget when missing, creates the database with a limited account, loads the test data only if it is not there, and says in a sentence what to fix if something is wrong; it can be run again safely. `start-services.cmd` and `stop-services.cmd` start and stop the three services. The apps come as an installer that needs no administrator rights, built in release mode by GitHub Actions on each version tag, after every test passes there.
 **Why:** the owner asked that whoever grades the project can install it without asking anything. The only question left is the grader's own MySQL root password, which only MySQL may see.
 **Verified on the development computer:** setup.cmd passed all seven steps without a question, kept the existing settings and data, and start and stop worked, including starting twice. The GitHub build: see the release's run.
+
+### E-045 — Shelves: books by category, like a bookshop's sections
+
+Every book is on one of five shelves: Fiction, Nonfiction, Kids, Science, Technology. The customer app shows them as a row of tabs under the sign (All, then each shelf); the chosen tab is bold and underlined, not only colored, and works from the keyboard. A search stays on the chosen shelf, and when it finds nothing there it offers to search every shelf. The manager chooses a shelf when adding or editing a book, and sees each book's shelf in the list. book-service filters by it (`?category=`) and refuses an unknown one.
+**Why:** the owner liked how a bookshop website shows its categories. 12 general books were added so no shelf is empty.
+**Verified:** 6 new book-service tests (one against the real MongoDB), 3 shared and 2 app tests; on the running services the Fiction shelf answered in 25 ms.
+
+### E-046 — Real cover photos, never an empty slot
+
+Each book links to its real cover on Open Library. A cover shows the drawn cover first and fades the photo in once it has arrived, so a slot is never empty; without internet the drawn cover simply stays. Every photo was checked by eye on a contact sheet for the right title and an English edition (six were replaced, P-013).
+**Why:** the owner liked real photos. Linking instead of storing keeps publishers' artwork out of the public repository.
+**Effect:** the screenshots in the style guide show the real covers.
+
+### E-047 — The store has a name and a sign: Mooney's
+
+Gold capitals on deep green, drawn by our own widget (`MooneysSign`), inspired by the bookshop in the series *You*: in the top bar of both apps, large on the login screens, in the window titles, on the bill and the email subject, and in the installer and Start menu. It looks the same in light and dark mode, like a painted sign, and is the one colored thing besides the covers, so the approved neutral style holds.
+**Why:** the owner wanted the store's logo shown off, as a bookshop website does.

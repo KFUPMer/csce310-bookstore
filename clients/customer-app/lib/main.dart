@@ -63,7 +63,7 @@ class _CustomerAppState extends State<CustomerApp> {
       isDark: dark,
       toggleTheme: () => _services.preferences.update(darkMode: !dark),
       child: MaterialApp(
-        title: 'Bookstore',
+        title: MooneysSign.name,
         debugShowCheckedModeBanner: false,
         theme: buildBookstoreTheme(Brightness.light),
         darkTheme: buildBookstoreTheme(Brightness.dark),

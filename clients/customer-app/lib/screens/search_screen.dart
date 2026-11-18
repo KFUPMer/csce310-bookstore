@@ -22,7 +22,8 @@ class SearchScreen extends StatefulWidget {
 }
 
 class _SearchScreenState extends State<SearchScreen> {
-  static const double _barHeight = 64;
+  static const double _barHeight = 108; // the sign and the tools (64), then the shelves (44)
+  static const double _toolsHeight = 64;
   static const double _panelWidth = 340;
   static const Duration _typingPause = Duration(milliseconds: 250);
 
@@ -33,6 +34,9 @@ class _SearchScreenState extends State<SearchScreen> {
   /// Covers or list: the customer's preference, remembered for next time.
   bool get _list => _services.preferences.listView;
   String _query = '';
+
+  /// The shelf being shown; null for every shelf.
+  String? _category;
   Book? _selected;
 
   List<Book> _results = const [];
@@ -77,7 +81,7 @@ class _SearchScreenState extends State<SearchScreen> {
       _error = null;
     });
     try {
-      final books = await _services.books.search(query);
+      final books = await _services.books.search(query, category: _category);
       if (!mounted || number != _searchNumber) return;
       setState(() {
         _results = books;
@@ -98,6 +102,17 @@ class _SearchScreenState extends State<SearchScreen> {
     } finally {
       if (mounted && number == _searchNumber) setState(() => _loading = false);
     }
+  }
+
+  void _selectCategory(String? category) {
+    if (category == _category) return;
+    _typing?.cancel();
+    setState(() {
+      _category = category;
+      _total = null; // the count of the new shelf comes with its first search
+    });
+    _load();
+    if (_scroll.hasClients) _scroll.animateTo(0, duration: Motion.slow, curve: Motion.curve);
   }
 
   void _onTyping(String value) {
@@ -187,7 +202,13 @@ class _SearchScreenState extends State<SearchScreen> {
                             SliverPadding(
                               padding: const EdgeInsets.symmetric(horizontal: Space.xxxl),
                               sliver: SliverToBoxAdapter(
-                                child: _Heading(query: _query, count: _results.length, total: _total, loading: _loading && _results.isEmpty),
+                                child: _Heading(
+                                  query: _query,
+                                  shelf: _category,
+                                  count: _results.length,
+                                  total: _total,
+                                  loading: _loading && _results.isEmpty,
+                                ),
                               ),
                             ),
                             const SliverToBoxAdapter(child: SizedBox(height: Space.xl)),
@@ -209,69 +230,84 @@ class _SearchScreenState extends State<SearchScreen> {
                   child: Glass(
                     radius: Radii.panel,
                     padding: const EdgeInsets.symmetric(horizontal: Space.lg),
-                    child: Row(
+                    child: Column(
                       children: [
-                        Text('Bookstore', style: Theme.of(context).textTheme.titleLarge),
-                        const SizedBox(width: Space.xl),
-                        Expanded(
-                          child: Align(
-                            alignment: Alignment.centerLeft,
-                            child: ConstrainedBox(
-                              constraints: const BoxConstraints(maxWidth: 440),
-                              child: SearchField(
-                                controller: _search,
-                                focusNode: _searchFocus,
-                                searching: _loading && _results.isNotEmpty,
-                                onChanged: _onTyping,
-                                onClear: _clearSearch,
+                        SizedBox(
+                          height: _toolsHeight,
+                          child: Row(
+                            children: [
+                              const MooneysSign(height: 38),
+                              const SizedBox(width: Space.xl),
+                              Expanded(
+                                child: Align(
+                                  alignment: Alignment.centerLeft,
+                                  child: ConstrainedBox(
+                                    constraints: const BoxConstraints(maxWidth: 440),
+                                    child: SearchField(
+                                      controller: _search,
+                                      focusNode: _searchFocus,
+                                      searching: _loading && _results.isNotEmpty,
+                                      onChanged: _onTyping,
+                                      onClear: _clearSearch,
+                                    ),
+                                  ),
+                                ),
                               ),
-                            ),
+                              const SizedBox(width: Space.lg),
+                              AppIconButton(
+                                icon: Icons.grid_view_rounded,
+                                tooltip: 'Show as covers',
+                                selected: !_list,
+                                onPressed: () => _services.preferences.update(listView: false),
+                              ),
+                              const SizedBox(width: Space.xs),
+                              AppIconButton(
+                                icon: Icons.view_list_rounded,
+                                tooltip: 'Show as a list',
+                                selected: _list,
+                                onPressed: () => _services.preferences.update(listView: true),
+                              ),
+                              Container(
+                                width: 1,
+                                height: 24,
+                                margin: const EdgeInsets.symmetric(horizontal: Space.md),
+                                color: c.hairline,
+                              ),
+                              AppIconButton(
+                                icon: scope.isDark ? Icons.light_mode_outlined : Icons.dark_mode_outlined,
+                                tooltip: scope.isDark ? 'Switch to light mode' : 'Switch to dark mode',
+                                onPressed: scope.toggleTheme,
+                              ),
+                              const SizedBox(width: Space.sm),
+                              AppButton(
+                                label: draft.isEmpty ? 'Your order' : 'Your order (${draft.length})',
+                                icon: Icons.shopping_bag_outlined,
+                                style: draft.isEmpty ? AppButtonStyle.secondary : AppButtonStyle.primary,
+                                onPressed: _openOrder,
+                              ),
+                              const SizedBox(width: Space.md),
+                              // In a narrow window the name gives its room to the search field; the icon stays.
+                              if (MediaQuery.sizeOf(context).width >= 1180)
+                                Tooltip(
+                                  message: 'Your account',
+                                  child: AppButton(
+                                    label: scope.services.session.username ?? '',
+                                    icon: Icons.person_outline_rounded,
+                                    style: AppButtonStyle.secondary,
+                                    onPressed: _openAccount,
+                                  ),
+                                )
+                              else
+                                AppIconButton(icon: Icons.person_outline_rounded, tooltip: 'Your account', onPressed: _openAccount),
+                              const SizedBox(width: Space.xs),
+                              AppIconButton(icon: Icons.logout_rounded, tooltip: 'Log out', onPressed: _logout),
+                            ],
                           ),
                         ),
-                        const SizedBox(width: Space.lg),
-                        AppIconButton(
-                          icon: Icons.grid_view_rounded,
-                          tooltip: 'Show as covers',
-                          selected: !_list,
-                          onPressed: () => _services.preferences.update(listView: false),
+                        Container(height: 1, color: c.hairline),
+                        Expanded(
+                          child: _ShelfTabs(selected: _category, onSelect: _selectCategory),
                         ),
-                        const SizedBox(width: Space.xs),
-                        AppIconButton(
-                          icon: Icons.view_list_rounded,
-                          tooltip: 'Show as a list',
-                          selected: _list,
-                          onPressed: () => _services.preferences.update(listView: true),
-                        ),
-                        Container(
-                          width: 1,
-                          height: 24,
-                          margin: const EdgeInsets.symmetric(horizontal: Space.md),
-                          color: c.hairline,
-                        ),
-                        AppIconButton(
-                          icon: scope.isDark ? Icons.light_mode_outlined : Icons.dark_mode_outlined,
-                          tooltip: scope.isDark ? 'Switch to light mode' : 'Switch to dark mode',
-                          onPressed: scope.toggleTheme,
-                        ),
-                        const SizedBox(width: Space.sm),
-                        AppButton(
-                          label: draft.isEmpty ? 'Your order' : 'Your order (${draft.length})',
-                          icon: Icons.shopping_bag_outlined,
-                          style: draft.isEmpty ? AppButtonStyle.secondary : AppButtonStyle.primary,
-                          onPressed: _openOrder,
-                        ),
-                        const SizedBox(width: Space.md),
-                        Tooltip(
-                          message: 'Your account',
-                          child: AppButton(
-                            label: scope.services.session.username ?? '',
-                            icon: Icons.person_outline_rounded,
-                            style: AppButtonStyle.secondary,
-                            onPressed: _openAccount,
-                          ),
-                        ),
-                        const SizedBox(width: Space.xs),
-                        AppIconButton(icon: Icons.logout_rounded, tooltip: 'Log out', onPressed: _logout),
                       ],
                     ),
                   ),
@@ -334,14 +370,23 @@ class _SearchScreenState extends State<SearchScreen> {
       return [
         SliverFillRemaining(
           hasScrollBody: false,
-          child: _query.trim().isEmpty
-              ? const _Message(icon: Icons.menu_book_outlined, title: 'The catalog is empty', text: 'No books have been added yet.')
-              : _Message(
+          child: _query.trim().isNotEmpty
+              ? _Message(
                   icon: Icons.menu_book_outlined,
-                  title: 'No books match "${_query.trim()}"',
+                  title: 'No books match "${_query.trim()}"${_category == null ? '' : ' in $_category'}',
                   text: 'Check the spelling, or try part of the title or the author\'s name.',
-                  action: AppButton(label: 'Clear search', style: AppButtonStyle.secondary, onPressed: _clearSearch),
-                ),
+                  action: _category == null
+                      ? AppButton(label: 'Clear search', style: AppButtonStyle.secondary, onPressed: _clearSearch)
+                      : AppButton(label: 'Search every shelf', style: AppButtonStyle.secondary, onPressed: () => _selectCategory(null)),
+                )
+              : _category != null
+              ? _Message(
+                  icon: Icons.menu_book_outlined,
+                  title: 'This shelf is empty',
+                  text: 'No $_category books yet.',
+                  action: AppButton(label: 'Show every shelf', style: AppButtonStyle.secondary, onPressed: () => _selectCategory(null)),
+                )
+              : const _Message(icon: Icons.menu_book_outlined, title: 'The catalog is empty', text: 'No books have been added yet.'),
         ),
       ];
     }
@@ -386,10 +431,99 @@ class _SearchScreenState extends State<SearchScreen> {
   );
 }
 
+/// The store's shelves, like the sections of a bookshop: All, then each category.
+/// The chosen one is bold and underlined, not only colored. Tab and Enter work.
+class _ShelfTabs extends StatelessWidget {
+  const _ShelfTabs({required this.selected, required this.onSelect});
+
+  final String? selected;
+  final ValueChanged<String?> onSelect;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        for (final shelf in <String?>[null, ...categories])
+          _ShelfTab(label: shelf ?? 'All', selected: shelf == selected, onTap: () => onSelect(shelf)),
+      ],
+    );
+  }
+}
+
+class _ShelfTab extends StatefulWidget {
+  const _ShelfTab({required this.label, required this.selected, required this.onTap});
+
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  State<_ShelfTab> createState() => _ShelfTabState();
+}
+
+class _ShelfTabState extends State<_ShelfTab> {
+  bool _hover = false;
+  bool _focus = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final c = BookstoreColors.of(context);
+    final t = Theme.of(context).textTheme;
+    final on = widget.selected;
+    return Semantics(
+      button: true,
+      selected: on,
+      label: widget.label == 'All' ? 'All books' : '${widget.label} shelf',
+      excludeSemantics: true,
+      child: FocusableActionDetector(
+        mouseCursor: SystemMouseCursors.click,
+        onShowHoverHighlight: (v) => setState(() => _hover = v),
+        onShowFocusHighlight: (v) => setState(() => _focus = v),
+        actions: {ActivateIntent: CallbackAction<ActivateIntent>(onInvoke: (_) => widget.onTap())},
+        child: GestureDetector(
+          onTap: widget.onTap,
+          child: AnimatedContainer(
+            duration: Motion.fast,
+            curve: Motion.curve,
+            margin: const EdgeInsets.symmetric(horizontal: Space.xs, vertical: Space.xs),
+            padding: const EdgeInsets.symmetric(horizontal: Space.md),
+            decoration: BoxDecoration(
+              color: _hover && !on ? c.hover : Colors.transparent,
+              borderRadius: BorderRadius.circular(Radii.control),
+              border: Border.all(color: _focus ? c.accent : Colors.transparent, width: 2),
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  widget.label,
+                  style: t.bodyMedium!.copyWith(color: on ? c.text : c.textSecondary, fontWeight: on ? FontWeight.w700 : FontWeight.w500),
+                ),
+                const SizedBox(height: 3),
+                AnimatedContainer(
+                  duration: Motion.base,
+                  curve: Motion.curve,
+                  height: 2,
+                  width: on ? 22 : 0,
+                  decoration: BoxDecoration(color: c.accent, borderRadius: BorderRadius.circular(1)),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class _Heading extends StatelessWidget {
-  const _Heading({required this.query, required this.count, required this.total, required this.loading});
+  const _Heading({required this.query, required this.shelf, required this.count, required this.total, required this.loading});
 
   final String query;
+
+  /// The shelf being shown; null for every shelf.
+  final String? shelf;
   final int count;
   final int? total;
   final bool loading;
@@ -398,20 +532,23 @@ class _Heading extends StatelessWidget {
   Widget build(BuildContext context) {
     final t = Theme.of(context).textTheme;
     final searching = query.trim().isNotEmpty;
+    final where = shelf == null ? '' : ' in $shelf';
     final String line;
     if (loading) {
       line = 'Loading the catalog…';
     } else if (searching) {
       line = total == null
-          ? '$count ${count == 1 ? 'book matches' : 'books match'} in title or author'
-          : '$count of $total books match in title or author';
+          ? '$count ${count == 1 ? 'book matches' : 'books match'} in title or author$where'
+          : '$count of $total books$where match in title or author';
+    } else if (shelf != null) {
+      line = '$count ${count == 1 ? 'book' : 'books'} on this shelf. Search by title or author, or pick a cover.';
     } else {
       line = '$count books. Search by title or author, or pick a cover.';
     }
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(searching ? 'Results for "${query.trim()}"' : 'All books', style: t.displaySmall),
+        Text(searching ? 'Results for "${query.trim()}"$where' : (shelf ?? 'All books'), style: t.displaySmall),
         const SizedBox(height: Space.sm),
         Text(line, style: t.bodyLarge!.copyWith(color: BookstoreColors.of(context).textSecondary)),
       ],

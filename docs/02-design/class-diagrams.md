@@ -88,11 +88,12 @@ Every source file that exists so far, and the classes in it. Updated in the same
 | `lib/src/bill_view.dart` | `BillView` | The bill of an `Order` drawn in the app, with the same parts as the HTML bill |
 | `lib/src/auth_layout.dart` | `AuthLayout`, `_CoverFan` | The layout of the log-in and create-account screens |
 | `lib/src/login_form.dart` | `LoginForm`, `InfoNote` | The log-in form of both apps, letting in one role only; a neutral note with an icon |
-| `lib/src/search_field.dart` | `SearchField` | The round search field of both apps |
+| `lib/src/search_field.dart` | `SearchField` | The round search field of both apps; gives up its "Ctrl F" hint when narrow |
+| `lib/src/mooneys_sign.dart` | `MooneysSign` | The store's sign: MOONEY'S in gold on deep green, in both apps |
 | `lib/src/api/api_client.dart` | `ApiClient`, `ApiException` | Sends a request with the token, reads the answer, turns every failure into a readable message; uses dart:io, so no plugin is needed |
 | `lib/src/api/session.dart` | `Session` | Who is logged in |
 | `lib/src/api/apis.dart` | `UserApi`, `BookApi`, the services' addresses | user-service and book-service, as both apps use them |
-| `lib/src/models/book.dart` | `Book`, `ItemType`, `rentPercent`, `rentDays` | A book, with its rent price (10%, in whole cents) |
+| `lib/src/models/book.dart` | `Book`, `ItemType`, `rentPercent`, `rentDays`, `categories` | A book, with its shelf and its rent price (10%, in whole cents); the five shelves |
 | `lib/src/models/order.dart` | `Order`, `PlacedItem` | An order as order-service returns it: a list row, or a whole order with its items |
 | `test/bookstore_ui_test.dart` | — | Tests that a title always gets the same cover color |
 
@@ -108,15 +109,15 @@ Every source file that exists so far, and the classes in it. Updated in the same
 | `lib/models/account_rules.dart` | `checkRegistration()` | The account rules of user-service, checked in the app first |
 | `lib/screens/login_screen.dart` | `LoginScreen` | Log in, with the shared `LoginForm`; opens Create an account |
 | `lib/screens/register_screen.dart` | `RegisterScreen` | Create an account |
-| `lib/screens/search_screen.dart` | `SearchScreen`, and its private parts: `_Heading`, `_Availability`, `_BookCard`, `_PlaceholderCard`, `_BookRow`, `_DetailPanel`, `_Message` | Search and browse books, add them to the order |
+| `lib/screens/search_screen.dart` | `SearchScreen`, and its private parts: `_Heading`, `_Availability`, `_BookCard`, `_PlaceholderCard`, `_BookRow`, `_DetailPanel`, `_Message`, `_ShelfTabs`, `_ShelfTab` | Search and browse books by shelf, add them to the order |
 | `lib/screens/order_screen.dart` | `OrderScreen`, `_ItemRow`, `_TypeChoice`, `_Segment`, `_Summary`, `_Empty` | Review and place the order |
 | `lib/screens/bill_screen.dart` | `BillScreen` | The bill of the order just placed, with Pay now |
 | `lib/screens/pay_dialog.dart` | `showPayDialog()`, `_PayDialog` | The pretend checkout |
 | `lib/screens/account_screen.dart` | `AccountScreen`, `_Card`, `_Field`, `_Preferences`, `_SwitchRow`, `_RentalRow`, `_OrderRow`, `_BillDialog` | The account page |
 
-Tests (`clients/customer-app/test/`): `order_draft_test.dart` (9), `account_rules_test.dart` (5), `account_test.dart` (6: rentals, due dates, preferences), `screens_test.dart` (14: every screen driven as a customer uses it, including a 1024 x 700 window), `fakes.dart` (stand-ins for the services), plus two that are skipped unless asked for: `live_services_test.dart` (the app's clients against the real running services) and `screenshots_test.dart` (draws the screens to `docs/02-design/ui`).
+Tests (`clients/customer-app/test/`): `order_draft_test.dart` (9), `account_rules_test.dart` (5), `account_test.dart` (6: rentals, due dates, preferences), `screens_test.dart` (15: every screen driven as a customer uses it, including a 1024 x 700 window), `fakes.dart` (stand-ins for the services), plus two that are skipped unless asked for: `live_services_test.dart` (the app's clients against the real running services) and `screenshots_test.dart` (draws the screens to `docs/02-design/ui`).
 
-Tests of the shared package (`clients/bookstore-ui/test/`): `book_test.dart` (5: prices, money), `order_test.dart` (1), `api_client_test.dart` (10: against a small real web server), `bookstore_ui_test.dart` (2).
+Tests of the shared package (`clients/bookstore-ui/test/`): `book_test.dart` (7: prices, money, shelves), `order_test.dart` (1), `api_client_test.dart` (11: against a small real web server), `bookstore_ui_test.dart` (2).
 
 Private classes (names starting with `_`) are pieces of one screen and are used nowhere else, so they are listed here and not drawn as separate boxes.
 
@@ -128,15 +129,15 @@ Private classes (names starting with `_`) are pieces of one screen and are used 
 |---|---|---|
 | `lib/main.dart` | `ManagerApp`, `ManagerServices`, `ManagerScope`, `FileOpener` | Starts the app at the login screen, holds light or dark mode, gives the screens the session and the services; returns to log in when the session ends |
 | `lib/api/order_api.dart` | `OrderApi` | The manager's calls to order-service |
-| `lib/models/book_rules.dart` | `checkBook()`, `BookCheck` | The book rules of book-service, checked in the form first |
+| `lib/models/book_rules.dart` | `checkBook()`, `BookCheck` | The book rules of book-service, shelf included, checked in the form first |
 | `lib/screens/login_screen.dart` | `LoginScreen` | Manager log in, with the shared `LoginForm` |
 | `lib/screens/home_screen.dart` | `HomeScreen`, `Tabs`, `_Tab` | The glass bar and the two tabs; `Tabs` is also the order filter |
 | `lib/screens/orders_view.dart` | `OrdersView`, `_Table`, `_Row`, `_OrderDialog` | The orders, their payment status, and one order's bill |
 | `lib/screens/books_view.dart` | `BooksView`, `_BookRow` | The books |
-| `lib/screens/book_form_dialog.dart` | `BookFormDialog` | Add or edit a book |
+| `lib/screens/book_form_dialog.dart` | `BookFormDialog`, `_ShelfChoice` | Add or edit a book, and choose its shelf |
 | `lib/screens/widgets.dart` | `Message` | The "nothing here" or "could not load" message of both tabs |
 
-Tests (`clients/management-app/test/`): `book_rules_test.dart` (6), `screens_test.dart` (9: every screen driven as a manager uses it, including a 1024 x 700 window), `fakes.dart`, plus `live_services_test.dart` and `screenshots_test.dart`, skipped unless asked for.
+Tests (`clients/management-app/test/`): `book_rules_test.dart` (7), `screens_test.dart` (9: every screen driven as a manager uses it, including a 1024 x 700 window), `fakes.dart`, plus `live_services_test.dart` and `screenshots_test.dart`, skipped unless asked for.
 
 ## Backend services
 
@@ -200,14 +201,14 @@ File map (`services/book-service/book_service/`):
 | `app.py` | HTTP | `create_app()`, `create_production_app()` | Puts the parts together; the only place that knows the concrete classes |
 | `config.py` | Settings | `Config` | Port, MongoDB address, user-service address, service key |
 | `routes.py` | HTTP | `create_routes()` | The five endpoints |
-| `schemas.py` | Request | `BookInput`, `CopiesChange` | What a request must contain, with validation |
+| `schemas.py` | Request | `BookInput`, `CopiesChange`, `category_filter()` | What a request must contain, with validation; the `?category=` of a search |
 | `auth.py` | Rules | `SessionChecker`, `UserServiceSessionChecker`, `token_from()`, `require_manager()`, `require_service_key()` | Who is asking, and whether they may |
 | `services.py` | Rules | `BookService` | Search, get, add, update, change copies |
 | `repository.py` | Database | `BookRepository`, `MongoBookRepository`, `InMemoryBookRepository` | Reading and writing books |
-| `models.py` | Data | `Book`, `CurrentUser` | Plain data |
+| `models.py` | Data | `Book`, `CurrentUser`, `CATEGORIES` | Plain data; the five shelves |
 | `errors.py` | Error | `ApiError` and its six subclasses, `register_error_handlers()` | The errors, and the one place that answers them |
 
-Tests (`services/book-service/tests/`): `test_api.py` (24: every endpoint, success and each error), `test_mongo_repository.py` (7: against a real MongoDB), `fakes.py` (the stand-in for user-service).
+Tests (`services/book-service/tests/`): `test_api.py` (29: every endpoint, success and each error, shelves too), `test_mongo_repository.py` (8: against a real MongoDB), `fakes.py` (the stand-in for user-service).
 
 **Changes from the design overview:** the overview had 4 boxes for this service. Added: the request shapes with validation, the repository interface with an in-memory version, the error classes, `Config`, and `app.py`. Because Python groups functions in modules, `routes.py`, `auth.py`, `app.py`, and `errors.py` are drawn as modules rather than classes.
 

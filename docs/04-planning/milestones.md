@@ -53,7 +53,7 @@ The live version of this plan is on GitHub: milestones hold the deadlines, issue
 ### M5 — Testing & Final Release (due 2026-12-04)
 
 - [x] Test every requirement FR1–FR14 and N1–N5 end to end: [requirements test report](../06-testing/requirements-test.md)
-- [ ] Final documentation and release v1.0.0
+- [x] Final documentation and release v1.0.0
 
 ### Extra credit (all being done, +4% in total)
 
@@ -94,3 +94,4 @@ Add a short dated note whenever a milestone closes or a deadline moves, and say 
 | 2026-11-17 | Every requirement checked: 225 tests, 41 live checks on the running services (all passed after fixing one fault in the check script itself), and the apps' live checks; N3 confirmed in the real database. Report in `docs/06-testing`. Issue #13 closed. Next: issue #14, final documentation and v1.0.0. |
 | 2026-11-17 | The owner asked for an installable build. **v1.0.0-beta.1 published** as a pre-release: an installer for both apps, a portable zip, and a server zip with `setup.cmd`. Release builds are made and the installer tested on GitHub's Windows machine (P-017). `HANDOVER.md` written for the instructor. Left: the instructor's access to the private repository, and a try on another computer, then v1.0.0. |
 | 2026-11-17 | The owner made the repository public, so the instructor can see it and download the release without an account. Before that, the whole history was checked: no `.env`, local SQL, or bill file was ever committed, and none of the secret values appears in any commit. Left: a try on another computer, then v1.0.0. |
+| 2026-11-17 | The owner asked for the store to look like a real bookshop: it is now **Mooney's**, with a sign, five shelves, and real cover photos; 12 books added. All 236 tests pass, and the apps' live checks pass on the running services. v1.0.0 released. |

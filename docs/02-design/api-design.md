@@ -113,19 +113,21 @@ Errors: `400` a field is missing or invalid · `409` username or email already u
 
 ## book-service — `http://localhost:8082`
 
-**Status: built, tested (31 tests), and verified on the running service.** Requests answer in 3–38 ms. Also answers `503` when user-service or MongoDB is not available, and `404` / `405` for an unknown address or a wrong method.
+**Status: built, tested (37 tests), and verified on the running service.** Requests answer in 3–38 ms. Also answers `503` when user-service or MongoDB is not available, and `404` / `405` for an unknown address or a wrong method.
 
 A book looks like this everywhere:
 
 ```json
-{ "id": "655f1c2ab7e4a1d2c3f4a5b6", "title": "Clean Code", "author": "Robert C. Martin", "price": 40.00, "copiesAvailable": 4, "coverUrl": null }
+{ "id": "655f1c2ab7e4a1d2c3f4a5b6", "title": "Clean Code", "author": "Robert C. Martin", "price": 40.00, "copiesAvailable": 4, "coverUrl": "https://covers.openlibrary.org/b/id/8065615-L.jpg", "category": "Technology" }
 ```
 
-`coverUrl` is optional (the address of a cover image, or `null`). It can be set in POST and PUT.
+`coverUrl` is optional (the address of a cover image, or `null`). It can be set in POST and PUT. The sample books' covers are photos from Open Library ([REFERENCES.md](../../REFERENCES.md)).
 
-### GET `/api/books?keyword=java`
+`category` is the book's shelf, one of `Fiction`, `Nonfiction`, `Kids`, `Science`, `Technology` (added in M5 at the owner's request, beyond the PRD). Required in POST and PUT. It is `null` only for a book stored before shelves existed, until a manager gives it one.
 
-Returns the books whose **title or author** contains the keyword, ignoring upper and lower case. Without a keyword, returns all books. Sorted by title.
+### GET `/api/books?keyword=java&category=Technology`
+
+Returns the books whose **title or author** contains the keyword, ignoring upper and lower case. Without a keyword, returns all books. `category`, optional, keeps only that shelf; empty or missing means every shelf. Sorted by title.
 
 Response `200`:
 
@@ -136,7 +138,7 @@ Response `200`:
 ]
 ```
 
-An empty list `[]` when nothing matches. Errors: `401`.
+An empty list `[]` when nothing matches. Errors: `400` an unknown category ("Choose a category: Fiction, Nonfiction, Kids, Science, or Technology") · `401`.
 
 ### GET `/api/books/{id}`
 
@@ -147,16 +149,16 @@ Response `200`: one book. Errors: `401` · `404`.
 Request:
 
 ```json
-{ "title": "Clean Architecture", "author": "Robert C. Martin", "price": 42.00, "copiesAvailable": 3 }
+{ "title": "Clean Architecture", "author": "Robert C. Martin", "price": 42.00, "copiesAvailable": 3, "category": "Technology" }
 ```
 
-Rules: title and author not empty, at most 255 characters · price a number greater than 0 (kept to two decimals) · copies a whole number, 0 or more · `coverUrl` optional, must start with `http://` or `https://`.
+Rules: title and author not empty, at most 255 characters · price a number greater than 0 (kept to two decimals) · copies a whole number, 0 or more · `coverUrl` optional, must start with `http://` or `https://` · `category` one of the five shelves.
 
 Response `201`: the new book, with its `id`. Errors: `400` · `401` · `403` not a manager.
 
 ### PUT `/api/books/{id}` — manager
 
-Request: the same four fields as POST. Response `200`: the updated book.
+Request: the same fields as POST. Response `200`: the updated book.
 
 Errors: `400` · `401` · `403` · `404`.
 

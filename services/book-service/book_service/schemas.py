@@ -3,6 +3,7 @@ from dataclasses import dataclass
 from typing import Any, Optional
 
 from .errors import ValidationError
+from .models import CATEGORIES, CATEGORY_PROBLEM
 
 TITLE_MAX = 255
 AUTHOR_MAX = 255
@@ -41,6 +42,7 @@ class BookInput:
     price: float
     copies_available: int
     cover_url: Optional[str]
+    category: Optional[str] = None  # required in a request (from_json); optional for books stored before categories
 
     @staticmethod
     def from_json(body: Any) -> "BookInput":
@@ -72,8 +74,21 @@ class BookInput:
             if len(cover_url) > COVER_URL_MAX:
                 raise ValidationError("The cover address is too long")
 
+        category = body.get("category")
+        if category not in CATEGORIES:
+            raise ValidationError(CATEGORY_PROBLEM)
+
         # Prices are money: keep two decimals.
-        return BookInput(title, author, round(float(price), 2), copies, cover_url)
+        return BookInput(title, author, round(float(price), 2), copies, cover_url, category)
+
+
+def category_filter(value: Optional[str]) -> Optional[str]:
+    """The ?category= of a search: empty or missing means every shelf. Raises ValidationError if unknown."""
+    if not value:
+        return None
+    if value not in CATEGORIES:
+        raise ValidationError(CATEGORY_PROBLEM)
+    return value
 
 
 @dataclass(frozen=True)

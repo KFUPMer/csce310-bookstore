@@ -3,6 +3,7 @@ import 'package:material_ui/material_ui.dart';
 import 'format.dart';
 import 'models/book.dart';
 import 'models/order.dart';
+import 'mooneys_sign.dart';
 import 'status_chip.dart';
 import 'tokens.dart';
 
@@ -69,7 +70,7 @@ class BillView extends StatelessWidget {
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                Expanded(child: Text('Bookstore', style: t.headlineSmall)),
+                Expanded(child: Text(MooneysSign.name, style: t.headlineSmall)),
                 Text('BILL', style: label!.copyWith(fontSize: 12, letterSpacing: 2.4, color: c.textSecondary)),
               ],
             ),

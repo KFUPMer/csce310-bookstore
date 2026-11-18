@@ -125,6 +125,23 @@ class MySqlOrderRepositoryTest(unittest.TestCase):
         self.assertEqual([item.title for item in mine[1].items], ["Clean Code", "Java Concurrency in Practice"])
         self.assertEqual(self.orders.list_for_user(-1), [])
 
+    def test_list_between_includes_the_start_and_excludes_the_end_newest_first_with_items(self):
+        before = self.orders.save(self.new_order(datetime(2026, 11, 15, 23, 59, 59)))
+        first = self.orders.save(self.new_order(datetime(2026, 11, 16, 0, 0, 0)))
+        last = self.orders.save(self.new_order(datetime(2026, 11, 16, 23, 59, 59)))
+        after = self.orders.save(self.new_order(datetime(2026, 11, 17, 0, 0, 0)))
+
+        def mine(orders):
+            return [order.id for order in orders if order.user_id == self.user_id]
+
+        in_period = self.orders.list_between(datetime(2026, 11, 16), datetime(2026, 11, 17))
+        self.assertEqual(mine(in_period), [last.id, first.id])
+        (found_last,) = [order for order in in_period if order.id == last.id]
+        self.assertEqual(found_last, replace(self.new_order(datetime(2026, 11, 16, 23, 59, 59)), id=last.id, username=TEST_USER, email=TEST_EMAIL))
+        self.assertEqual(mine(self.orders.list_between(None, datetime(2026, 11, 16))), [before.id])
+        self.assertEqual(mine(self.orders.list_between(datetime(2026, 11, 17), None)), [after.id])
+        self.assertEqual(mine(self.orders.list_between(None, None)), [after.id, last.id, first.id, before.id])
+
     def test_set_payment_status_changes_it_and_returns_the_order(self):
         saved = self.orders.save(self.new_order())
         self.assertEqual(self.orders.set_payment_status(saved.id, "PAID").payment_status, "PAID")

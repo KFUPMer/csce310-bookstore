@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:bookstore_ui/bookstore_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:management_app/api/order_api.dart';
+import 'package:management_app/api/report_api.dart';
 
 /// The manager app's service clients against the three real running services.
 ///
@@ -52,6 +53,13 @@ void main() {
     final saved = await books.update(book);
     stdout.writeln('saved "${saved.title}" unchanged in ${watch.elapsedMilliseconds} ms');
     expect((saved.title, saved.price, saved.copiesAvailable), (book.title, book.price, book.copiesAvailable));
+
+    // The sales report (extra credit): over all time it counts exactly the orders the list shows.
+    watch.reset();
+    final report = await ReportApi(session).salesReport();
+    stdout.writeln('report: ${report.orderCount} orders, ${money(report.revenue)}, ${report.bestSellers.length} best sellers in ${watch.elapsedMilliseconds} ms');
+    expect(report.orderCount, list.length);
+    expect(report.paidCount + report.pendingCount, report.orderCount);
     await users.logout();
   });
 }

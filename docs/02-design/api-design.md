@@ -22,10 +22,11 @@
 |---|---|
 | 200 | OK |
 | 201 | Created |
+| 204 | Done, nothing to send back (deleting a review) |
 | 400 | The request is missing a field or a value is invalid |
 | 401 | No token, or the token is not valid (not logged in) |
 | 403 | Logged in, but this role is not allowed to do this |
-| 404 | The book or order does not exist |
+| 404 | The book, order, or review does not exist |
 | 409 | Conflict: username or email already used, or no copies available |
 
 ## Overview
@@ -41,6 +42,9 @@
 | book | POST | `/api/books` | Manager | FR14 |
 | book | PUT | `/api/books/{id}` | Manager | FR14 |
 | book | PATCH | `/api/books/{id}/copies` | order-service only | FR7 |
+| book | GET | `/api/books/{id}/reviews` | Logged in | Reviews and ratings (extra credit, issue #20) |
+| book | PUT | `/api/books/{id}/reviews/mine` | Customer | Reviews and ratings (extra credit, issue #20) |
+| book | DELETE | `/api/books/{id}/reviews/mine` | Customer | Reviews and ratings (extra credit, issue #20) |
 | order | POST | `/api/orders` | Customer | FR6–FR10 |
 | order | GET | `/api/orders` | Manager | FR12 |
 | order | GET | `/api/orders/mine` | Customer | Account page (beyond the PRD) |
@@ -48,6 +52,7 @@
 | order | POST | `/api/orders/{id}/pay` | Owner (customer) | Pretend checkout (beyond the PRD) |
 | order | GET | `/api/orders/{id}/bill` | Owner or Manager | FR8, FR9 |
 | order | PATCH | `/api/orders/{id}/payment-status` | Manager | FR13 |
+| order | GET | `/api/reports/sales?from=&to=&top=` | Manager | Sales report (extra credit, issue #21) |
 
 ---
 
@@ -113,17 +118,19 @@ Errors: `400` a field is missing or invalid · `409` username or email already u
 
 ## book-service — `http://localhost:8082`
 
-**Status: built, tested (37 tests), and verified on the running service.** Requests answer in 3–38 ms. Also answers `503` when user-service or MongoDB is not available, and `404` / `405` for an unknown address or a wrong method.
+**Status: built, tested (71 tests), and verified on the running service.** Requests answer in 3–38 ms. Reviews (added 2026-11-18): on the running service a review was saved in 15 ms. Also answers `503` when user-service or MongoDB is not available, and `404` / `405` for an unknown address or a wrong method.
 
 A book looks like this everywhere:
 
 ```json
-{ "id": "655f1c2ab7e4a1d2c3f4a5b6", "title": "Clean Code", "author": "Robert C. Martin", "price": 40.00, "copiesAvailable": 4, "coverUrl": "https://covers.openlibrary.org/b/id/8065615-L.jpg", "category": "Technology" }
+{ "id": "655f1c2ab7e4a1d2c3f4a5b6", "title": "Clean Code", "author": "Robert C. Martin", "price": 40.00, "copiesAvailable": 4, "coverUrl": "https://covers.openlibrary.org/b/id/8065615-L.jpg", "category": "Technology", "ratingAverage": 4.3, "ratingCount": 4 }
 ```
 
 `coverUrl` is optional (the address of a cover image, or `null`). It can be set in POST and PUT. The sample books' covers are photos from Open Library ([REFERENCES.md](../../REFERENCES.md)).
 
 `category` is the book's shelf, one of `Fiction`, `Nonfiction`, `Kids`, `Science`, `Technology` (added in M5 at the owner's request, beyond the PRD). Required in POST and PUT. It is `null` only for a book stored before shelves existed, until a manager gives it one.
+
+`ratingAverage` and `ratingCount` come from the customers' reviews (extra credit, added in M6). `ratingAverage` is the average number of stars to one decimal, a half rounded up (4.25 becomes 4.3), or `null` when nobody has reviewed the book; `ratingCount` is the number of reviews, `0` when there are none. They are worked out from the reviews on every answer (one database query for a whole search) and never stored on the book, so they cannot be set in POST or PUT.
 
 ### GET `/api/books?keyword=java&category=Technology`
 
@@ -174,11 +181,62 @@ Request:
 
 Response `200`: the updated book. Errors: `400` the change is not a whole number other than 0 · `403` wrong or missing service key · `404` · `409` not enough copies (nothing is changed).
 
+### Reviews and ratings (extra credit)
+
+Added in M6 (issue #20), course section 6. Any logged-in customer may review any book, not only one they bought: checking purchases would make book-service call order-service, which already calls book-service, a loop between the services. One review per customer per book; the customer who wrote it can change or delete it. Managers cannot review, and there is no moderation by managers (left out on purpose).
+
+Reviews are kept in the MongoDB collection `reviews`, with a unique index `one_review_per_customer_per_book` on (`bookId`, `userId`). A review is stored under the book's own id, so the same id sent in capital letters reaches the same review.
+
+A review looks like this:
+
+```json
+{ "id": "6560a1f2c3d4e5f6a7b8c9d0", "bookId": "655f1c2ab7e4a1d2c3f4a5b6", "username": "customer1", "rating": 5, "text": "Clear and practical.", "createdAt": "2026-11-18T10:05:00", "updatedAt": "2026-11-18T10:05:00" }
+```
+
+`text` is `""` when the customer wrote nothing. The user id stays inside the service; the apps show the username.
+
+### GET `/api/books/{id}/reviews`
+
+Any logged-in user, customer or manager.
+
+Response `200`: the book's reviews, the most recently written or changed first. An empty list `[]` when there are none.
+
+Errors: `401` · `404` "This book does not exist".
+
+### PUT `/api/books/{id}/reviews/mine` — customer
+
+Writes the customer's review of the book, or replaces the one they wrote before (`createdAt` is kept, `updatedAt` changes).
+
+Request:
+
+```json
+{ "rating": 5, "text": "Clear and practical." }
+```
+
+Rules: `rating` a whole number from 1 to 5 · `text` optional (missing or `null` means no text), trimmed, then at most 1000 characters, counted as Unicode code points (the customer app's counter counts the same way).
+
+Response `200`: the saved review, in the shape above.
+
+Errors, checked in this order:
+
+- `401` no token, or the session has ended.
+- `403` a manager: "Only a customer can review books".
+- `400` the body is not a JSON object: "Send the book as a JSON object" (the message all book-service bodies share; it reads oddly for a review) · the rating is missing, not a whole number, or not 1 to 5: "Choose a rating from 1 to 5 stars" · `text` is not a string, for example `42`: "Write the review as text" (a message the plan for this endpoint did not list; it was added while building) · the text is too long: "The review can be at most 1000 characters".
+- `404` "This book does not exist".
+
+### DELETE `/api/books/{id}/reviews/mine` — customer
+
+Deletes the customer's own review of the book. No body.
+
+Response `204`, with an empty body.
+
+Errors: `401` · `403` a manager: "Only a customer can review books" · `404` "This book does not exist", or "You have not reviewed this book".
+
 ---
 
 ## order-service — `http://localhost:8083`
 
-**Status: built, tested (101 tests), and verified on the running service.** The first order after a cold start answered in 93 ms; other requests in 6–44 ms. Also answers `503` when user-service, book-service, or MySQL is not available, and `404` / `405` for an unknown address or a wrong method.
+**Status: built, tested (117 tests), and verified on the running service.** The first order after a cold start answered in 93 ms; other requests in 6–44 ms. Re-checked on 2026-11-18 after the sales report was added: `manual_check.py` passed 41 of 41 checks, slowest 88 ms; the report answered in 15 ms in the manager app's live check. Also answers `503` when user-service, book-service, or MySQL is not available, and `404` / `405` for an unknown address or a wrong method.
 
 ### POST `/api/orders` — customer
 
@@ -285,6 +343,60 @@ Request:
 Response `200`: the updated order (same shape as one entry of the list). `PENDING` is accepted too, so a manager can undo a mistake.
 
 Errors: `400` a status that is not `PENDING` or `PAID` · `401` · `403` · `404`.
+
+### GET `/api/reports/sales?from=2026-11-01&to=2026-11-30&top=10` — manager
+
+The sales report (extra credit, added in M6, issue #21, course section 6): the orders of a period and what they add up to. The figures are added up in Python from the period's orders, which is fine at a bookstore's scale.
+
+Query, every part optional:
+
+- `from`, `to`: dates as `YYYY-MM-DD`, both included. `to` means up to 23:59:59 of that day. Leaving one out leaves the period open on that side; leaving both out gives every order (all time). `to=9999-12-31` also means no end.
+- `top`: how many best sellers to list, 1 to 50; 10 when left out.
+
+A parameter that is present but empty (`?from=`) is an error, not a default: the apps leave out what they do not use.
+
+Response `200`:
+
+```json
+{
+  "from": "2026-11-01",
+  "to": "2026-11-30",
+  "orderCount": 3,
+  "paidCount": 2,
+  "pendingCount": 1,
+  "revenue": 198.00,
+  "paidRevenue": 95.00,
+  "booksSold": 4,
+  "booksRented": 1,
+  "byDay": [
+    { "date": "2026-11-12", "orders": 1, "revenue": 55.00 },
+    { "date": "2026-11-13", "orders": 2, "revenue": 143.00 }
+  ],
+  "bestSellers": [
+    { "bookId": "655f…a5b7", "title": "Database System Concepts", "author": "Abraham Silberschatz", "bought": 2, "rented": 0, "copies": 2, "revenue": 110.00 },
+    { "bookId": "655f…a5b6", "title": "Clean Code", "author": "Robert C. Martin", "bought": 2, "rented": 0, "copies": 2, "revenue": 80.00 },
+    { "bookId": "655f…a5b8", "title": "Java Concurrency in Practice", "author": "Brian Goetz", "bought": 0, "rented": 1, "copies": 1, "revenue": 8.00 }
+  ],
+  "orders": [
+    { "id": 1043, "username": "omar", "createdAt": "2026-11-13T16:20:00", "total": 40.00, "paymentStatus": "PAID" },
+    { "id": 1042, "username": "alice", "createdAt": "2026-11-13T10:05:00", "total": 103.00, "paymentStatus": "PENDING" },
+    { "id": 1041, "username": "omar", "createdAt": "2026-11-12T18:40:00", "total": 55.00, "paymentStatus": "PAID" }
+  ]
+}
+```
+
+- `from` and `to` are `null` when they were left out.
+- `revenue` is the total of every order in the period; `paidRevenue` only of the paid ones. `booksSold` and `booksRented` count copies.
+- `byDay` has one entry per day that had orders, oldest first; days without orders are left out.
+- `bestSellers` are grouped by `bookId`. Sorted by copies (bought plus rented), then revenue, both highest first, then by title A to Z ignoring upper and lower case. The title and author are those of the book's most recent order.
+- `orders` are the period's orders, newest first, in the shape of `GET /api/orders`.
+- Money is sent as a JSON number, so `192.50` arrives as `192.5`, the same as the order totals.
+
+Errors, checked in this order:
+
+- `401` no token, or the session has ended.
+- `403` a customer: "Only a manager can do this".
+- `400` a date that is not `YYYY-MM-DD` or not a real day (`20261118`, `2026-02-30`, or empty): "Enter the dates as YYYY-MM-DD" · `from` after `to`: "The start date must be on or before the end date" · `top` not a whole number from 1 to 50 (`0`, `51`, `-1`, `1.5`, `+5`, or empty): "top must be a whole number from 1 to 50".
 
 ---
 

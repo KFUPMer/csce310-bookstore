@@ -40,6 +40,34 @@ void main() {
     expect(b.coverUrl, isNull);
   });
 
+  test('a book has its rating from the reviews, and none when book-service sends none', () {
+    final rated = Book.fromJson({
+      'id': 'abc',
+      'title': 'Matilda',
+      'author': 'Roald Dahl',
+      'price': 8.99,
+      'copiesAvailable': 4,
+      'ratingAverage': 4.3,
+      'ratingCount': 12,
+    });
+    expect(rated.ratingAverage, 4.3);
+    expect(rated.ratingCount, 12);
+    final whole = Book.fromJson({'id': 'abc', 'title': 'M', 'author': 'R', 'price': 1, 'copiesAvailable': 1, 'ratingAverage': 4, 'ratingCount': 1});
+    expect(whole.ratingAverage, 4.0, reason: 'a whole number in the JSON is still a double');
+    final none = Book.fromJson({'id': 'abc', 'title': 'M', 'author': 'R', 'price': 1, 'copiesAvailable': 1, 'ratingAverage': null, 'ratingCount': 0});
+    expect(none.ratingAverage, isNull);
+    expect(none.ratingCount, 0);
+    final old = Book.fromJson({'id': 'abc', 'title': 'M', 'author': 'R', 'price': 1, 'copiesAvailable': 1});
+    expect(old.ratingAverage, isNull, reason: 'a service without reviews sends no rating at all');
+    expect(old.ratingCount, 0);
+  });
+
+  test('the rating is not sent back when a manager saves a book: it comes from the reviews', () {
+    final b = Book.fromJson({'id': 'abc', 'title': 'M', 'author': 'R', 'price': 1, 'copiesAvailable': 1, 'ratingAverage': 4.3, 'ratingCount': 12});
+    expect(b.toJson().containsKey('ratingAverage'), isFalse);
+    expect(b.toJson().containsKey('ratingCount'), isFalse);
+  });
+
   test('money is shown with two decimals and thousands separators', () {
     expect(money(4), '\$4.00');
     expect(money(12345.6), '\$12,345.60');

@@ -68,6 +68,12 @@ def require_manager(user: CurrentUser) -> None:
         raise ForbiddenError("Only a manager can do this")
 
 
+def require_customer(user: CurrentUser) -> None:
+    """Reviews are the customers' own words; a manager's would read as the store praising itself."""
+    if user.is_manager:
+        raise ForbiddenError("Only a customer can review books")
+
+
 def require_service_key(given: str | None, expected: str) -> None:
     """For endpoints meant for other services only, not for the apps.
 

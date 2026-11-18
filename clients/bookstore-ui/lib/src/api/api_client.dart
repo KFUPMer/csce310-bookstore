@@ -44,6 +44,9 @@ class ApiClient {
   Future<dynamic> put(String path, Object? body) => _send('PUT', path, body);
   Future<dynamic> patch(String path, Object? body) => _send('PATCH', path, body);
 
+  /// An empty answer (204) comes back as null, or '' when it is not marked as JSON.
+  Future<dynamic> delete(String path) => _send('DELETE', path, null);
+
   Future<dynamic> _send(String method, String path, Object? body) async {
     final token = session.token;
     final int status;

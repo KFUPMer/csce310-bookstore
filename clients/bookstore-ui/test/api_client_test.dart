@@ -134,6 +134,81 @@ void main() {
     await expectLater(slow.get('/api/books'), throwsA(isA<ApiException>().having((e) => e.status, 'status', 0)));
   });
 
+  group('reviews', () {
+    const bookId = 'aaaaaaaaaaaaaaaaaaaaaaaa';
+    Map<String, dynamic> reviewJson({int rating = 4, String text = 'Loved it'}) => {
+      'id': 'f' * 24,
+      'bookId': bookId,
+      'username': 'alice',
+      'rating': rating,
+      'text': text,
+      'createdAt': '2026-11-18T10:05:00',
+      'updatedAt': '2026-11-18T10:05:00',
+    };
+
+    test("a book's reviews are asked for at its address and read in the order given", () async {
+      answer = (r) => reply(r, 200, [reviewJson(rating: 5), reviewJson(rating: 2, text: '')]);
+      final books = BookApi(session, baseUrl: 'http://127.0.0.1:${server.port}');
+      final reviews = await books.reviews(bookId);
+      expect(seen.single.method, 'GET');
+      expect(seen.single.uri.toString(), '/api/books/$bookId/reviews');
+      expect([for (final r in reviews) r.rating], [5, 2]);
+      expect(reviews.last.text, '');
+    });
+
+    test("saving the customer's review sends the stars and the trimmed words with PUT", () async {
+      String? received;
+      answer = (r) async {
+        received = await utf8.decoder.bind(r).join();
+        await reply(r, 200, reviewJson(rating: 3, text: 'Good'));
+      };
+      final books = BookApi(session, baseUrl: 'http://127.0.0.1:${server.port}');
+      final saved = await books.saveMyReview(bookId, 3, '  Good \n');
+      expect(seen.single.method, 'PUT');
+      expect(seen.single.uri.toString(), '/api/books/$bookId/reviews/mine');
+      expect(jsonDecode(received!), {'rating': 3, 'text': 'Good'});
+      expect(saved.rating, 3);
+    });
+
+    test('a refused review raises the message book-service gives', () async {
+      answer = (r) => reply(r, 400, {'error': 'Choose a rating from 1 to 5 stars'});
+      final books = BookApi(session, baseUrl: 'http://127.0.0.1:${server.port}');
+      await expectLater(
+        books.saveMyReview(bookId, 0, ''),
+        throwsA(isA<ApiException>().having((e) => e.message, 'message', 'Choose a rating from 1 to 5 stars')),
+      );
+    });
+
+    test("deleting the customer's review uses DELETE and accepts the empty 204 answer", () async {
+      answer = (r) async {
+        r.response.statusCode = 204;
+        await r.response.close();
+      };
+      final books = BookApi(session, baseUrl: 'http://127.0.0.1:${server.port}');
+      await books.deleteMyReview(bookId);
+      expect(seen.single.method, 'DELETE');
+      expect(seen.single.uri.toString(), '/api/books/$bookId/reviews/mine');
+    });
+
+    test('a 204 marked as JSON but with no body is also accepted', () async {
+      answer = (r) async {
+        r.response.statusCode = 204;
+        r.response.headers.contentType = ContentType.json;
+        await r.response.close();
+      };
+      expect(await api.delete('/api/books/$bookId/reviews/mine'), isNull);
+    });
+
+    test('deleting a review that is not there raises the service message', () async {
+      answer = (r) => reply(r, 404, {'error': 'You have not reviewed this book'});
+      final books = BookApi(session, baseUrl: 'http://127.0.0.1:${server.port}');
+      await expectLater(
+        books.deleteMyReview(bookId),
+        throwsA(isA<ApiException>().having((e) => e.message, 'message', 'You have not reviewed this book').having((e) => e.status, 'status', 404)),
+      );
+    });
+  });
+
   test('an HTML answer is returned as text', () async {
     answer = (r) async {
       r.response.headers.contentType = ContentType.html;

@@ -23,6 +23,7 @@ class AppTextField extends StatefulWidget {
     this.inputFormatters,
     this.onChanged,
     this.onSubmitted,
+    this.lines = 1,
   });
 
   final String label;
@@ -43,6 +44,9 @@ class AppTextField extends StatefulWidget {
   final List<TextInputFormatter>? inputFormatters;
   final ValueChanged<String>? onChanged;
   final ValueChanged<String>? onSubmitted;
+
+  /// More than 1 makes a box of that many lines, where Enter starts a new line.
+  final int lines;
 
   @override
   State<AppTextField> createState() => _AppTextFieldState();
@@ -74,6 +78,7 @@ class _AppTextFieldState extends State<AppTextField> {
     final focused = _focus.hasFocus;
     final hasError = widget.error != null;
     final borderColor = focused ? c.accent : (hasError ? c.danger : c.hairline);
+    final multiline = widget.lines > 1;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -83,8 +88,13 @@ class _AppTextFieldState extends State<AppTextField> {
         AnimatedContainer(
           duration: Motion.fast,
           curve: Motion.curve,
-          height: 44,
-          padding: EdgeInsets.only(left: Space.md, right: widget.password ? Space.xs : Space.md),
+          height: multiline ? null : 44,
+          padding: EdgeInsets.only(
+            left: Space.md,
+            right: widget.password ? Space.xs : Space.md,
+            top: multiline ? Space.sm + 2 : 0,
+            bottom: multiline ? Space.sm + 2 : 0,
+          ),
           decoration: BoxDecoration(
             color: c.surface.withValues(alpha: widget.enabled ? 1 : 0.5),
             borderRadius: BorderRadius.circular(Radii.control),
@@ -100,8 +110,10 @@ class _AppTextFieldState extends State<AppTextField> {
                   enabled: widget.enabled,
                   obscureText: widget.password && _hidden,
                   autofillHints: widget.autofillHints,
-                  textInputAction: widget.textInputAction,
-                  keyboardType: widget.keyboardType,
+                  textInputAction: multiline ? TextInputAction.newline : widget.textInputAction,
+                  keyboardType: multiline ? TextInputType.multiline : widget.keyboardType,
+                  minLines: multiline ? widget.lines : null,
+                  maxLines: widget.lines,
                   inputFormatters: widget.inputFormatters,
                   onChanged: widget.onChanged,
                   onSubmitted: widget.onSubmitted,

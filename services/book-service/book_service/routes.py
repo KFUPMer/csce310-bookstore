@@ -1,4 +1,4 @@
-"""The endpoints under /api/books.
+"""The endpoints under /api/books, including a book's reviews.
 
 Each one: find out who is asking, check the request, call the service, return
 JSON. No rules live here, and no error responses are built here: routes raise,
@@ -6,15 +6,15 @@ and errors.py answers.
 """
 from flask import Blueprint, jsonify, request
 
-from .auth import SessionChecker, require_manager, require_service_key, token_from
+from .auth import SessionChecker, require_customer, require_manager, require_service_key, token_from
 from .models import CurrentUser
-from .schemas import BookInput, CopiesChange, category_filter
-from .services import BookService
+from .schemas import BookInput, CopiesChange, ReviewInput, category_filter
+from .services import BookService, ReviewService
 
 SERVICE_KEY_HEADER = "X-Service-Key"
 
 
-def create_routes(books: BookService, sessions: SessionChecker, service_key: str) -> Blueprint:
+def create_routes(books: BookService, reviews: ReviewService, sessions: SessionChecker, service_key: str) -> Blueprint:
     routes = Blueprint("books", __name__, url_prefix="/api/books")
 
     def current_user() -> CurrentUser:
@@ -58,5 +58,27 @@ def create_routes(books: BookService, sessions: SessionChecker, service_key: str
         require_service_key(request.headers.get(SERVICE_KEY_HEADER), service_key)
         change = CopiesChange.from_json(json_body())
         return jsonify(books.change_copies(book_id, change.change).to_json())
+
+    @routes.get("/<book_id>/reviews")
+    def list_reviews(book_id: str):
+        """GET /api/books/{id}/reviews (extra credit). Any logged-in user."""
+        current_user()
+        return jsonify([review.to_json() for review in reviews.list_for_book(book_id)])
+
+    @routes.put("/<book_id>/reviews/mine")
+    def save_my_review(book_id: str):
+        """PUT /api/books/{id}/reviews/mine (extra credit). Customers only: writes or replaces their review."""
+        user = current_user()
+        require_customer(user)
+        review = reviews.save_mine(book_id, user, ReviewInput.from_json(json_body()))
+        return jsonify(review.to_json())
+
+    @routes.delete("/<book_id>/reviews/mine")
+    def delete_my_review(book_id: str):
+        """DELETE /api/books/{id}/reviews/mine (extra credit). Customers only."""
+        user = current_user()
+        require_customer(user)
+        reviews.delete_mine(book_id, user)
+        return "", 204
 
     return routes

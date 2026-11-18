@@ -7,6 +7,7 @@ tested without a database.
 from abc import ABC, abstractmethod
 from contextlib import contextmanager
 from dataclasses import replace
+from datetime import datetime
 from typing import Optional
 
 import mysql.connector
@@ -38,6 +39,11 @@ class OrderRepository(ABC):
     @abstractmethod
     def list_for_user(self, user_id: int) -> list[Order]:
         """One customer's orders, newest first."""
+
+    @abstractmethod
+    def list_between(self, start: Optional[datetime], end: Optional[datetime]) -> list[Order]:
+        """The orders placed from `start` (included) until `end` (not included), newest first.
+        None leaves that side open."""
 
     @abstractmethod
     def set_payment_status(self, order_id: int, payment_status: str) -> Optional[Order]:
@@ -116,6 +122,16 @@ class MySqlOrderRepository(OrderRepository):
     def list_for_user(self, user_id: int) -> list[Order]:
         return self._list("WHERE o.user_id = %s", (user_id,))
 
+    def list_between(self, start: Optional[datetime], end: Optional[datetime]) -> list[Order]:
+        conditions, params = [], []
+        if start is not None:
+            conditions.append("o.created_at >= %s")
+            params.append(start)
+        if end is not None:
+            conditions.append("o.created_at < %s")
+            params.append(end)
+        return self._list("WHERE " + " AND ".join(conditions) if conditions else "", tuple(params))
+
     def _list(self, where: str, params: tuple) -> list[Order]:
         """`where` is fixed text from this class, never user input; values go in `params`."""
         with self._transaction() as connection:
@@ -190,6 +206,9 @@ class InMemoryOrderRepository(OrderRepository):
 
     def list_for_user(self, user_id: int) -> list[Order]:
         return [order for order in self.list_all() if order.user_id == user_id]
+
+    def list_between(self, start: Optional[datetime], end: Optional[datetime]) -> list[Order]:
+        return [order for order in self.list_all() if (start is None or order.created_at >= start) and (end is None or order.created_at < end)]
 
     def set_payment_status(self, order_id: int, payment_status: str) -> Optional[Order]:
         if order_id not in self._orders:

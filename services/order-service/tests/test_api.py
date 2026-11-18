@@ -196,6 +196,7 @@ class ApiTest(unittest.TestCase):
             self.client.patch("/api/orders/1001/payment-status", json={"paymentStatus": "PAID"}),
             self.client.get("/api/orders/mine"),
             self.client.post("/api/orders/1001/pay"),
+            self.client.get("/api/reports/sales"),
         ]:
             self.assert_error(response, 401, "You are not logged in")
 
@@ -359,6 +360,148 @@ class ApiTest(unittest.TestCase):
 
     def test_the_payment_status_of_an_unknown_order_is_404(self):
         self.assert_error(self.mark(9999, "PAID"), 404, "This order does not exist")
+
+    # ------------------------------------------------------------ sales report (extra credit)
+
+    def report(self, query="", headers=None):
+        return self.client.get(f"/api/reports/sales{query}", headers=headers or as_manager())
+
+    def place_known_orders(self):
+        """Four orders over three days, two customers, bought and rented, paid and pending."""
+        self.now = datetime(2026, 11, 16, 9, 0, 0)
+        self.place((self.clean_code, "BUY"), (self.clean_code, "BUY"), (self.concurrency, "RENT"))  # 1001: 80 + 8 = 88.00
+        self.mark(1001, "PAID")
+        self.now = datetime(2026, 11, 16, 23, 59, 59)
+        self.place((self.database, "BUY"), headers=as_omar())  # 1002: 55.00
+        self.now = datetime(2026, 11, 17, 0, 0, 0)
+        self.place((self.clean_code, "RENT"), (self.database, "RENT"))  # 1003: 4.00 + 5.50 = 9.50
+        self.mark(1003, "PAID")
+        self.now = datetime(2026, 11, 18, 12, 30, 0)
+        self.place((self.clean_code, "BUY"), headers=as_omar())  # 1004: 40.00
+
+    def test_the_sales_report_of_all_orders(self):
+        self.place_known_orders()
+        response = self.report()
+        self.assertEqual(response.status_code, 200, response.get_data(as_text=True))
+        self.assertEqual(response.get_json(), {
+            "from": None,
+            "to": None,
+            "orderCount": 4,
+            "paidCount": 2,
+            "pendingCount": 2,
+            "revenue": 192.5,
+            "paidRevenue": 97.5,
+            "booksSold": 4,
+            "booksRented": 3,
+            "byDay": [
+                {"date": "2026-11-16", "orders": 2, "revenue": 143.0},
+                {"date": "2026-11-17", "orders": 1, "revenue": 9.5},
+                {"date": "2026-11-18", "orders": 1, "revenue": 40.0},
+            ],
+            "bestSellers": [
+                {"bookId": self.clean_code, "title": "Clean Code", "author": "Robert C. Martin", "bought": 3, "rented": 1, "copies": 4, "revenue": 124.0},
+                {"bookId": self.database, "title": "Database System Concepts", "author": "Abraham Silberschatz", "bought": 1, "rented": 1, "copies": 2, "revenue": 60.5},
+                {"bookId": self.concurrency, "title": "Java Concurrency in Practice", "author": "Brian Goetz", "bought": 0, "rented": 1, "copies": 1, "revenue": 8.0},
+            ],
+            "orders": [
+                {"id": 1004, "username": "omar", "createdAt": "2026-11-18T12:30:00", "total": 40.0, "paymentStatus": "PENDING"},
+                {"id": 1003, "username": "alice", "createdAt": "2026-11-17T00:00:00", "total": 9.5, "paymentStatus": "PAID"},
+                {"id": 1002, "username": "omar", "createdAt": "2026-11-16T23:59:59", "total": 55.0, "paymentStatus": "PENDING"},
+                {"id": 1001, "username": "alice", "createdAt": "2026-11-16T09:00:00", "total": 88.0, "paymentStatus": "PAID"},
+            ],
+        })
+
+    def test_a_one_day_period_includes_its_last_second_and_not_the_next_midnight(self):
+        self.place_known_orders()
+        report = self.report("?from=2026-11-16&to=2026-11-16").get_json()
+        self.assertEqual((report["from"], report["to"]), ("2026-11-16", "2026-11-16"))
+        self.assertEqual([order["id"] for order in report["orders"]], [1002, 1001])
+        self.assertEqual((report["orderCount"], report["paidCount"], report["pendingCount"]), (2, 1, 1))
+        self.assertEqual((report["revenue"], report["paidRevenue"], report["booksSold"], report["booksRented"]), (143.0, 88.0, 3, 1))
+        self.assertEqual(report["byDay"], [{"date": "2026-11-16", "orders": 2, "revenue": 143.0}])
+
+    def test_the_start_day_begins_at_midnight(self):
+        self.place_known_orders()
+        report = self.report("?from=2026-11-17&to=2026-11-17").get_json()
+        self.assertEqual([order["id"] for order in report["orders"]], [1003])
+
+    def test_without_a_start_date_the_period_has_no_lower_bound(self):
+        self.place_known_orders()
+        report = self.report("?to=2026-11-17").get_json()
+        self.assertEqual((report["from"], report["to"]), (None, "2026-11-17"))
+        self.assertEqual([order["id"] for order in report["orders"]], [1003, 1002, 1001])
+
+    def test_without_an_end_date_the_period_has_no_upper_bound(self):
+        self.place_known_orders()
+        report = self.report("?from=2026-11-17").get_json()
+        self.assertEqual((report["from"], report["to"]), ("2026-11-17", None))
+        self.assertEqual([order["id"] for order in report["orders"]], [1004, 1003])
+
+    def test_the_last_possible_date_as_the_end_is_not_a_crash(self):
+        self.place_known_orders()
+        response = self.report("?from=2026-11-18&to=9999-12-31")
+        self.assertEqual(response.status_code, 200, response.get_data(as_text=True))
+        self.assertEqual([order["id"] for order in response.get_json()["orders"]], [1004])
+
+    def test_top_limits_the_best_sellers(self):
+        self.place_known_orders()
+        self.assertEqual([book["title"] for book in self.report("?top=1").get_json()["bestSellers"]], ["Clean Code"])
+        self.assertEqual(len(self.report("?top=50").get_json()["bestSellers"]), 3)
+
+    def test_best_sellers_with_the_same_copies_are_ordered_by_revenue_then_title(self):
+        zebra = self.catalog.add(5, "Zebra", "Z. Writer", "10.00", 5)
+        apple = self.catalog.add(6, "Apple", "A. Writer", "10.00", 5)
+        middle = self.catalog.add(7, "Middle", "M. Writer", "20.00", 5)
+        self.place((zebra, "BUY"), (apple, "BUY"), (middle, "BUY"))
+        self.assertEqual([book["title"] for book in self.report().get_json()["bestSellers"]], ["Middle", "Apple", "Zebra"])
+
+    def test_best_sellers_with_the_same_copies_and_revenue_are_alphabetical_whatever_the_case(self):
+        zebra = self.catalog.add(5, "Zebra", "Z. Writer", "10.00", 5)
+        apple = self.catalog.add(6, "apple basics", "A. Writer", "10.00", 5)
+        self.place((zebra, "BUY"), (apple, "BUY"))
+        self.assertEqual([book["title"] for book in self.report().get_json()["bestSellers"]], ["apple basics", "Zebra"])
+
+    def test_a_best_seller_shows_the_title_of_its_most_recent_order(self):
+        self.place((self.clean_code, "BUY"))
+        self.catalog.add(1, "Clean Code, 2nd edition", "Robert C. Martin", "40.00", 4)  # the book was renamed
+        self.now = datetime(2026, 11, 14, 9, 0, 0)
+        self.place((self.clean_code, "BUY"))
+        best = self.report().get_json()["bestSellers"]
+        self.assertEqual([(book["title"], book["copies"]) for book in best], [("Clean Code, 2nd edition", 2)])
+
+    def test_an_empty_period_gives_zeros_and_empty_lists(self):
+        self.place_known_orders()
+        self.assertEqual(self.report("?from=2025-01-01&to=2025-01-31").get_json(), {
+            "from": "2025-01-01",
+            "to": "2025-01-31",
+            "orderCount": 0,
+            "paidCount": 0,
+            "pendingCount": 0,
+            "revenue": 0.0,
+            "paidRevenue": 0.0,
+            "booksSold": 0,
+            "booksRented": 0,
+            "byDay": [],
+            "bestSellers": [],
+            "orders": [],
+        })
+
+    def test_a_date_not_written_as_yyyy_mm_dd_is_400(self):
+        for query in ["?from=2026/11/01", "?from=20261101", "?to=2026-13-01", "?to=2026-02-30", "?from=yesterday", "?from=", "?to=2026-11-1"]:
+            with self.subTest(query):
+                self.assert_error(self.report(query), 400, "Enter the dates as YYYY-MM-DD")
+
+    def test_a_start_after_the_end_is_400(self):
+        self.assert_error(self.report("?from=2026-11-18&to=2026-11-17"), 400, "The start date must be on or before the end date")
+
+    def test_top_must_be_a_whole_number_from_1_to_50(self):
+        for query in ["?top=0", "?top=51", "?top=-1", "?top=1.5", "?top=ten", "?top=", "?top=%2B5"]:
+            with self.subTest(query):
+                self.assert_error(self.report(query), 400, "top must be a whole number from 1 to 50")
+
+    def test_only_a_manager_sees_the_sales_report(self):
+        self.assert_error(self.report(headers=as_alice()), 403, "Only a manager can do this")
+        self.assert_error(self.client.get("/api/reports/sales"), 401, "You are not logged in")
 
     # ------------------------------------------------------------ everything else
 

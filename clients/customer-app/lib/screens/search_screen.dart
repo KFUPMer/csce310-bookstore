@@ -7,6 +7,7 @@ import 'package:material_ui/material_ui.dart';
 import '../main.dart';
 import 'account_screen.dart';
 import 'order_screen.dart';
+import 'review_dialog.dart';
 
 /// Search the books and add them to the order (FR4, FR5, FR6). Also where
 /// the customer logs out (FR2).
@@ -332,6 +333,9 @@ class _SearchScreenState extends State<SearchScreen> {
                             inOrder: draft.contains(_selected!),
                             onClose: () => setState(() => _selected = null),
                             onAdd: (type) => _add(_selected!, type),
+                            onReviewsChanged: () {
+                              if (mounted) _load(); // the book's rating has changed
+                            },
                           ),
                   ),
                 ),
@@ -556,6 +560,11 @@ class _Heading extends StatelessWidget {
   }
 }
 
+/// What a screen reader says for a book card or row.
+String _bookLabel(Book book) =>
+    '${book.title} by ${book.author}, ${money(book.price)}'
+    '${book.isRated ? ', rated ${book.ratingAverage!.toStringAsFixed(1)} out of 5' : ''}';
+
 /// Availability in words and an icon, never by color alone.
 class _Availability extends StatelessWidget {
   const _Availability({required this.book, required this.inOrder, this.compact = false});
@@ -613,7 +622,7 @@ class _BookCardState extends State<_BookCard> {
     final book = widget.book;
     return Semantics(
       button: true,
-      label: '${book.title} by ${book.author}, ${money(book.price)}',
+      label: _bookLabel(book),
       excludeSemantics: true,
       child: FocusableActionDetector(
         mouseCursor: SystemMouseCursors.click,
@@ -651,7 +660,18 @@ class _BookCardState extends State<_BookCard> {
                 const SizedBox(height: Space.md),
                 Text(book.title, maxLines: 2, overflow: TextOverflow.ellipsis, style: t.titleSmall),
                 const SizedBox(height: 2),
-                Text(book.author, maxLines: 1, overflow: TextOverflow.ellipsis, style: t.bodySmall),
+                // The rating shares the author's line: the card's height is fixed and has no room for another.
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(book.author, maxLines: 1, overflow: TextOverflow.ellipsis, style: t.bodySmall),
+                    ),
+                    if (book.isRated) ...[
+                      const SizedBox(width: Space.sm),
+                      RatingStars(rating: book.ratingAverage!, count: book.ratingCount, compact: true),
+                    ],
+                  ],
+                ),
                 const Spacer(),
                 Row(
                   children: [
@@ -734,7 +754,7 @@ class _BookRowState extends State<_BookRow> {
     final book = widget.book;
     return Semantics(
       button: true,
-      label: '${book.title} by ${book.author}, ${money(book.price)}',
+      label: _bookLabel(book),
       excludeSemantics: true,
       child: FocusableActionDetector(
         mouseCursor: SystemMouseCursors.click,
@@ -773,6 +793,15 @@ class _BookRowState extends State<_BookRow> {
                 ),
                 const SizedBox(width: Space.lg),
                 SizedBox(
+                  width: 120,
+                  child: book.isRated
+                      ? Align(
+                          alignment: Alignment.centerLeft,
+                          child: RatingStars(rating: book.ratingAverage!, count: book.ratingCount, compact: true),
+                        )
+                      : null,
+                ),
+                SizedBox(
                   width: 140,
                   child: _Availability(book: book, inOrder: widget.inOrder),
                 ),
@@ -791,68 +820,268 @@ class _BookRowState extends State<_BookRow> {
   }
 }
 
-/// Everything about one book, with the two ways to order it.
-class _DetailPanel extends StatelessWidget {
-  const _DetailPanel({super.key, required this.book, required this.inOrder, required this.onClose, required this.onAdd});
+/// Everything about one book: the two ways to order it, then its reviews,
+/// where the customer writes, edits, or deletes their own.
+class _DetailPanel extends StatefulWidget {
+  const _DetailPanel({
+    super.key,
+    required this.book,
+    required this.inOrder,
+    required this.onClose,
+    required this.onAdd,
+    required this.onReviewsChanged,
+  });
 
   final Book book;
   final bool inOrder;
   final VoidCallback onClose;
   final ValueChanged<ItemType> onAdd;
 
+  /// After a review is saved or deleted: the book's rating has changed.
+  final VoidCallback onReviewsChanged;
+
+  @override
+  State<_DetailPanel> createState() => _DetailPanelState();
+}
+
+class _DetailPanelState extends State<_DetailPanel> {
+  List<Review>? _reviews;
+  String? _error;
+  bool _loading = false;
+  bool _started = false;
+
+  AppServices get _services => AppScope.of(context).services;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_started) {
+      _started = true;
+      _loadReviews();
+    }
+  }
+
+  Future<void> _loadReviews() async {
+    setState(() {
+      _loading = true;
+      _error = null;
+    });
+    try {
+      final reviews = await _services.books.reviews(widget.book.id);
+      if (mounted) setState(() => _reviews = reviews);
+    } on ApiException catch (e) {
+      if (mounted) setState(() => _error = e.message);
+    } finally {
+      if (mounted) setState(() => _loading = false);
+    }
+  }
+
+  void _changed() {
+    if (mounted) _loadReviews();
+    widget.onReviewsChanged();
+  }
+
+  Review? get _mine {
+    final me = _services.session.username;
+    for (final r in _reviews ?? const <Review>[]) {
+      if (r.username == me) return r;
+    }
+    return null;
+  }
+
+  Future<void> _write() async {
+    final saved = await showReviewDialog(context, widget.book, mine: _mine);
+    if (saved != null) _changed();
+  }
+
+  Future<void> _delete(Review mine) async {
+    final books = _services.books;
+    final toast = ToastHost.of(context);
+    final title = widget.book.title;
+    final ratingChanged = widget.onReviewsChanged;
+    try {
+      await books.deleteMyReview(mine.bookId);
+    } on ApiException catch (e) {
+      toast.show(e.message, icon: Icons.error_outline_rounded);
+      return;
+    }
+    _changed();
+    // Undo writes the same stars and words back; the panel may have closed by then.
+    toast.show(
+      'Your review of $title was deleted',
+      undo: () async {
+        try {
+          await books.saveMyReview(mine.bookId, mine.rating, mine.text);
+          if (mounted) _loadReviews();
+          ratingChanged();
+        } on ApiException catch (e) {
+          toast.show(e.message, icon: Icons.error_outline_rounded);
+        }
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final c = BookstoreColors.of(context);
     final t = Theme.of(context).textTheme;
+    final book = widget.book;
+    final inOrder = widget.inOrder;
     final canOrder = book.isAvailable && !inOrder;
     return Glass(
       padding: const EdgeInsets.fromLTRB(Space.xl, Space.md, Space.xl, Space.xl),
-      // Scrolls when the window is too short to show everything.
-      child: LayoutBuilder(
-        builder: (context, box) => SingleChildScrollView(
-          child: ConstrainedBox(
-            constraints: BoxConstraints(minHeight: box.maxHeight),
-            child: IntrinsicHeight(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: AppIconButton(icon: Icons.close_rounded, tooltip: 'Close (Esc)', onPressed: onClose),
-                  ),
-                  Center(
-                    child: BookCover(title: book.title, author: book.author, imageUrl: book.coverUrl, width: 140, dimmed: !book.isAvailable),
-                  ),
-                  const SizedBox(height: Space.lg),
-                  Text(book.title, style: t.headlineSmall),
-                  const SizedBox(height: Space.xs),
-                  Text(book.author, style: t.bodyLarge!.copyWith(color: c.textSecondary)),
-                  const SizedBox(height: Space.md),
-                  _Availability(book: book, inOrder: inOrder),
-                  const SizedBox(height: Space.lg),
-                  const Spacer(),
-                  if (inOrder)
-                    Text('This book is already in your order.', style: t.bodySmall)
-                  else if (!book.isAvailable)
-                    Text('No copies are available right now, so it cannot be ordered.', style: t.bodySmall)
-                  else
-                    Text('Renting costs 10% of the price. The book is due back after 7 days.', style: t.bodySmall),
-                  const SizedBox(height: Space.md),
-                  AppButton(label: 'Buy', trailing: money(book.price), expand: true, onPressed: canOrder ? () => onAdd(ItemType.buy) : null),
-                  const SizedBox(height: Space.sm),
-                  AppButton(
-                    label: 'Rent for 7 days',
-                    trailing: money(book.rentPrice),
-                    expand: true,
-                    style: AppButtonStyle.secondary,
-                    onPressed: canOrder ? () => onAdd(ItemType.rent) : null,
-                  ),
-                ],
-              ),
+      // Scrolls: the reviews can be longer than any window.
+      child: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Align(
+              alignment: Alignment.centerRight,
+              child: AppIconButton(icon: Icons.close_rounded, tooltip: 'Close (Esc)', onPressed: widget.onClose),
             ),
-          ),
+            Center(
+              child: BookCover(title: book.title, author: book.author, imageUrl: book.coverUrl, width: 140, dimmed: !book.isAvailable),
+            ),
+            const SizedBox(height: Space.lg),
+            Text(book.title, style: t.headlineSmall),
+            const SizedBox(height: Space.xs),
+            Text(book.author, style: t.bodyLarge!.copyWith(color: c.textSecondary)),
+            if (book.isRated) ...[const SizedBox(height: Space.sm), RatingStars(rating: book.ratingAverage!, count: book.ratingCount)],
+            const SizedBox(height: Space.md),
+            _Availability(book: book, inOrder: inOrder),
+            const SizedBox(height: Space.lg),
+            if (inOrder)
+              Text('This book is already in your order.', style: t.bodySmall)
+            else if (!book.isAvailable)
+              Text('No copies are available right now, so it cannot be ordered.', style: t.bodySmall)
+            else
+              Text('Renting costs 10% of the price. The book is due back after 7 days.', style: t.bodySmall),
+            const SizedBox(height: Space.md),
+            AppButton(label: 'Buy', trailing: money(book.price), expand: true, onPressed: canOrder ? () => widget.onAdd(ItemType.buy) : null),
+            const SizedBox(height: Space.sm),
+            AppButton(
+              label: 'Rent for 7 days',
+              trailing: money(book.rentPrice),
+              expand: true,
+              style: AppButtonStyle.secondary,
+              onPressed: canOrder ? () => widget.onAdd(ItemType.rent) : null,
+            ),
+            const SizedBox(height: Space.xl),
+            Container(height: 1, color: c.hairline),
+            const SizedBox(height: Space.lg),
+            ..._reviewsSection(t, c),
+          ],
         ),
       ),
+    );
+  }
+
+  List<Widget> _reviewsSection(TextTheme t, BookstoreColors c) {
+    final reviews = _reviews;
+    final mine = _mine;
+    final heading = Row(
+      children: [
+        Expanded(child: Text('Reviews', style: t.titleLarge)),
+        if (reviews != null && mine == null)
+          AppButton(label: 'Write a review', icon: Icons.rate_review_outlined, style: AppButtonStyle.secondary, onPressed: _write),
+      ],
+    );
+    if (_error != null) {
+      return [
+        heading,
+        const SizedBox(height: Space.md),
+        ErrorMessage(_error!),
+        const SizedBox(height: Space.md),
+        Align(
+          alignment: Alignment.centerLeft,
+          child: AppButton(
+            label: 'Try again',
+            icon: Icons.refresh_rounded,
+            style: AppButtonStyle.secondary,
+            loading: _loading,
+            onPressed: _loadReviews,
+          ),
+        ),
+      ];
+    }
+    if (reviews == null) {
+      return [
+        heading,
+        const Padding(
+          padding: EdgeInsets.all(Space.xl),
+          child: Center(child: SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2))),
+        ),
+      ];
+    }
+    final others = [
+      for (final r in reviews)
+        if (r != mine) r,
+    ];
+    return [
+      heading,
+      const SizedBox(height: Space.md),
+      if (reviews.isEmpty) Text('No reviews yet. Be the first.', style: t.bodyMedium!.copyWith(color: c.textSecondary)),
+      if (mine != null)
+        Container(
+          margin: const EdgeInsets.only(bottom: Space.sm),
+          padding: const EdgeInsets.fromLTRB(Space.md, Space.md, Space.md, Space.xs),
+          decoration: BoxDecoration(
+            color: c.surface,
+            borderRadius: BorderRadius.circular(Radii.control),
+            border: Border.all(color: c.hairline),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              _ReviewTile(review: mine, mine: true),
+              Row(
+                children: [
+                  AppButton(label: 'Edit', icon: Icons.edit_outlined, style: AppButtonStyle.quiet, onPressed: _write),
+                  AppButton(label: 'Delete', icon: Icons.delete_outline_rounded, style: AppButtonStyle.quiet, onPressed: () => _delete(mine)),
+                ],
+              ),
+            ],
+          ),
+        ),
+      for (final (i, r) in others.indexed) ...[
+        if (i > 0) Container(height: 1, color: c.hairline),
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: Space.md),
+          child: _ReviewTile(review: r),
+        ),
+      ],
+    ];
+  }
+}
+
+/// One review: who wrote it and when, its stars, and its words.
+class _ReviewTile extends StatelessWidget {
+  const _ReviewTile({required this.review, this.mine = false});
+
+  final Review review;
+
+  /// The logged-in customer's own review, titled "Your review".
+  final bool mine;
+
+  @override
+  Widget build(BuildContext context) {
+    final t = Theme.of(context).textTheme;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Expanded(
+              child: Text(mine ? 'Your review' : review.username, maxLines: 1, overflow: TextOverflow.ellipsis, style: t.titleSmall),
+            ),
+            const SizedBox(width: Space.sm),
+            Text(formatDay(review.updatedAt), style: t.bodySmall),
+          ],
+        ),
+        const SizedBox(height: Space.xs),
+        RatingStars(rating: review.rating.toDouble(), size: 15),
+        if (review.text.isNotEmpty) ...[const SizedBox(height: Space.sm - 2), Text(review.text, style: t.bodyMedium)],
+      ],
     );
   }
 }

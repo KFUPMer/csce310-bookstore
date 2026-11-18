@@ -4,10 +4,11 @@ import 'package:material_ui/material_ui.dart';
 import '../main.dart';
 import 'books_view.dart';
 import 'orders_view.dart';
+import 'reports_view.dart';
 
-/// The manager's main screen: the Orders and Books tabs under one glass bar.
+/// The manager's main screen: the Orders, Books, and Reports tabs under one glass bar.
 ///
-/// Both tabs stay alive when switching, so a search or a scroll position is
+/// Every tab stays alive when switching, so a search or a scroll position is
 /// not lost.
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -25,13 +26,21 @@ class _HomeScreenState extends State<HomeScreen> {
     final scope = ManagerScope.of(context);
     final c = BookstoreColors.of(context);
     final t = Theme.of(context).textTheme;
+    final username = scope.services.session.username ?? '';
 
     return Scaffold(
       body: Stack(
         children: [
           Positioned.fill(
             top: barHeight + Space.md,
-            child: IndexedStack(index: _tab, children: const [OrdersView(), BooksView()]),
+            child: IndexedStack(
+              index: _tab,
+              children: [
+                const OrdersView(),
+                const BooksView(),
+                ReportsView(visible: _tab == 2),
+              ],
+            ),
           ),
           Positioned(
             top: Space.md,
@@ -46,30 +55,56 @@ class _HomeScreenState extends State<HomeScreen> {
                   const MooneysSign(height: 38),
                   const SizedBox(width: Space.sm),
                   Text('MANAGER', style: t.labelSmall!.copyWith(letterSpacing: 1.6)),
-                  const SizedBox(width: Space.xl),
+                  const SizedBox(width: Space.lg),
                   Tabs(
-                    labels: const ['Orders', 'Books'],
-                    icons: const [Icons.receipt_long_outlined, Icons.menu_book_outlined],
+                    labels: const ['Orders', 'Books', 'Reports'],
+                    icons: const [Icons.receipt_long_outlined, Icons.menu_book_outlined, Icons.insights_outlined],
                     selected: _tab,
                     onSelected: (i) => setState(() => _tab = i),
                   ),
-                  const Spacer(),
-                  AppIconButton(
-                    icon: scope.isDark ? Icons.light_mode_outlined : Icons.dark_mode_outlined,
-                    tooltip: scope.isDark ? 'Switch to light mode' : 'Switch to dark mode',
-                    onPressed: scope.toggleTheme,
+                  const SizedBox(width: Space.sm),
+                  // The name takes whatever room is left and is cut short with "..." when a long
+                  // username (up to 50 characters) would not fit; the tooltip has it in full.
+                  Expanded(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        AppIconButton(
+                          icon: scope.isDark ? Icons.light_mode_outlined : Icons.dark_mode_outlined,
+                          tooltip: scope.isDark ? 'Switch to light mode' : 'Switch to dark mode',
+                          onPressed: scope.toggleTheme,
+                        ),
+                        Container(
+                          width: 1,
+                          height: 24,
+                          margin: const EdgeInsets.symmetric(horizontal: Space.sm),
+                          color: c.hairline,
+                        ),
+                        Flexible(
+                          child: Tooltip(
+                            message: 'Logged in as $username',
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(Icons.badge_outlined, size: 17, color: c.textSecondary),
+                                const SizedBox(width: Space.xs),
+                                Flexible(
+                                  child: Text(
+                                    username,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: t.bodyMedium!.copyWith(color: c.textSecondary),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: Space.xs),
+                        AppIconButton(icon: Icons.logout_rounded, tooltip: 'Log out', onPressed: scope.services.users.logout),
+                      ],
+                    ),
                   ),
-                  Container(
-                    width: 1,
-                    height: 24,
-                    margin: const EdgeInsets.symmetric(horizontal: Space.md),
-                    color: c.hairline,
-                  ),
-                  Icon(Icons.badge_outlined, size: 17, color: c.textSecondary),
-                  const SizedBox(width: Space.xs),
-                  Text(scope.services.session.username ?? '', style: t.bodyMedium!.copyWith(color: c.textSecondary)),
-                  const SizedBox(width: Space.xs),
-                  AppIconButton(icon: Icons.logout_rounded, tooltip: 'Log out', onPressed: scope.services.users.logout),
                 ],
               ),
             ),

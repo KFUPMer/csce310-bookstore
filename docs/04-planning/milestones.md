@@ -10,7 +10,8 @@ The live version of this plan is on GitHub: milestones hold the deadlines, issue
 | M2 — Design | Architecture, database, API, and UI designed | 2026-11-19 | v0.2.0 — **released 2026-11-13** |
 | M3 — Backend Services | All three services working against their databases | 2026-11-26 | v0.3.0 — **released 2026-11-17** |
 | M4 — Desktop Clients | Both GUI apps working against the services | 2026-12-01 | v0.4.0 — **released 2026-11-17** |
-| M5 — Testing & Final Release | Tested, documented, ready to submit | 2026-12-04 | v1.0.0 |
+| M5 — Testing & Final Release | Tested, documented, ready to submit | 2026-12-04 | v1.0.0 — **released 2026-11-17** |
+| M6 — Extra Credit (course section 6) | User profiles with order history, book reviews and ratings, sales reports for managers | 2026-12-04 | v1.1.0 |
 
 ## Tasks
 
@@ -61,6 +62,15 @@ The live version of this plan is on GitHub: milestones hold the deadlines, issue
 - [x] FR10: email the bill to the customer (+1%) — built in order-service; a real bill was sent through Gmail
 - [x] Modern GUI framework (+2%) — both apps in Flutter (M4)
 
+### M6 — Extra Credit (course section 6, due 2026-12-04)
+
+The three extra-credit items in section 6 of the course document, 1% each. GitHub milestone "M6 - Extra Credit (course section 6)".
+
+- [x] User profiles with order history (issue #19) — already built in M4 as the customer's "Your account" page: profile, preferences, every order with its bill, rentals due back (`GET /api/orders/mine`)
+- [x] Book reviews and ratings (issue #20) — book-service: three review endpoints, MongoDB collection `reviews` with one review per customer per book; ratings worked out from the reviews on each search. Mooney's: stars on the books, and a Reviews section in the detail panel
+- [x] Sales report and analytics for managers (issue #21) — order-service: `GET /api/reports/sales` (orders for a period, revenue, sales by day, best sellers). Mooney's Manager: the Reports tab
+- [ ] Release v1.1.0
+
 ## Progress notes
 
 Add a short dated note whenever a milestone closes or a deadline moves, and say why.
@@ -95,3 +105,4 @@ Add a short dated note whenever a milestone closes or a deadline moves, and say 
 | 2026-11-17 | The owner asked for an installable build. **v1.0.0-beta.1 published** as a pre-release: an installer for both apps, a portable zip, and a server zip with `setup.cmd`. Release builds are made and the installer tested on GitHub's Windows machine (P-017). `HANDOVER.md` written for the instructor. Left: the instructor's access to the private repository, and a try on another computer, then v1.0.0. |
 | 2026-11-17 | The owner made the repository public, so the instructor can see it and download the release without an account. Before that, the whole history was checked: no `.env`, local SQL, or bill file was ever committed, and none of the secret values appears in any commit. Left: a try on another computer, then v1.0.0. |
 | 2026-11-17 | The owner asked for the store to look like a real bookshop: it is now **Mooney's**, with a sign, five shelves, and real cover photos; 12 books added. All 236 tests pass, and the apps' live checks pass on the running services. v1.0.0 released. |
+| 2026-11-18 | M6 opened for the three extra-credit items in section 6 of the course document (issues #19, #20, #21). Profiles with order history were already built in M4. Book reviews and ratings, and the managers' sales report, built at the owner's request by a multi-agent workflow: four builders on separate folders, an independent reviewer per area that tried to break the work, and a fixer for confirmed findings. The reviewers found five things, all fixed with a test each. Decided: any logged-in customer may review any book (a purchase check would make book-service call order-service, which already calls book-service); ratings are worked out from the reviews, never stored; managers do not moderate reviews. All 333 tests pass; 41 of 41 checks on the restarted services, slowest 88 ms; the apps' live checks pass (a review saved in 15 ms, the all-time report in 15 ms counting exactly the 4 orders listed). Next: release v1.1.0. |

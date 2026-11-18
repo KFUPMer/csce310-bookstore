@@ -4,6 +4,7 @@ import 'package:bookstore_ui/bookstore_ui.dart';
 import 'package:material_ui/material_ui.dart';
 
 import 'api/order_api.dart';
+import 'api/report_api.dart';
 import 'screens/login_screen.dart';
 
 void main() => runApp(const ManagerApp());
@@ -75,20 +76,38 @@ Future<void> _openWithWindows(String path) async {
   await Process.run('cmd', ['/c', 'start', '', path]);
 }
 
-/// Everything the screens share: who is logged in and the three services.
+/// Everything the screens share: who is logged in, the three services, and the clock.
 class ManagerServices {
-  ManagerServices({required this.session, required this.users, required this.books, required this.orders, this.openFile = _openWithWindows});
+  ManagerServices({
+    required this.session,
+    required this.users,
+    required this.books,
+    required this.orders,
+    required this.reports,
+    this.openFile = _openWithWindows,
+    this.now = DateTime.now,
+  });
 
   factory ManagerServices.real() {
     final session = Session();
-    return ManagerServices(session: session, users: UserApi(session), books: BookApi(session), orders: OrderApi(session));
+    return ManagerServices(
+      session: session,
+      users: UserApi(session),
+      books: BookApi(session),
+      orders: OrderApi(session),
+      reports: ReportApi(session),
+    );
   }
 
   final Session session;
   final UserApi users;
   final BookApi books;
   final OrderApi orders;
+  final ReportApi reports;
   final FileOpener openFile;
+
+  /// Today, for the report's periods; tests give a fixed day.
+  final DateTime Function() now;
 }
 
 /// Gives every screen the [ManagerServices] and the light/dark switch.

@@ -1,5 +1,8 @@
+import 'dart:async';
+
 import 'package:bookstore_ui/bookstore_ui.dart';
 import 'package:customer_app/main.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
 
@@ -18,6 +21,7 @@ void main() {
   late AppServices services;
 
   FakeOrders orders() => services.orders as FakeOrders;
+  FakeBooks fakeBooks() => services.books as FakeBooks;
 
   Future<void> start(WidgetTester tester, {String role = 'CUSTOMER'}) async {
     tester.view.physicalSize = const Size(1440, 960);
@@ -47,12 +51,23 @@ void main() {
 
   testWidgets('every screen fits a small 1024 x 700 window without anything overflowing', (tester) async {
     await start(tester);
+    fakeBooks().addReview(books[0].id, 'bob', 3, 'Solid advice');
     tester.view.physicalSize = const Size(1024, 700);
     await tester.pumpAndSettle();
     await logIn(tester);
     await tester.tap(find.bySemanticsLabel(RegExp('^Clean Code by')));
     await tester.pumpAndSettle();
+    await tester.ensureVisible(find.widgetWithText(AppButton, 'Rent for 7 days'));
     await tester.tap(find.widgetWithText(AppButton, 'Rent for 7 days'));
+    await tester.pumpAndSettle();
+    await tester.ensureVisible(find.widgetWithText(AppButton, 'Write a review'));
+    await tester.pumpAndSettle();
+    expect(find.text('Solid advice'), findsOneWidget);
+    await tester.tap(find.widgetWithText(AppButton, 'Write a review'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byTooltip('5 stars'));
+    await tester.pump();
+    await tester.tap(find.widgetWithText(AppButton, 'Cancel'));
     await tester.pumpAndSettle();
     await tester.tap(find.byTooltip('Show as a list'));
     await tester.pumpAndSettle();
@@ -278,6 +293,195 @@ void main() {
     await tester.pumpAndSettle();
     expect(services.draft.length, 1);
     await finish(tester);
+  });
+
+  group('reviews', () {
+    /// Scrolls the detail panel to [label]'s button and clicks it.
+    Future<void> press(WidgetTester tester, String label) async {
+      final button = find.widgetWithText(AppButton, label);
+      await tester.ensureVisible(button);
+      await tester.pumpAndSettle();
+      await tester.tap(button);
+      await tester.pumpAndSettle();
+    }
+
+    Future<void> openCleanCode(WidgetTester tester) async {
+      await start(tester);
+      fakeBooks().addReview(books[0].id, 'bob', 3, 'Solid advice');
+      await logIn(tester);
+      await tester.tap(find.bySemanticsLabel(RegExp('^Clean Code by')));
+      await tester.pumpAndSettle();
+    }
+
+    Finder reviewText() => find.descendant(of: find.byType(Dialog), matching: find.byType(TextField));
+
+    Future<void> writeReview(WidgetTester tester, {int stars = 5, String text = 'Loved it'}) async {
+      await press(tester, 'Write a review');
+      await tester.tap(find.byTooltip(stars == 1 ? '1 star' : '$stars stars'));
+      await tester.enterText(reviewText(), text);
+      await tester.tap(find.widgetWithText(AppButton, 'Save'));
+      await tester.pumpAndSettle();
+    }
+
+    testWidgets("cards show a book's rating, and nothing for a book without reviews", (tester) async {
+      await openCleanCode(tester);
+      expect(find.text('3.0 (1)'), findsOneWidget, reason: 'the Clean Code card');
+      expect(find.bySemanticsLabel(RegExp(r'^Clean Code by .*rated 3\.0 out of 5')), findsOneWidget);
+      expect(find.bySemanticsLabel(RegExp(r'^Effective Java by .*rated')), findsNothing);
+      await tester.tap(find.byTooltip('Show as a list'));
+      await tester.pumpAndSettle();
+      expect(find.text('3.0 (1)'), findsOneWidget, reason: 'the Clean Code row');
+      await finish(tester);
+    });
+
+    testWidgets('a book with no reviews invites the first one', (tester) async {
+      await start(tester);
+      await logIn(tester);
+      await tester.tap(find.bySemanticsLabel(RegExp('^Effective Java by')));
+      await tester.pumpAndSettle();
+      expect(find.text('No reviews yet. Be the first.'), findsOneWidget);
+      expect(find.widgetWithText(AppButton, 'Write a review'), findsOneWidget);
+      await finish(tester);
+    });
+
+    testWidgets('the customer writes a review with stars and words and sees it listed first, with the new average', (tester) async {
+      await openCleanCode(tester);
+      expect(find.text('3.0 · 1 review'), findsOneWidget, reason: 'the rating under the author');
+      expect(find.text('Solid advice'), findsOneWidget);
+      expect(find.text('bob'), findsOneWidget);
+
+      await writeReview(tester);
+      expect(fakeBooks().reviewsByBook[books[0].id]!.map((r) => (r.username, r.rating, r.text)), contains(('alice', 5, 'Loved it')));
+      expect(find.text('Your review'), findsOneWidget);
+      expect(find.text('Loved it'), findsOneWidget);
+      expect(find.text('4.0 · 2 reviews'), findsOneWidget, reason: 'the book is searched again for its new rating');
+      expect(find.text('4.0 (2)'), findsOneWidget, reason: 'and the card shows it too');
+      expect(find.widgetWithText(AppButton, 'Write a review'), findsNothing, reason: 'one review per customer: it is edited instead');
+      expect(tester.getTopLeft(find.text('Your review')).dy, lessThan(tester.getTopLeft(find.text('Solid advice')).dy));
+      await finish(tester);
+    });
+
+    testWidgets('saving without choosing stars names the problem and saves nothing', (tester) async {
+      await openCleanCode(tester);
+      await press(tester, 'Write a review');
+      await tester.enterText(reviewText(), 'No stars');
+      await tester.tap(find.widgetWithText(AppButton, 'Save'));
+      await tester.pumpAndSettle();
+      expect(find.text('Choose a rating from 1 to 5 stars'), findsOneWidget);
+      expect(find.byType(Dialog), findsOneWidget, reason: 'the dialog stays open with what was written');
+      expect(fakeBooks().reviewsByBook[books[0].id], hasLength(1));
+
+      await tester.tap(find.byTooltip('2 stars'));
+      await tester.pump();
+      expect(find.text('Choose a rating from 1 to 5 stars'), findsNothing, reason: 'the problem goes once fixed');
+      await finish(tester);
+    });
+
+    testWidgets('the words are limited to 1000 characters and the count is shown', (tester) async {
+      await openCleanCode(tester);
+      await press(tester, 'Write a review');
+      expect(find.text('0 / 1000'), findsOneWidget);
+      await tester.enterText(reviewText(), 'x' * 1200);
+      await tester.pump();
+      expect(find.text('1000 / 1000'), findsOneWidget);
+      await finish(tester);
+    });
+
+    testWidgets('the limit and the count agree with book-service for emoji too: Unicode characters, not text units', (tester) async {
+      await openCleanCode(tester);
+      await press(tester, 'Write a review');
+      // Each of these is two UTF-16 units but one character to book-service.
+      await tester.enterText(reviewText(), '\u{1F600}' * 1200);
+      await tester.pump();
+      expect(find.text('1000 / 1000'), findsOneWidget);
+      expect(tester.widget<TextField>(reviewText()).controller!.text.runes.length, 1000);
+
+      // A family emoji is one picture but five characters to book-service, so 300 of them are over the limit.
+      await tester.enterText(reviewText(), '\u{1F468}‍\u{1F469}‍\u{1F467}' * 300);
+      await tester.pump();
+      expect(find.text('1000 / 1000'), findsOneWidget);
+      await finish(tester);
+    });
+
+    testWidgets('while a review is being saved, Esc and a click outside do not close the dialog', (tester) async {
+      await openCleanCode(tester);
+      final gate = fakeBooks().saveGate = Completer<void>();
+      await press(tester, 'Write a review');
+      await tester.tap(find.byTooltip('4 stars'));
+      await tester.tap(find.widgetWithText(AppButton, 'Save'));
+      await tester.pump();
+
+      // The spinner never settles, so wait out a closing animation by hand.
+      await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+      await tester.pump(const Duration(seconds: 1));
+      expect(find.byType(Dialog), findsOneWidget, reason: 'Esc waits while the save is on its way');
+      await tester.tapAt(const Offset(4, 4));
+      await tester.pump(const Duration(seconds: 1));
+      expect(find.byType(Dialog), findsOneWidget, reason: 'and so does a click outside');
+
+      gate.complete();
+      await tester.pumpAndSettle();
+      expect(find.byType(Dialog), findsNothing);
+      expect(find.text('Your review'), findsOneWidget, reason: 'the panel knows about the saved review');
+      expect(find.text('No reviews yet. Be the first.'), findsNothing);
+      await finish(tester);
+    });
+
+    testWidgets('when nothing is being saved, Esc still closes the review dialog', (tester) async {
+      await openCleanCode(tester);
+      await press(tester, 'Write a review');
+      await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+      await tester.pumpAndSettle();
+      expect(find.byType(Dialog), findsNothing);
+      await finish(tester);
+    });
+
+    testWidgets('the customer edits their review: the dialog starts from it', (tester) async {
+      await openCleanCode(tester);
+      await writeReview(tester);
+      await press(tester, 'Edit');
+      expect(find.text('5 of 5 stars'), findsOneWidget);
+      expect(find.descendant(of: find.byType(Dialog), matching: find.text('Loved it')), findsOneWidget);
+      await tester.tap(find.byTooltip('2 stars'));
+      await tester.enterText(reviewText(), 'Less good the second time');
+      await tester.tap(find.widgetWithText(AppButton, 'Save'));
+      await tester.pumpAndSettle();
+      expect(find.text('Less good the second time'), findsOneWidget);
+      expect(find.text('2.5 · 2 reviews'), findsOneWidget);
+      expect(fakeBooks().reviewsByBook[books[0].id], hasLength(2), reason: 'replaced, not added');
+      await finish(tester);
+    });
+
+    testWidgets('a deleted review can be put back with Undo', (tester) async {
+      await openCleanCode(tester);
+      await writeReview(tester);
+      await press(tester, 'Delete');
+      expect(find.text('Your review of Clean Code was deleted'), findsOneWidget);
+      expect(find.text('Loved it'), findsNothing);
+      expect(find.text('3.0 · 1 review'), findsOneWidget);
+      expect(find.widgetWithText(AppButton, 'Write a review'), findsOneWidget);
+
+      await tester.tap(find.widgetWithText(AppButton, 'Undo'));
+      await tester.pumpAndSettle();
+      expect(find.text('Loved it'), findsOneWidget);
+      expect(find.text('4.0 · 2 reviews'), findsOneWidget);
+      await finish(tester);
+    });
+
+    testWidgets('if the reviews cannot be loaded, the message is shown with Try again', (tester) async {
+      await start(tester);
+      fakeBooks().addReview(books[0].id, 'bob', 3, 'Solid advice');
+      fakeBooks().reviewsFailure = const ApiException('The book catalog is not answering. Please try again in a moment.', 0);
+      await logIn(tester);
+      await tester.tap(find.bySemanticsLabel(RegExp('^Clean Code by')));
+      await tester.pumpAndSettle();
+      expect(find.text('The book catalog is not answering. Please try again in a moment.'), findsOneWidget);
+
+      fakeBooks().reviewsFailure = null;
+      await press(tester, 'Try again');
+      expect(find.text('Solid advice'), findsOneWidget);
+      await finish(tester);
+    });
   });
 
   testWidgets('when a service says the session has ended, the app goes back to log in and says why', (tester) async {

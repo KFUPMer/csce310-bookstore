@@ -112,3 +112,80 @@ class Order:
             "total": float(self.total),
             "billFile": self.bill_file,
         }
+
+
+def _money(amount: Decimal) -> float:
+    return float(amount.quantize(Decimal("0.01")))
+
+
+@dataclass(frozen=True)
+class DaySales:
+    """The orders of one day in a sales report."""
+
+    day: date
+    orders: int
+    revenue: Decimal
+
+    def to_json(self) -> dict:
+        return {"date": self.day.isoformat(), "orders": self.orders, "revenue": _money(self.revenue)}
+
+
+@dataclass(frozen=True)
+class BestSeller:
+    """One book in a sales report: how many copies were bought and rented, and what they brought in."""
+
+    book_id: str
+    title: str
+    author: str
+    bought: int
+    rented: int
+    revenue: Decimal
+
+    @property
+    def copies(self) -> int:
+        return self.bought + self.rented
+
+    def to_json(self) -> dict:
+        return {
+            "bookId": self.book_id,
+            "title": self.title,
+            "author": self.author,
+            "bought": self.bought,
+            "rented": self.rented,
+            "copies": self.copies,
+            "revenue": _money(self.revenue),
+        }
+
+
+@dataclass(frozen=True)
+class SalesReport:
+    """GET /api/reports/sales: the orders of a period and what they add up to (extra credit)."""
+
+    start: Optional[date]
+    end: Optional[date]
+    """Both inclusive; None means the period is open on that side."""
+    orders: tuple[Order, ...]
+    """Newest first."""
+    paid_count: int
+    revenue: Decimal
+    paid_revenue: Decimal
+    books_sold: int
+    books_rented: int
+    by_day: tuple[DaySales, ...]
+    best_sellers: tuple[BestSeller, ...]
+
+    def to_json(self) -> dict:
+        return {
+            "from": self.start.isoformat() if self.start else None,
+            "to": self.end.isoformat() if self.end else None,
+            "orderCount": len(self.orders),
+            "paidCount": self.paid_count,
+            "pendingCount": len(self.orders) - self.paid_count,
+            "revenue": _money(self.revenue),
+            "paidRevenue": _money(self.paid_revenue),
+            "booksSold": self.books_sold,
+            "booksRented": self.books_rented,
+            "byDay": [day.to_json() for day in self.by_day],
+            "bestSellers": [book.to_json() for book in self.best_sellers],
+            "orders": [order.to_summary_json() for order in self.orders],
+        }

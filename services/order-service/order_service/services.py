@@ -1,7 +1,7 @@
 """The rules about orders. Knows nothing about HTTP or SQL."""
 import logging
 from dataclasses import dataclass, replace
-from datetime import datetime, timedelta
+from datetime import date, datetime, time, timedelta
 from decimal import Decimal
 from typing import Callable
 
@@ -9,10 +9,10 @@ from .bill import BillStore, render_bill
 from .catalog import BookCatalog
 from .errors import ConflictError, ForbiddenError, NotFoundError
 from .mailer import Mailer
-from .models import PAID, PENDING, RENT, CurrentUser, Order, OrderItem
+from .models import BUY, PAID, PENDING, RENT, BestSeller, CurrentUser, DaySales, Order, OrderItem, SalesReport
 from .pricing import RENT_DAYS, charge_for
 from .repository import OrderRepository
-from .schemas import OrderInput
+from .schemas import OrderInput, SalesReportQuery
 
 log = logging.getLogger(__name__)
 
@@ -149,3 +149,49 @@ class OrderService:
         except Exception:  # noqa: BLE001 - a failed email does not fail the order (architecture decision 6)
             log.exception("Could not email the bill of order %s", order.id)
             return False
+
+
+class ReportService:
+    """The sales report for managers (extra credit). The figures are added up here, from the
+    period's orders: at a bookstore's scale that is a few hundred orders at most."""
+
+    def __init__(self, orders: OrderRepository):
+        self._orders = orders
+
+    def sales(self, query: SalesReportQuery) -> SalesReport:
+        start = datetime.combine(query.start, time()) if query.start else None
+        # The end date is inclusive, so the period stops at midnight at the start of the next day.
+        # 9999-12-31 has no next day; nothing can be later than it, so it means "no end".
+        end = datetime.combine(query.end + timedelta(days=1), time()) if query.end and query.end < date.max else None
+        orders = self._orders.list_between(start, end)  # newest first
+
+        zero = Decimal("0.00")
+        days: dict[date, list] = {}
+        books: dict[str, dict] = {}
+        for order in reversed(orders):  # oldest first, so a later order's title replaces an earlier one
+            day = days.setdefault(order.created_at.date(), [0, zero])
+            day[0] += 1
+            day[1] += order.total
+            for item in order.items:
+                book = books.setdefault(item.book_id, {"bought": 0, "rented": 0, "revenue": zero})
+                book["title"], book["author"] = item.title, item.author
+                book["bought" if item.type == BUY else "rented"] += item.quantity
+                book["revenue"] += item.line_total
+
+        paid = [order for order in orders if order.payment_status == PAID]
+        best_sellers = sorted(
+            (BestSeller(book_id, b["title"], b["author"], b["bought"], b["rented"], b["revenue"]) for book_id, b in books.items()),
+            key=lambda book: (-book.copies, -book.revenue, book.title.casefold()),
+        )
+        return SalesReport(
+            start=query.start,
+            end=query.end,
+            orders=tuple(orders),
+            paid_count=len(paid),
+            revenue=sum((order.total for order in orders), zero),
+            paid_revenue=sum((order.total for order in paid), zero),
+            books_sold=sum(item.quantity for order in orders for item in order.items if item.type == BUY),
+            books_rented=sum(item.quantity for order in orders for item in order.items if item.type == RENT),
+            by_day=tuple(DaySales(day, count, revenue) for day, (count, revenue) in sorted(days.items())),
+            best_sellers=tuple(best_sellers[: query.top]),
+        )

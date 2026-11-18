@@ -2,13 +2,15 @@
 
 **Mooney's**: the bookstore's desktop app for customers. Flutter (Dart), Windows.
 
-Requirements covered: FR1–FR8 and FR10 (shows that the bill is emailed), FR3 (extra credit), N2, N4, N5.
+Requirements covered: FR1–FR8 and FR10 (shows that the bill is emailed), FR3 (extra credit), N2, N4, N5, and two of the course's section-6 extra-credit items: profiles with order history (the account page) and book reviews and ratings.
 
 | Screen | What the customer does |
 |---|---|
 | Log in | Logs in. A manager account is refused: managers use the management app |
 | Create an account | Username, email, password; each problem is shown under its field before anything is sent |
-| Search | Searches by title or author as they type; picks a shelf (Fiction, Nonfiction, Kids, Science, Technology); sees the real covers or a list with title, author, price; opens a book; buys or rents it |
+| Search | Searches by title or author as they type; picks a shelf (Fiction, Nonfiction, Kids, Science, Technology); sees the real covers or a list with title, author, price; opens a book; buys or rents it. Each book shows its stars and number of reviews (4.3 (12)) |
+| Book detail: Reviews | Under Buy and Rent: the rating, "Your review" first with Edit and Delete (Delete has Undo), then the other customers' reviews, newest first. A book with none says "No reviews yet. Be the first." |
+| Write a review | 1 to 5 stars (mouse or keyboard) and optional words, up to 1000 characters with a count; "Choose a rating from 1 to 5 stars" if no stars are chosen. It cannot be closed while it is saving |
 | Your order | Switches each book between buy and rent, removes books (with Undo), sees the total, places the order |
 | Bill | Sees the bill of the order just placed, and that a copy is being emailed; can pay at once |
 | Pay | The pretend checkout: shows the total, says nothing is charged, marks the order paid. No card details |
@@ -36,25 +38,25 @@ Or, in VS Code: Run and Debug, "Customer app", F5.
 flutter test
 ```
 
-35 tests, no server needed: the rules (the order draft, the account rules, rentals and due dates, preferences), and every screen driven the way a customer uses it, with stand-in services. One of them checks that every screen fits a 1024 x 700 window. The shared service client and data have their own tests in `../bookstore-ui`.
+46 tests, no server needed: the rules (the order draft, the account rules, rentals and due dates, preferences), writing, editing, and deleting reviews, and every screen driven the way a customer uses it, with stand-in services. One of them checks that every screen fits a 1024 x 700 window. The shared service client and data have their own tests in `../bookstore-ui`.
 
 Two more are skipped unless asked for:
 
 | Command | Does |
 |---|---|
-| `set BOOKSTORE_LIVE=1 && flutter test test/live_services_test.dart` | The app's own service clients against the three real running services: log in, search, place a real order, find it under "my orders", pay it (remove it afterwards) |
+| `set BOOKSTORE_LIVE=1 && flutter test test/live_services_test.dart` | The app's own service clients against the three real running services: log in, search, write a review and see it in the rating, delete it again, place a real order, find it under "my orders", pay it (remove the order afterwards) |
 | `set BOOKSTORE_SCREENSHOTS=1 && flutter test test/screenshots_test.dart` | First, once: `python tools/screenshots/fetch_covers.py` in the repository root, for the real cover photos. Draws each screen with the real typefaces into `docs/02-design/ui/customer-*.png` |
 
 ## How it is built
 
 | Folder | Holds |
 |---|---|
-| `lib/screens/` | One file per screen. What is shown, and the screen's own state (loading, error) |
+| `lib/screens/` | One file per screen. What is shown, and the screen's own state (loading, error). `review_dialog.dart` is the dialog to write or edit a review; the Reviews section is part of `search_screen.dart` |
 | `lib/api/` | `OrderApi`, the customer's calls to order-service |
 | `lib/models/` | The rules that need no screen: the order draft, the account rules, rentals due back, preferences |
 | `lib/main.dart` | Starts the app and gives every screen the session, the order draft, the preferences, and the services |
 
-The log-in form, the user and book clients, `ApiClient`, the session, the book and order data, and everything visual (buttons, fields, the bill, the toast) live in the shared package [`../bookstore-ui`](../bookstore-ui/README.md), used by both apps.
+The log-in form, the user and book clients (including the review calls), `ApiClient`, the session, the book, review, and order data, and everything visual (buttons, fields, the bill, the toast, the stars) live in the shared package [`../bookstore-ui`](../bookstore-ui/README.md), used by both apps.
 
 Class diagram and a description of every file: [class-diagrams.md](../../docs/02-design/class-diagrams.md#customer-app).
 

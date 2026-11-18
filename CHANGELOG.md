@@ -6,6 +6,46 @@ All versions and patches of the project, newest first.
 
 Nothing yet.
 
+## v1.1.0 — 2026-11-18 — Extra credit: reviews, ratings, and sales reports
+
+The three extra-credit items of the course document's section 6 (milestone M6, issues #19, #20, #21). User profiles with order history were already built in v0.4.0 as the customer's "Your account" page; this version adds book reviews and ratings, and a sales report for managers. A minor version: new features, nothing removed or changed in the existing API. All 333 tests pass, and the 41 checks of `manual_check.py` pass on the running services (slowest 88 ms).
+
+| Part | Tests |
+|---|---|
+| user-service (Java HttpServer, MySQL) | 26 |
+| book-service (Python Flask, MongoDB) | 71 |
+| order-service (Python Flask, MySQL) | 117 |
+| Shared package `bookstore-ui` | 40 |
+| Customer app (Mooney's) | 46 |
+| Management app (Mooney's Manager) | 33 |
+| **Total** | **333, all passing** |
+
+| File | What it is |
+|---|---|
+| `Mooneys-Apps-Setup-1.1.0.exe` | Installs both apps for the current user (no administrator needed) |
+| `Mooneys-Apps-1.1.0-portable.zip` | The same two apps, to unzip and run |
+| `Mooneys-Server-1.1.0.zip` | The services and the whole source, with `user-service.jar` built; `setup.cmd`, `start-services.cmd`, `stop-services.cmd` |
+
+### Added
+- **Book reviews and ratings** in book-service: `GET /api/books/{id}/reviews`, `PUT /api/books/{id}/reviews/mine` (1 to 5 stars, up to 1000 characters of text), `DELETE /api/books/{id}/reviews/mine`. Any logged-in customer may review any book, once; the writer can edit or delete it; a manager cannot write one. Reviews are kept in the MongoDB collection `reviews`, with the unique index `one_review_per_customer_per_book` on (bookId, userId), created at start-up
+- Every book now carries `ratingAverage` (one decimal, or null) and `ratingCount`, worked out from the reviews with one aggregation per search; never stored on the book
+- **Mooney's**: stars and the review count on each book's card and in the list view; a Reviews section in a book's detail panel ("Your review" first with Edit and Delete, then the others, newest first); a dialog to write or edit a review, with a star picker and a character count; Delete has Undo
+- **Sales report** in order-service: `GET /api/reports/sales?from=&to=&top=`, managers only. For the period (whole days, both ends included): how many orders, paid, and pending; revenue and paid revenue; books sold and rented; the orders themselves; sales by day, and the best sellers (default 10, at most 50). Worked out in Python from the period's orders
+- **Mooney's Manager**: a third tab, **Reports**. Period buttons (Today, Last 7 days, Last 30 days, This month, All time), four tiles, a Sales by day bar chart with the amounts, the Best sellers table, and the orders in the period. F5 refreshes it
+- Shared package: `Review`, `RatingStars`, `StarPicker`, `BookApi.reviews`, `saveMyReview`, `deleteMyReview`, `ApiClient.delete`, and multi-line text fields
+- Screenshots: `customer-reviews-light.png`, `manager-reports-light.png`, `manager-reports-dark.png`
+- The apps' live checks also write and delete a review, and compare the all-time report with the order list
+
+### Changed
+- The manager app's top bar: the logged-in name now shortens with an ellipsis, with the full name in a tooltip, so the bar fits with three tabs at any width (it overflowed at 1024 px)
+- In the customer app's detail panel the reviews sit under Buy and Rent, and the panel scrolls; Buy and Rent are no longer pinned to the bottom of a tall window
+
+### Fixed (found by the review before release, each with a test)
+- book-service: a review sent with the book id in capital letters was stored under a second spelling, so one customer could review a book twice and those reviews were missing from the rating. Reviews are now stored under the book's own id
+- order-service: best sellers tied on copies and revenue were ordered with capitals before lower case; now alphabetical whatever the case
+- Customer app: the review dialog could be closed (Esc, a click outside) while a save was running; now it cannot. The character count counted UTF-16 units while book-service counts code points; now both count code points
+- Manager app: the third tab made the top bar overflow at 1024 px, and the first fix (hiding the name below 1100 px) still overflowed with a long username at 1100 px and wider; now the name shortens with an ellipsis at any width
+
 ## v1.0.0 — 2026-11-17 — Mooney's: the final version (M5)
 
 The submittable system. Every requirement FR1–FR14 and N1–N5 is met and tested ([requirements test report](docs/06-testing/requirements-test.md)), with every extra-credit item. The store now has a name, **Mooney's**, with shelves and real cover photos, at the owner's request. Install: [INSTALL.md](INSTALL.md). For the instructor: [HANDOVER.md](HANDOVER.md).

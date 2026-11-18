@@ -6,7 +6,7 @@ so no database and no other service is needed.
 import unittest
 
 from book_service.app import create_app
-from book_service.repository import InMemoryBookRepository
+from book_service.repository import InMemoryBookRepository, InMemoryReviewRepository
 from book_service.schemas import BookInput
 
 from .fakes import SERVICE_KEY, FakeSessionChecker, as_customer, as_manager
@@ -18,7 +18,7 @@ class ApiTest(unittest.TestCase):
     def setUp(self):
         self.repository = InMemoryBookRepository()
         self.sessions = FakeSessionChecker()
-        self.client = create_app(self.repository, self.sessions, SERVICE_KEY).test_client()
+        self.client = create_app(self.repository, InMemoryReviewRepository(), self.sessions, SERVICE_KEY).test_client()
         self.clean_code = self.repository.insert(BookInput("Clean Code", "Robert C. Martin", 40.0, 4, None, "Technology"))
         self.effective_java = self.repository.insert(BookInput("Effective Java", "Joshua Bloch", 50.0, 2, None, "Technology"))
         self.sold_out = self.repository.insert(BookInput("MongoDB: The Definitive Guide", "Shannon Bradshaw", 44.0, 0, None, "Technology"))
@@ -41,7 +41,7 @@ class ApiTest(unittest.TestCase):
 
     def test_search_results_show_title_author_and_price(self):
         book = self.client.get("/api/books?keyword=clean", headers=as_customer()).get_json()[0]
-        self.assertEqual(book, {"id": self.clean_code.id, "title": "Clean Code", "author": "Robert C. Martin", "price": 40.0, "copiesAvailable": 4, "coverUrl": None, "category": "Technology"})
+        self.assertEqual(book, {"id": self.clean_code.id, "title": "Clean Code", "author": "Robert C. Martin", "price": 40.0, "copiesAvailable": 4, "coverUrl": None, "category": "Technology", "ratingAverage": None, "ratingCount": 0})
 
     def test_no_keyword_lists_every_book_sorted_by_title(self):
         titles = [b["title"] for b in self.client.get("/api/books", headers=as_manager()).get_json()]
@@ -209,7 +209,7 @@ class ApiTest(unittest.TestCase):
                 self.assert_error(response, 400, "Enter the change as a whole number other than 0")
 
     def test_with_no_service_key_configured_the_endpoint_stays_closed(self):
-        client = create_app(self.repository, self.sessions, "").test_client()
+        client = create_app(self.repository, InMemoryReviewRepository(), self.sessions, "").test_client()
         response = client.patch(f"/api/books/{self.clean_code.id}/copies", json={"change": -1}, headers={"X-Service-Key": ""})
         self.assertEqual(response.status_code, 403)
 

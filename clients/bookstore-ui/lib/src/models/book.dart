@@ -8,6 +8,8 @@ class Book {
     required this.copiesAvailable,
     this.coverUrl,
     this.category,
+    this.ratingAverage,
+    this.ratingCount = 0,
   });
 
   final String id;
@@ -22,6 +24,10 @@ class Book {
   /// Its shelf, one of [categories]; null for a book stored before shelves existed.
   final String? category;
 
+  /// The average of the customers' stars, to one decimal; null when nobody has reviewed it.
+  final double? ratingAverage;
+  final int ratingCount;
+
   factory Book.fromJson(Map<String, dynamic> json) => Book(
     id: json['id'] as String,
     title: json['title'] as String,
@@ -30,9 +36,14 @@ class Book {
     copiesAvailable: json['copiesAvailable'] as int,
     coverUrl: json['coverUrl'] as String?,
     category: json['category'] as String?,
+    ratingAverage: (json['ratingAverage'] as num?)?.toDouble(),
+    ratingCount: json['ratingCount'] as int? ?? 0,
   );
 
+  bool get isRated => ratingAverage != null && ratingCount > 0;
+
   /// The body of POST and PUT /api/books (FR14). The id is in the address, not the body.
+  /// The rating is left out: book-service works it out from the reviews.
   Map<String, dynamic> toJson() => {
     'title': title,
     'author': author,

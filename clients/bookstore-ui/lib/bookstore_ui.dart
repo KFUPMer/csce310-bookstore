@@ -9,6 +9,7 @@ export 'src/api/api_client.dart';
 export 'src/api/session.dart';
 export 'src/models/book.dart';
 export 'src/models/order.dart';
+export 'src/models/review.dart';
 export 'src/api/apis.dart';
 
 export 'src/tokens.dart';
@@ -26,3 +27,4 @@ export 'src/auth_layout.dart';
 export 'src/login_form.dart';
 export 'src/search_field.dart';
 export 'src/mooneys_sign.dart';
+export 'src/stars.dart';

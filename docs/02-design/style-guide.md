@@ -54,6 +54,25 @@ Added at the owner's request after M4, from a bookstore website they liked and t
 - **The shelves.** All, Fiction, Nonfiction, Kids, Science, Technology, as a row under the sign, like a bookshop's sections. The chosen one is bold with a short accent underline: weight and line, not color alone (color-blind users). Tab and Enter work.
 - **Real covers.** Every book shows its real cover photo. The drawn cover shows first and the photo fades in over it (Motion.base), so a slot is never empty. Without internet the drawn cover stays.
 
+## Reviews and the sales report (v1.1.0)
+
+Added for the extra credit (course section 6). Nothing new brings color: the covers and the sign stay the only colored things.
+
+- **Stars.** A rating is drawn in the neutral ink color, never gold or yellow. A star is filled, half filled, or outlined, so the rating is told by shape, not by color, and color-blind users read it the same way. The number is written next to it ("4.0 · 3 reviews"), and a screen reader hears one sentence ("Rated 4.3 out of 5 from 12 reviews"). A card has room for one star and "4.0 (3)" only; the detail panel shows all five.
+- **Choosing stars.** The five stars of the review dialog are five buttons, each with a tooltip ("1 star" to "5 stars"). Tab reaches them, Enter or Space chooses, and the pointer previews a choice on hover. The choice is also written in words ("3 of 5 stars", or "No stars chosen"). Saving without stars puts the problem under them, with an icon, like every other field.
+- **Reviews in the detail panel.** "Your review" comes first, in a card with Edit and Delete; Delete offers Undo in a toast. The other reviews follow, newest first, each with the name, the date, the stars, and the text.
+- **The sales report.** Period buttons at the top; the chosen one is filled and has a check, so it is not told by color alone. Four tiles give the numbers in the serif of the headings (orders, revenue, books sold, books rented), each with a line of detail under it. Sales by day are bars in the ink color with the day under each bar and the amount over it when the bar is wide enough (at least 64 px), so the chart is read from its words; at most the last 31 days with orders are drawn, and more than fit scroll sideways; pointing at a bar shows the date, the amount, and the number of orders. The best sellers are a plain numbered table, and the period's orders follow, with the same Paid/Pending chip as the Orders tab.
+
+**Reviews**, in the customer app: the rating on each card, and the detail panel's Reviews section.
+
+![Reviews and ratings, light](ui/customer-reviews-light.png)
+
+**Sales report**, in the manager app's new Reports tab.
+
+![Sales report, light](ui/manager-reports-light.png)
+
+![Sales report, dark](ui/manager-reports-dark.png)
+
 ## Customer app as built (M4)
 
 Every screen of the customer app, in the approved style. Drawn by Flutter from the app's real widgets, with the real typefaces, on the 27 sample books, with their real cover photos, and stand-in services, at 1440 x 900 (`test/screenshots_test.dart`). They are not captures of the running window; that the app works against the real services was checked separately.

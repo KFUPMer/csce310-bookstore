@@ -19,8 +19,8 @@ from .config import Config
 from .errors import ServiceUnavailableError, register_error_handlers
 from .mailer import Mailer, NoMailer, SmtpMailer
 from .repository import MySqlOrderRepository, OrderRepository, create_pool
-from .routes import create_routes
-from .services import OrderService
+from .routes import create_report_routes, create_routes
+from .services import OrderService, ReportService
 
 log = logging.getLogger(__name__)
 
@@ -49,6 +49,7 @@ def create_app(
         return {"error": unavailable.message}, unavailable.status
 
     app.register_blueprint(create_routes(OrderService(orders, catalog, bills, mailer, clock), sessions))
+    app.register_blueprint(create_report_routes(ReportService(orders), sessions))
     return app
 
 

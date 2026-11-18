@@ -16,17 +16,19 @@ The live plan is `docs/04-planning/milestones.md`; tasks are GitHub issues on `K
 |---|---|
 | M1 Idea, M2 Design, M3 Backend, M4 Clients | Closed. Released as v0.1.0, v0.2.0, v0.3.0, v0.4.0 |
 | user-service (Java HttpServer, MySQL) | Done, verified against MySQL |
-| book-service (Python Flask, MongoDB) | Done, verified on the running service |
-| order-service (Python Flask, MySQL) | Done, verified on the running service with the other two. A real bill email was sent through Gmail (`email_check.py`) and the owner confirmed it looks right in the inbox. `GET /api/orders/{id}`, `GET /api/orders/mine`, `POST /api/orders/{id}/pay` added in M4 (101 tests) |
-| bookstore-ui (shared) | The look, plus the shared log-in form, `ApiClient`, `Session`, `UserApi`, `BookApi`, `Book`, `Order` (18 tests) |
-| customer-app (Flutter) | Built on the real services (issues 11, 15), 34 tests. The owner ran it: it works. Account page and pretend checkout added after; the owner tried them too |
-| management-app (Flutter) | Built (issue 12), 15 tests, checked against the running services. The owner tried it: it works (`manager1` / `manager123`) |
+| book-service (Python Flask, MongoDB) | Done, verified on the running service. Reviews added in M6: `GET /api/books/{id}/reviews`, `PUT` and `DELETE /api/books/{id}/reviews/mine`; books carry `ratingAverage`, `ratingCount` (71 tests) |
+| order-service (Python Flask, MySQL) | Done, verified on the running service with the other two. A real bill email was sent through Gmail (`email_check.py`) and the owner confirmed it looks right in the inbox. `GET /api/orders/{id}`, `GET /api/orders/mine`, `POST /api/orders/{id}/pay` added in M4; `GET /api/reports/sales` (managers only) in M6 (117 tests) |
+| bookstore-ui (shared) | The look, plus the shared log-in form, `ApiClient`, `Session`, `UserApi`, `BookApi`, `Book`, `Order`, `Review`, `RatingStars`, `StarPicker` (40 tests) |
+| customer-app (Flutter) | Built on the real services (issues 11, 15), 46 tests. The owner ran it: it works. Account page and pretend checkout added after; the owner tried them too |
+| management-app (Flutter) | Built (issue 12), 33 tests, checked against the running services. The owner tried it: it works (`manager1` / `manager123`). Reports tab added in M6 |
+| Reviews and ratings (M6, issue #20) | Built 2026-11-18, course section-6 extra credit. Any logged-in customer may review any book, once (no purchase check: book-service would have to call order-service, which already calls book-service); the writer edits or deletes it; no moderation, on purpose. MongoDB collection `reviews`, unique index `one_review_per_customer_per_book` on (bookId, userId). Ratings are one aggregation per search, never stored. Checked on the running services (review saved in 15 ms) |
+| Sales report (M6, issue #21) | Built 2026-11-18, course section-6 extra credit. Worked out in Python from the period's orders; best sellers grouped by bookId. Manager app Reports tab: Today / Last 7 days / Last 30 days / This month / All time. Checked on the running services (all-time report in 15 ms, matching the order list). Profiles with order history (issue #19) are the M4 account page |
 | Customer account page + pretend checkout | Built 2026-11-17, beyond the PRD (asked for by the owner). No card details are ever asked for or stored. Preferences in `%APPDATA%\CSCE310 Bookstore\preferences.json` |
 | Requirements testing (issue 13) | Done: `docs/06-testing/requirements-test.md`. `manual_check.py` covers every order endpoint (41 checks) |
 | Installable build | `setup.cmd` etc., `INSTALL.md`, `HANDOVER.md` (for the instructor). The release build, installer, and installer test run on GitHub Actions on each `v*` tag. The installer cannot run on this machine (Smart App Control, P-017) |
 | Mooney's (M5) | The store's name and sign (`MooneysSign`), five shelves (`category` in book-service, `categories` in bookstore-ui), real covers linked from Open Library (never stored in git). Screenshot tests need `python tools/screenshots/fetch_covers.py` first |
-| **Next** | v1.0.0 released; issue 14 closed. Anything new is a patch (v1.0.x) on a fix branch, per versioning.md. The repo is **public** since 2026-11-17 (history checked: no secret file or value was ever committed), so never commit anything from `services/.env` |
-| Testing and final release | M5 |
+| **Next** | Release v1.1.0 (M6: reviews, ratings, sales report), then close issues #19 to #21 and M6. After that, only patches (v1.1.x) on a fix branch, per versioning.md. The repo is **public** since 2026-11-17 (history checked: no secret file or value was ever committed), so never commit anything from `services/.env` |
+| Testing and final release | M5, closed with v1.0.0 (2026-11-17). M6 (course section-6 extra credit) open until v1.1.0 |
 
 Known unfinished or unverified things: the "Known gaps" table at the end of `docs/03-problems/problem-log.md`.
 

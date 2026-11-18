@@ -146,6 +146,33 @@ void main() {
     await tester.pumpAndSettle(const Duration(seconds: 7));
   });
 
+  testWidgets('reviews and ratings', (tester) async {
+    final services = await start(tester);
+    final books = services.books as FakeBooks;
+    String id(String title) => books.books.firstWhere((b) => b.title == title).id;
+    for (final (title, stars) in [
+      ('A Brief History of Time', [5, 4, 4]),
+      ("Charlotte's Web", [5, 5]),
+      ('Clean Code', [4, 5, 3, 4]),
+      ('Cosmos', [4]),
+    ]) {
+      for (final (i, s) in stars.indexed) {
+        books.addReview(id(title), 'reader${i + 1}', s, '');
+      }
+    }
+    books.addReview(id('Atomic Habits'), 'omar', 5, 'Small changes, explained clearly. I started using the two-minute rule the day I finished it.');
+    books.addReview(id('Atomic Habits'), 'sara', 3, 'Useful, but the same idea is repeated in many chapters.');
+    books.addReview(id('Atomic Habits'), 'alice', 4, 'A practical book. The habit tracker idea helped me read every day.');
+    await logIn(tester);
+
+    await tester.tap(find.bySemanticsLabel(RegExp('^Atomic Habits by')));
+    await tester.pumpAndSettle();
+    await tester.ensureVisible(find.text('Useful, but the same idea is repeated in many chapters.'));
+    await tester.pumpAndSettle();
+    await shoot(tester, 'customer-reviews-light');
+    await tester.pumpAndSettle(const Duration(seconds: 7));
+  });
+
   testWidgets('account page and the pretend checkout', (tester) async {
     final services = await start(tester);
     PlacedItem item(String title, String author, ItemType type, double price, {DateTime? due}) =>

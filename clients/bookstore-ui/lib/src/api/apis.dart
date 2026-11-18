@@ -1,4 +1,5 @@
 import '../models/book.dart';
+import '../models/review.dart';
 import 'api_client.dart';
 import 'session.dart';
 
@@ -59,4 +60,15 @@ class BookApi extends ApiClient {
 
   /// FR14: changes a book's details, including its number of copies.
   Future<Book> update(Book book) async => Book.fromJson(await put('/api/books/${book.id}', book.toJson()) as Map<String, dynamic>);
+
+  /// A book's reviews, newest first. Extra credit, beyond the PRD.
+  Future<List<Review>> reviews(String bookId) async => [
+    for (final r in await get('/api/books/$bookId/reviews') as List) Review.fromJson(r as Map<String, dynamic>),
+  ];
+
+  /// Writes the customer's review of the book, or replaces the one they wrote before.
+  Future<Review> saveMyReview(String bookId, int rating, String text) async =>
+      Review.fromJson(await put('/api/books/$bookId/reviews/mine', {'rating': rating, 'text': text.trim()}) as Map<String, dynamic>);
+
+  Future<void> deleteMyReview(String bookId) => delete('/api/books/$bookId/reviews/mine');
 }

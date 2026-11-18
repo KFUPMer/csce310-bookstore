@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:ui' as ui;
@@ -85,14 +86,83 @@ class FakeBooks extends BookApi {
   FakeBooks(super.session, this.books) : super(baseUrl: 'http://unused');
   final List<Book> books;
 
+  /// Each book's reviews, by book id. The rating a search returns is worked out from them, as book-service does.
+  final Map<String, List<Review>> reviewsByBook = {};
+
+  /// When set, asking for reviews fails with it.
+  ApiException? reviewsFailure;
+
+  /// When set, saving a review waits until it completes, so a test can act while the save is on its way.
+  Completer<void>? saveGate;
+
+  /// The time stamped on the next review; moves on a minute each time, so "newest first" is clear.
+  DateTime clock = DateTime(2026, 11, 17, 9);
+
   @override
   Future<List<Book>> search(String keyword, {String? category}) async {
     final k = keyword.trim().toLowerCase();
     final found = [
       for (final b in books)
-        if ((b.title.toLowerCase().contains(k) || b.author.toLowerCase().contains(k)) && (category == null || b.category == category)) b,
+        if ((b.title.toLowerCase().contains(k) || b.author.toLowerCase().contains(k)) && (category == null || b.category == category)) _rated(b),
     ];
     return found..sort((a, b) => a.title.compareTo(b.title));
+  }
+
+  Book _rated(Book b) {
+    final reviews = reviewsByBook[b.id] ?? const [];
+    if (reviews.isEmpty) return b;
+    final average = reviews.fold<int>(0, (sum, r) => sum + r.rating) / reviews.length;
+    return Book(
+      id: b.id,
+      title: b.title,
+      author: b.author,
+      price: b.price,
+      copiesAvailable: b.copiesAvailable,
+      coverUrl: b.coverUrl,
+      category: b.category,
+      ratingAverage: (average * 10).round() / 10,
+      ratingCount: reviews.length,
+    );
+  }
+
+  /// Saves [username]'s review of the book: what another customer wrote, for a test to start from.
+  Review addReview(String bookId, String username, int rating, String text) {
+    final list = reviewsByBook.putIfAbsent(bookId, () => []);
+    final old = list.where((r) => r.username == username).firstOrNull;
+    clock = clock.add(const Duration(minutes: 1));
+    final review = Review(
+      id: (list.length + 1).toRadixString(16).padLeft(24, 'e'),
+      bookId: bookId,
+      username: username,
+      rating: rating,
+      text: text.trim(),
+      createdAt: old?.createdAt ?? clock,
+      updatedAt: clock,
+    );
+    list
+      ..removeWhere((r) => r.username == username)
+      ..add(review);
+    return review;
+  }
+
+  @override
+  Future<List<Review>> reviews(String bookId) async {
+    if (reviewsFailure != null) throw reviewsFailure!;
+    return [...?reviewsByBook[bookId]]..sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
+  }
+
+  @override
+  Future<Review> saveMyReview(String bookId, int rating, String text) async {
+    if (rating < 1 || rating > 5) throw const ApiException('Choose a rating from 1 to 5 stars', 400);
+    await saveGate?.future;
+    return addReview(bookId, session.username!, rating, text);
+  }
+
+  @override
+  Future<void> deleteMyReview(String bookId) async {
+    final list = reviewsByBook[bookId] ?? [];
+    if (!list.any((r) => r.username == session.username)) throw const ApiException('You have not reviewed this book', 404);
+    list.removeWhere((r) => r.username == session.username);
   }
 }
 

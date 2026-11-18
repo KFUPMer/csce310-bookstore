@@ -10,6 +10,9 @@ AUTHOR_MAX = 255
 PRICE_MAX = 100_000
 COPIES_MAX = 1_000_000
 COVER_URL_MAX = 2000
+RATING_MIN = 1
+RATING_MAX = 5
+REVIEW_TEXT_MAX = 1000
 
 
 def _require_object(body: Any) -> dict:
@@ -89,6 +92,30 @@ def category_filter(value: Optional[str]) -> Optional[str]:
     if value not in CATEGORIES:
         raise ValidationError(CATEGORY_PROBLEM)
     return value
+
+
+@dataclass(frozen=True)
+class ReviewInput:
+    """The body of PUT /api/books/{id}/reviews/mine: 1 to 5 stars and, if the customer likes, some words."""
+
+    rating: int
+    text: str
+
+    @staticmethod
+    def from_json(body: Any) -> "ReviewInput":
+        body = _require_object(body)
+        rating = body.get("rating")
+        if not isinstance(rating, int) or isinstance(rating, bool) or not RATING_MIN <= rating <= RATING_MAX:
+            raise ValidationError("Choose a rating from 1 to 5 stars")
+        text = body.get("text")
+        if text is None:
+            text = ""
+        if not isinstance(text, str):
+            raise ValidationError("Write the review as text")
+        text = text.strip()
+        if len(text) > REVIEW_TEXT_MAX:
+            raise ValidationError(f"The review can be at most {REVIEW_TEXT_MAX} characters")
+        return ReviewInput(rating, text)
 
 
 @dataclass(frozen=True)

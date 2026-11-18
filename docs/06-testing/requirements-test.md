@@ -4,21 +4,21 @@
 
 Each requirement is shown three ways, so that no single kind of test is trusted alone:
 
-- **Automated**: tests that run with no server (`mvn package`, `python -m unittest`, `flutter test`). All 236 pass (counted again after the shelves and the sign were added, 2026-11-17).
-- **Live**: calls to the three real services running against the real MySQL and MongoDB: `services/order-service/manual_check.py` (41 checks, all passed on 2026-11-17) and the apps' own clients in `live_services_test.dart` (customer and management app, both passed on 2026-11-17).
+- **Automated**: tests that run with no server (`mvn package`, `python -m unittest`, `flutter test`). All 333 pass (counted again after reviews and the sales report were added, 2026-11-18).
+- **Live**: calls to the three real services running against the real MySQL and MongoDB: `services/order-service/manual_check.py` (41 checks, all passed on 2026-11-18) and the apps' own clients in `live_services_test.dart` (customer and management app, both passed on 2026-11-18).
 - **Window**: the owner using the real app windows. The owner ran the customer app, the management app, and the account page and checkout on 2026-11-17 and reported that everything works.
 
-## Test counts (all run on 2026-11-17)
+## Test counts (all run on 2026-11-18)
 
 | Part | Command | Tests | Result |
 |---|---|---|---|
 | user-service | `mvn package` | 26 | Pass |
-| book-service | `python -m unittest discover -s tests -t .` | 37 | Pass, including 8 against the real MongoDB |
-| order-service | `python -m unittest discover -s tests -t .` | 101 | Pass, including 9 against the real MySQL |
-| Shared package | `flutter test` in `clients/bookstore-ui` | 21 | Pass |
-| Customer app | `flutter test` | 35 | Pass |
-| Management app | `flutter test` | 16 | Pass |
-| **Total** | | **236** | **Pass** |
+| book-service | `python -m unittest discover -s tests -t .` | 71 | Pass, including 17 against the real MongoDB |
+| order-service | `python -m unittest discover -s tests -t .` | 117 | Pass, including 10 against the real MySQL |
+| Shared package | `flutter test` in `clients/bookstore-ui` | 40 | Pass |
+| Customer app | `flutter test` | 46 | Pass |
+| Management app | `flutter test` | 33 | Pass |
+| **Total** | | **333** | **Pass** |
 
 ## Functional requirements
 
@@ -55,6 +55,18 @@ Each requirement is shown three ways, so that no single kind of test is trusted 
 |---|---|---|---|
 | Account page (orders, rentals due back, profile, preferences) | order-service: 3 tests for `GET /api/orders/mine`; customer app `account_test.dart` (6) and 2 screen tests | `manual_check.py`: only the customer's own orders; managers refused | Tried by the owner |
 | Pretend checkout | order-service: 5 tests for `POST /api/orders/{id}/pay`; customer app screen test | `manual_check.py`: pays, twice refused, someone else's refused, manager refused | Tried by the owner |
+
+## Extra credit (course section 6)
+
+The course document lists three extra-credit items, 1% each. All three are built (GitHub milestone "M6 - Extra Credit (course section 6)", issues #19, #20, #21). The "In the apps" column says where each one is; the owner has not yet tried reviews or the report in the app windows.
+
+| Item | Automated | Live | In the apps |
+|---|---|---|---|
+| User profiles with order history (#19, built in M4) | order-service `test_a_customer_sees_only_their_own_orders_newest_first_with_items` and the other `GET /api/orders/mine` tests (one against the real MySQL); customer app `account_test.dart` (6), screen test "the account page shows the profile, the rentals due back, and the orders, and pays one" | `manual_check.py`: only the customer's own orders, managers refused. Customer live check: my orders 64 ms (2026-11-17) | Customer app: the name in the top bar opens "Your account" (profile, preferences, rentals due back, every order with its bill). Tried by the owner |
+| Book reviews and ratings (#20) | book-service `test_reviews_api.py` (25: save, replace, the 1–5 and 1000-character rules, a manager refused, 401, 404, newest first, delete, ratings on search and get, rounding, `test_the_id_in_any_capitalisation_is_the_same_book_and_the_same_review`); `MongoReviewRepositoryTest` (8, real MongoDB: the unique index, one review per customer even when saved at the same moment, the rating aggregation); shared `review_test.dart`, `stars_test.dart`, the `reviews` group of `api_client_test.dart`; customer app `reviews` group in `screens_test.dart` (write, no stars chosen, the 1000 limit, emoji, Esc during a save, edit, delete with Undo, a failed load) | Customer live check (2026-11-18): a review saved in 15 ms, listed first, the book's `ratingCount` up by one, deleted again. The real `reviews` collection was left empty with its unique index | Customer app: stars on each card and in the list view; the book's detail panel has a Reviews section ("Your review" with Edit and Delete, then others). Screenshot `customer-reviews-light.png` |
+| Sales report and analytics for managers (#21) | order-service: 15 API tests from `test_the_sales_report_of_all_orders` to `test_only_a_manager_sees_the_sales_report` (day edges, open periods, `top`, best-seller order including `test_best_sellers_with_the_same_copies_and_revenue_are_alphabetical_whatever_the_case`, an empty period, every validation message), and `test_list_between_includes_the_start_and_excludes_the_end_newest_first_with_items` against the real MySQL; management app `sales_report_test.dart` (7), five Reports screen tests, the 1024 x 700 test, and the username tests in `screens_test.dart` and `home_bar_test.dart` | Manager live check (2026-11-18): the all-time report in 15 ms counted exactly the 4 orders the order list showed, with 6 best sellers. `manual_check.py` 41 of 41 on the new code (slowest 88 ms), but it has no report check | Management app: the Reports tab (Today, Last 7 days, Last 30 days, This month, All time; four tiles; Sales by day; Best sellers; Orders in this period). Screenshots `manager-reports-light.png`, `manager-reports-dark.png` |
+
+The test order and the review made by the live checks were removed afterwards.
 
 ## The release files, as a grader gets them
 

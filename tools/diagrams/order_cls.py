@@ -5,7 +5,7 @@ from xml.sax.saxutils import escape
 import flutter_cls as F  # shared drawing helpers (also rewrites the two app diagrams, unchanged)
 
 C = [40, 390, 740, 1090, 1440, 1790, 2160]
-R = [40, 300, 560, 900, 1150]
+R = [40, 300, 560, 900, 1150, 1420]
 RED = ('#f8cecc', '#b85450'); PURPLE = ('#e1d5e7', '#9673a6')
 n = [0]
 def E(a, b, label='', style=''):
@@ -26,7 +26,7 @@ c = [
  F.cls('cbook', 'CatalogBook', C[5], R[0], ['+ id : str', '+ title, author : str', '+ price : Decimal'], None, F.GREY, 'dataclass'),
  # http and the shapes of requests
  F.cls('checker', 'SessionChecker', C[0], R[1], ['(abstract)'], ['+ check(token) : CurrentUser'], F.GREEN, 'interface'),
- F.cls('routes', 'routes.py', C[1], R[1], ['create_routes(orders, sessions)'], ['POST /api/orders  (customer)', 'GET /api/orders  (manager)', 'GET /api/orders/mine  (customer)', 'GET /api/orders/<id>  (owner, manager)', 'GET /api/orders/<id>/bill  (owner, manager)', 'POST /api/orders/<id>/pay  (owner)', 'PATCH /api/orders/<id>/payment-status'], F.BLUE, 'module'),
+ F.cls('routes', 'routes.py', C[1], R[1], ['create_routes(orders, sessions)'], ['POST /api/orders  (customer)', 'GET /api/orders  (manager)', 'GET /api/orders/mine  (customer)', 'GET /api/orders/<id>  (owner, manager)', 'GET /api/orders/<id>/bill  (owner, manager)', 'POST /api/orders/<id>/pay  (owner)', 'PATCH /api/orders/<id>/payment-status', 'create_report_routes(reports, sessions):', 'GET /api/reports/sales  (manager)'], F.BLUE, 'module'),
  F.cls('authf', 'auth.py', C[2], R[1], ['TIMEOUT = (2 s, 3 s)'], ['token_from(header) : str', 'require_customer(user, message)', 'require_manager(user)'], F.GREEN, 'module'),
  F.cls('input', 'OrderInput', C[3], R[1], ['+ lines : tuple[OrderLine]', 'MAX_ITEMS = 50'], ['+ from_json(body) : OrderInput'], PURPLE, 'dataclass'),
  F.cls('line', 'OrderLine', C[4], R[1], ['+ book_id : str', '+ type : str', '+ quantity : int'], None, PURPLE, 'dataclass'),
@@ -40,7 +40,7 @@ c = [
  F.cls('item', 'OrderItem', C[5], R[2], ['+ book_id, title, author : str', '+ type : str', '+ quantity : int', '+ unit_price : Decimal', '+ rent_due_date : date | None'], ['+ line_total : Decimal', '+ to_json() : dict'], F.GREY, 'dataclass'),
  # what the rules use: other services, the database, files, mail
  F.cls('catalog', 'BookCatalog', C[0], R[3], ['(abstract)'], ['+ take(book_id, quantity) : CatalogBook', '+ give_back(book_id, quantity)'], F.GREEN, 'interface'),
- F.cls('repo', 'OrderRepository', C[1], R[3], ['(abstract)'], ['+ save(order) : Order', '+ find(order_id) : Order | None', '+ list_all() : list[Order]', '+ list_for_user(user_id) : list[Order]', '+ set_payment_status(order_id, status)', '+ set_bill_file(order_id, bill_file)'], F.YELLOW, 'interface'),
+ F.cls('repo', 'OrderRepository', C[1], R[3], ['(abstract)'], ['+ save(order) : Order', '+ find(order_id) : Order | None', '+ list_all() : list[Order]', '+ list_for_user(user_id) : list[Order]', '+ list_between(start, end) : list[Order]', '+ set_payment_status(order_id, status)', '+ set_bill_file(order_id, bill_file)'], F.YELLOW, 'interface'),
  F.cls('billf', 'bill.py', C[2], R[3], ['the approved bill layout'], ['render_bill(order) : str', 'bill_file_name(order_id) : str', 'money(amount) : str'], F.GREEN, 'module'),
  F.cls('bills', 'BillStore', C[3], R[3], ['- folder : Path'], ['+ write(order_id, bill_html) : str', '+ read(order_id) : str | None'], F.YELLOW),
  F.cls('mailer', 'Mailer', C[4], R[3], ['(abstract)'], ['+ send_bill(order, bill_html) : bool'], F.GREEN, 'interface'),
@@ -48,6 +48,11 @@ c = [
  F.cls('realcatalog', 'BookServiceCatalog', C[0], R[4], ['- url : str', '- http : requests.Session'], ['(PATCH /api/books/<id>/copies', ' with the shared service key;', ' 503 if book-service is down)'], F.GREEN),
  F.cls('mysql', 'MySqlOrderRepository', C[1], R[4], ['- pool : MySQLConnectionPool', 'POOL_SIZE = 8'], ['(tables orders, order_items, users)', '- transaction()', '- find(connection, order_id)', 'create_pool(config)'], F.YELLOW),
  F.cls('mem', 'InMemoryOrderRepository', C[2], R[4], ['- orders : dict[int, Order]', '- next_id : int'], ['(tests only)'], F.YELLOW),
+ F.cls('rquery', 'SalesReportQuery', C[0], R[5], ['+ start, end : date | None', '+ top : int  (1 to 50, default 10)'], ['+ from_args(args) : SalesReportQuery'], PURPLE, 'dataclass'),
+ F.cls('rservice', 'ReportService', C[1], R[5], ['- orders : OrderRepository'], ['+ sales(query) : SalesReport', "(the period's orders, in Python)"], F.GREEN),
+ F.cls('report', 'SalesReport', C[2], R[5], ['+ start, end : date | None', '+ order_count, paid_count, pending_count', '+ revenue, paid_revenue : Decimal', '+ books_sold, books_rented : int', '+ by_day : list[DaySales]', '+ best_sellers : list[BestSeller]', '+ orders : list[Order]'], ['+ to_json() : dict'], F.GREY, 'dataclass'),
+ F.cls('daysales', 'DaySales', C[3], R[5], ['+ day : date', '+ orders : int', '+ revenue : Decimal'], ['+ to_json() : dict'], F.GREY, 'dataclass'),
+ F.cls('bestseller', 'BestSeller', C[4], R[5], ['+ book_id, title, author : str', '+ bought, rented, copies : int', '+ revenue : Decimal'], ['+ to_json() : dict'], F.GREY, 'dataclass'),
  F.cls('smtp', 'SmtpMailer', C[4], R[4], ['- host, port, user, password, mail_from', '- worker : one background thread'], ['+ send_bill(order, bill_html) : bool', '+ close()', '(STARTTLS; a failure is logged)'], F.GREEN),
  F.cls('nomail', 'NoMailer', C[3], R[4], ['(email is not configured)'], ['+ send_bill(...) : False'], F.GREEN),
  # errors
@@ -64,8 +69,9 @@ c = [
  E('realchecker', 'checker', '', IMPL), E('service', 'pricing', 'charges', USES),
  E('service', 'catalog', '', DOWN), E('service', 'repo', '', DOWN), E('service', 'billf', '', DOWN), E('service', 'bills', '', DOWN), E('service', 'mailer', '', DOWN),
  E('realcatalog', 'catalog', '', IMPL), E('mysql', 'repo', '', IMPL), E('mem', 'repo', '', IMPL),
+ E('rservice', 'report', 'builds', USES), E('report', 'daysales', '', 'startArrow=diamond;startFill=1;startSize=14;endArrow=none;'),
  E('smtp', 'mailer', '', IMPL), E('nomail', 'mailer', '', IMPL), E('smtp', 'mailf', '', USES),
 ] + [E(x, 'apierr', '', SIDE) for x in ('e400', 'e401', 'e403', 'e404', 'e409', 'e503')]
-c.append(f'<mxCell id="note1" value="{F.esc(["Colors = layers (a layer only calls the one below it)", "Blue: HTTP. Routes, and app.py, which puts the parts together", "Purple: the shapes of requests, with their validation", "Green: the rules, and what they ask of others: user-service (who is asking),", "    book-service (take copies), the bill layout, the mail server", "Yellow: storage (orders in MySQL or in memory, bill files on disk)", "Grey: start-up, settings, plain data", "Red: errors", "", "Python modules that hold functions rather than a class are drawn as <<module>>.", "Not drawn: every layer may raise the red errors; errors.py answers them in one place.", "Not drawn: bill.py and SmtpMailer read Order; bill.py reads RENT_RATE and RENT_DAYS."])}" style="shape=note;size=14;whiteSpace=wrap;align=left;verticalAlign=top;spacingLeft=8;spacingTop=6;fillColor=#ffffff;strokeColor=#999999;fontSize=12;" vertex="1" parent="1"><mxGeometry x="{C[2]}" y="{R[4] + 190}" width="640" height="220" as="geometry" /></mxCell>')
+c.append(f'<mxCell id="note1" value="{F.esc(["Colors = layers (a layer only calls the one below it)", "Blue: HTTP. Routes, and app.py, which puts the parts together", "Purple: the shapes of requests, with their validation", "Green: the rules, and what they ask of others: user-service (who is asking),", "    book-service (take copies), the bill layout, the mail server", "Yellow: storage (orders in MySQL or in memory, bill files on disk)", "Grey: start-up, settings, plain data", "Red: errors", "", "Python modules that hold functions rather than a class are drawn as <<module>>.", "Not drawn: every layer may raise the red errors; errors.py answers them in one place.", "Not drawn: bill.py and SmtpMailer read Order; bill.py reads RENT_RATE and RENT_DAYS.", "Not drawn, to keep lines from crossing: routes.py also calls ReportService, which reads", "the period's orders through OrderRepository.list_between; SalesReport also holds BestSellers."])}" style="shape=note;size=14;whiteSpace=wrap;align=left;verticalAlign=top;spacingLeft=8;spacingTop=6;fillColor=#ffffff;strokeColor=#999999;fontSize=12;" vertex="1" parent="1"><mxGeometry x="{C[2]}" y="{R[5] + 260}" width="640" height="260" as="geometry" /></mxCell>')
 F.write('class-order-service', 'order-service classes', c)
 print('order-service diagram written')

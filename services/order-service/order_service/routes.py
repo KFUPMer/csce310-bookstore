@@ -8,8 +8,8 @@ from flask import Blueprint, Response, jsonify, request
 
 from .auth import SessionChecker, require_customer, require_manager, token_from
 from .models import CurrentUser
-from .schemas import OrderInput, PaymentStatusInput
-from .services import OrderService
+from .schemas import OrderInput, PaymentStatusInput, SalesReportQuery
+from .services import OrderService, ReportService
 
 # The bill is shown inside the apps. This tells whatever shows it that the page may use its
 # own styles and nothing else: no scripts, no images or addresses from outside.
@@ -73,5 +73,18 @@ def create_routes(orders: OrderService, sessions: SessionChecker) -> Blueprint:
         require_manager(current_user())
         status = PaymentStatusInput.from_json(json_body())
         return jsonify(orders.set_payment_status(order_id, status.payment_status).to_summary_json())
+
+    return routes
+
+
+def create_report_routes(reports: ReportService, sessions: SessionChecker) -> Blueprint:
+    """The endpoints under /api/reports: sales figures for managers (extra credit)."""
+    routes = Blueprint("reports", __name__, url_prefix="/api/reports")
+
+    @routes.get("/sales")
+    def sales():
+        """GET /api/reports/sales?from=YYYY-MM-DD&to=YYYY-MM-DD&top=10. Managers only."""
+        require_manager(sessions.check(token_from(request.headers.get("Authorization"))))
+        return jsonify(reports.sales(SalesReportQuery.from_args(request.args)).to_json())
 
     return routes

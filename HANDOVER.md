@@ -6,7 +6,7 @@ For the instructor. Everything needed to install, try, and grade the project, an
 
 ## In one paragraph
 
-An online bookstore built to the course PRD: three RESTful services and two native desktop apps. **user-service** (Java HttpServer, MySQL) handles accounts, login, sessions, and roles. **book-service** (Python Flask, MongoDB) handles searching and managing books. **order-service** (Python Flask, MySQL) handles orders, HTML bills, emailing the bills, and payment status. **Mooney's** is the customer app and **Mooney's Manager** the manager app, both in Flutter. All 14 functional and 5 non-functional requirements are met and tested, together with every extra-credit item. 236 automated tests and 41 checks against the running services pass.
+An online bookstore built to the course PRD: three RESTful services and two native desktop apps. **user-service** (Java HttpServer, MySQL) handles accounts, login, sessions, and roles. **book-service** (Python Flask, MongoDB) handles searching and managing books. **order-service** (Python Flask, MySQL) handles orders, HTML bills, emailing the bills, and payment status. **Mooney's** is the customer app and **Mooney's Manager** the manager app, both in Flutter. All 14 functional and 5 non-functional requirements are met and tested, together with every extra-credit item, including the three in the course document's section 6 (profiles with order history, book reviews and ratings, sales reports for managers). 333 automated tests and 41 checks against the running services pass.
 
 ## Trying it (about 15 minutes)
 
@@ -32,7 +32,9 @@ An online bookstore built to the course PRD: three RESTful services and two nati
 | 8 | Log in to **Mooney's Manager** as `manager1`: every order is listed | FR11, FR12 |
 | 9 | Click **Mark as paid** on the new order; open it to see its bill and **Print** it | FR13, FR9 |
 | 10 | **Books** tab: add a book, or change a book's copies; search for it in Mooney's | FR14 |
-| 11 | Every action answers at once, and the windows never freeze while waiting | N1, N2 |
+| 11 | In **Mooney's**, open a book and, under **Reviews** in its detail panel, write a review (1 to 5 stars and a few words). It is listed first as "Your review", with Edit and Delete; the book's card now shows its stars | Reviews and ratings (extra credit) |
+| 12 | In **Mooney's Manager**, open the **Reports** tab and switch the period (Today, Last 7 days, Last 30 days, This month, All time): the tiles, the sales-by-day chart, the best sellers, and the orders change with it | Sales report (extra credit) |
+| 13 | Every action answers at once, and the windows never freeze while waiting | N1, N2 |
 
 N4 (a token on every request) and N5 (each role limited to its own data) are enforced by the services; the [requirements test report](docs/06-testing/requirements-test.md) shows the tests and live checks for each.
 
@@ -63,7 +65,7 @@ N4 (a token on every request) and N5 (each role limited to its own data) are enf
 |---|---|
 | RESTful services | Three services, JSON over HTTP, one error shape `{ "error": "…" }` |
 | Java HttpServer and Python Flask | user-service: Java 21 with the built-in `com.sun.net.httpserver`. book-service and order-service: Flask, served by waitress |
-| MySQL and MongoDB | MySQL: users, sessions, orders, order items. MongoDB: books |
+| MySQL and MongoDB | MySQL: users, sessions, orders, order items. MongoDB: books and their reviews |
 | Two native desktop GUI apps | Flutter (Windows); no web pages |
 | Bill as HTML, saved, printable | Saved per order; the manager app prints it in the browser |
 
@@ -74,14 +76,17 @@ N4 (a token on every request) and N5 (each role limited to its own data) are enf
 | FR3: user registration (+1%) | `POST /api/users/register` in user-service; the "Create an account" screen |
 | FR10: email the bill (+1%) | order-service sends the HTML bill through Gmail SMTP in the background. A real email was received and checked in Gmail (problem log P-016) |
 | Modern GUI framework (+2%) | Flutter, with a design system shared by both apps (`clients/bookstore-ui`) |
+| Section 6: user profiles with order history (+1%) | Built in M4 as the customer's **Your account** page: profile, preferences, every order with its bill, rentals due back. `GET /api/orders/mine` in order-service |
+| Section 6: book reviews and ratings (+1%) | book-service: `GET /api/books/{id}/reviews`, `PUT` and `DELETE /api/books/{id}/reviews/mine`, kept in the MongoDB collection `reviews` (one review per customer per book, held by a unique index). Each book's `ratingAverage` and `ratingCount` are worked out from the reviews on every search, never stored. Mooney's: stars on every book, and the Reviews section of a book's detail panel. Any logged-in customer may review any book; a manager cannot |
+| Section 6: sales report for managers (+1%) | order-service: `GET /api/reports/sales?from=&to=&top=` (managers only): orders, revenue, books sold and rented, sales by day, best sellers. Mooney's Manager: the **Reports** tab |
 
-Beyond the PRD, at the owner's request: the store's name and sign, **Mooney's**; **shelves** (Fiction, Nonfiction, Kids, Science, Technology) with real **cover photos**; a customer **account page** (order history, profile, preferences, rentals due back) and a **demonstration checkout** that marks an order as paid. It asks for no card details. The PRD's manager payment flow (FR13) is unchanged.
+Beyond the PRD, at the owner's request: the store's name and sign, **Mooney's**; **shelves** (Fiction, Nonfiction, Kids, Science, Technology) with real **cover photos**; a customer **account page** (order history, profile, preferences, rentals due back; it also counts as the section-6 profile item above) and a **demonstration checkout** that marks an order as paid. It asks for no card details. The PRD's manager payment flow (FR13) is unchanged.
 
 ## Process
 
-- **Milestones M1 to M5**, each closed with a tagged GitHub release (v0.1.0 to v0.4.0, two betas tested on a second computer, then v1.0.0), most well before their deadlines. Dated notes in [milestones.md](docs/04-planning/milestones.md).
+- **Milestones M1 to M5**, each closed with a tagged GitHub release (v0.1.0 to v0.4.0, two betas tested on a second computer, then v1.0.0), most well before their deadlines. **M6**, the course's section-6 extra credit, added after v1.0.0 as v1.1.0. Dated notes in [milestones.md](docs/04-planning/milestones.md).
 - **Tasks as GitHub issues**, each closed with a note of what was done.
-- **17 problem-log entries**, including the assistant's own mistakes, and **44 enhancement-log entries**, each with its reason and measured effect.
+- **17 problem-log entries**, including the assistant's own mistakes, and **50 enhancement-log entries**, each with its reason and measured effect.
 - **Tests with the code**: every service and app has its own tests, run again for each release; order-service and the later app features were written test-first. A code review before committing found what the tests had not (P-015).
 
 ## Known limits

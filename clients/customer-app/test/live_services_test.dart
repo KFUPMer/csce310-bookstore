@@ -57,6 +57,21 @@ void main() {
     expect(all.where((b) => b.coverUrl != null), isNotEmpty, reason: 'the books have their cover photos');
 
     final book = all.firstWhere((b) => b.copiesAvailable >= 1);
+
+    // Reviews (extra credit): write one, see it and the rating, then take it away again.
+    final before = await books.reviews(book.id);
+    expect(before.where((r) => r.username == 'customer1'), isEmpty, reason: 'start without a review of our own');
+    watch.reset();
+    await books.saveMyReview(book.id, 4, 'Live check');
+    stdout.writeln('review saved in ${watch.elapsedMilliseconds} ms');
+    final listed = await books.reviews(book.id);
+    expect(listed.first.username, 'customer1', reason: 'newest first');
+    expect(listed.first.rating, 4);
+    final rated = (await books.search(book.title)).firstWhere((b) => b.id == book.id);
+    expect(rated.ratingCount, before.length + 1);
+    await books.deleteMyReview(book.id);
+    expect((await books.reviews(book.id)).length, before.length, reason: 'deleted again');
+
     final draft = OrderDraft()..add(book, ItemType.rent);
     watch.reset();
     final order = await orders.createOrder(draft);

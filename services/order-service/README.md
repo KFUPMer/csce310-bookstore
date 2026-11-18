@@ -1,8 +1,8 @@
 # order-service
 
-Places orders, makes and saves the HTML bill, emails it, lists orders, and updates the payment status. Python, Flask, MySQL.
+Places orders, makes and saves the HTML bill, emails it, lists orders, updates the payment status, and gives managers a sales report. Python, Flask, MySQL.
 
-Requirements covered: FR6, FR7, FR8, FR9, FR10 (extra credit), FR12, FR13, N1, N4, N5.
+Requirements covered: FR6, FR7, FR8, FR9, FR10 (extra credit), FR12, FR13, N1, N4, N5, and the extra-credit sales report for managers (course section 6, issue #21).
 
 ## Endpoints
 
@@ -15,6 +15,7 @@ Requirements covered: FR6, FR7, FR8, FR9, FR10 (extra credit), FR12, FR13, N1, N
 | POST | `/api/orders/{id}/pay` | The customer who placed it | The pretend checkout: marks the order paid. No card details; beyond the PRD (added in M4) |
 | GET | `/api/orders/{id}/bill` | The customer who placed it, or a manager | The bill, as HTML |
 | PATCH | `/api/orders/{id}/payment-status` | Manager | Sets `PENDING` or `PAID` |
+| GET | `/api/reports/sales?from=&to=&top=` | Manager | The sales report for a period: order counts, revenue, sales by day, best sellers, and the period's orders (added in M6) |
 
 Exact requests, responses, and errors: [api-design.md](../../docs/02-design/api-design.md).
 
@@ -40,16 +41,16 @@ Email: bills are emailed only when `SMTP_USER` and `SMTP_PASSWORD` are filled in
 python -m unittest discover -s tests -t .
 ```
 
-101 tests:
+117 tests:
 
 | File | Tests | What |
 |---|---|---|
-| `test_api.py` | 49 | Every endpoint, success and each error, with stand-ins for the other services |
+| `test_api.py` | 64 | Every endpoint, success and each error, with stand-ins for the other services; 15 of them for the sales report |
 | `test_rules.py` | 17 | The renting price, request validation, settings |
 | `test_bill.py` | 14 | What is on the bill, and saving it |
 | `test_book_catalog.py` | 7 | The client for book-service, against a small real web server that answers like it |
 | `test_mailer.py` | 5 | The email message, and that a failed send is logged and never raised |
-| `test_mysql_repository.py` | 9 | The repository against the real MySQL; skipped if MySQL is not reachable |
+| `test_mysql_repository.py` | 10 | The repository against the real MySQL, including the orders of a period; skipped if MySQL is not reachable |
 
 The MySQL tests run in the real `bookstore` database, because the services' account is not allowed to create another one. They only touch the orders of their own temporary user (`order_repo_test`) and delete that user afterwards. One side effect: each run uses up a few order numbers, so real order ids do not stay consecutive.
 
@@ -73,15 +74,15 @@ Four layers; each only calls the one below ([engineering rules](../../docs/02-de
 
 | File | Layer | Holds |
 |---|---|---|
-| `routes.py` | Receives requests, checks who is asking, returns the answer | The seven endpoints |
-| `schemas.py` | The shape of a request, with its validation | `OrderInput`, `OrderLine`, `PaymentStatusInput` |
-| `services.py` | The rules | `OrderService`, `PlacedOrder` |
+| `routes.py` | Receives requests, checks who is asking, returns the answer | The eight endpoints (the report in its own group, `create_report_routes()`) |
+| `schemas.py` | The shape of a request, with its validation | `OrderInput`, `OrderLine`, `PaymentStatusInput`, `SalesReportQuery` |
+| `services.py` | The rules | `OrderService`, `PlacedOrder`, `ReportService` |
 | `pricing.py` | The renting rule, in one place | `RENT_RATE`, `RENT_DAYS`, `charge_for()` |
 | `bill.py` | The bill | `render_bill()`, `BillStore` |
 | `catalog.py` | Books, through book-service | `BookCatalog`, `BookServiceCatalog` |
 | `mailer.py` | Email | `Mailer`, `SmtpMailer`, `NoMailer` |
-| `repository.py` | Database access | `OrderRepository`, with a MySQL and an in-memory version |
-| `models.py` | Plain data | `Order`, `OrderItem`, `CurrentUser`, `CatalogBook` |
+| `repository.py` | Database access | `OrderRepository`, with a MySQL and an in-memory version; `list_between()` gives the orders of a period |
+| `models.py` | Plain data | `Order`, `OrderItem`, `CurrentUser`, `CatalogBook`, `SalesReport`, `DaySales`, `BestSeller` |
 
 Plus `auth.py` (asks user-service who a token belongs to), `errors.py` (the errors, and the one place that answers them), `config.py` (settings), `app.py` (puts the parts together), and `__main__.py` (start-up).
 
@@ -109,7 +110,7 @@ Routes and services raise; `errors.py` answers every failure as `{ "error": "mes
 
 | Raised | Answer |
 |---|---|
-| `ValidationError` | 400, with a message naming the item |
+| `ValidationError` | 400, with a message naming the item, or the date or `top` of a report |
 | `UnauthorizedError` | 401: no token, or the session has ended |
 | `ForbiddenError` | 403: wrong role, or someone else's bill |
 | `NotFoundError` | 404: no such order or book |
@@ -124,6 +125,7 @@ Routes and services raise; `errors.py` answers every failure as `{ "error": "mes
 - **Nothing typed by a user can become HTML or SQL.** Titles, authors, and names are escaped on the bill; every database value is passed as a parameter; a book id must be 24 hexadecimal characters before it is used in an address.
 - **Secrets stay out of the log.** Printing the settings never shows a password or the service key, and a failed email is logged without them.
 - **Email never slows an order.** It is sent on a background thread, so `emailQueued: true` means "being sent", not "delivered".
+- **The sales report is added up in Python** from the orders of the period (one query for the orders, one for their items), in `Decimal`. That is fine at a bookstore's scale. Both dates are included: `to` runs to 23:59:59 of that day. Best sellers are grouped by `bookId`; ties on copies and revenue are sorted by title ignoring upper and lower case (at first capitals came before lower case; found in review, fixed, with a test).
 
 ## Status
 
@@ -137,6 +139,12 @@ Built and verified on 2026-11-16:
 - A real bill was sent through Gmail with `python email_check.py`: the order answered in 101 ms and Gmail accepted the email afterwards ("Emailed the bill for order 1033" in the log). That first email showed the layout broken in Gmail; it was fixed (problem P-016) and a second one sent.
 
 The owner opened the second email in Gmail and it looks as designed.
+
+Sales report, added 2026-11-18 (issue #21):
+
+- All 117 tests pass, including the 10 against the real MySQL.
+- After restarting the services on the new code: `manual_check.py` passed 41 of 41 checks, slowest request 88 ms. The manager app's live check got the all-time sales report in 15 ms; it counted exactly the 4 orders the order list showed, with 6 best sellers. The test order was removed afterwards.
+- **Not verified:** `manual_check.py` does not call the report itself; it was checked on the running service only through the manager app's live check.
 
 **Not verified:** how the bill looks in other mail programs (Outlook, phone apps).
 

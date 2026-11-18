@@ -3,7 +3,6 @@ import 'dart:ui' as ui;
 
 import 'package:bookstore_ui/bookstore_ui.dart';
 import 'package:flutter/rendering.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:management_app/main.dart';
 import 'package:material_ui/material_ui.dart';
@@ -18,29 +17,11 @@ import 'fakes.dart';
 /// normal test run:
 ///
 ///     set BOOKSTORE_SCREENSHOTS=1 && flutter test test/screenshots_test.dart
-const _out = '../../docs/02-design/ui';
+///
+/// BOOKSTORE_SCREENSHOTS_OUT draws them into another folder, to look at them
+/// before they replace the ones in the style guide.
+final _out = Platform.environment['BOOKSTORE_SCREENSHOTS_OUT'] ?? '../../docs/02-design/ui';
 const _size = Size(1440, 900);
-
-Future<void> _loadFonts() async {
-  Future<void> family(String name, List<String> files) async {
-    final loader = FontLoader(name);
-    for (final f in files) {
-      loader.addFont(File(f).readAsBytes().then((b) => ByteData.view(b.buffer)));
-    }
-    await loader.load();
-  }
-
-  const fonts = '../bookstore-ui/fonts';
-  await family('packages/bookstore_ui/Inter', [
-    '$fonts/Inter-Regular.ttf',
-    '$fonts/Inter-Medium.ttf',
-    '$fonts/Inter-SemiBold.ttf',
-    '$fonts/Inter-Bold.ttf',
-  ]);
-  await family('packages/bookstore_ui/SourceSerif4', ['$fonts/SourceSerif4-Regular.ttf', '$fonts/SourceSerif4-Semibold.ttf']);
-  final flutterRoot = File(Platform.resolvedExecutable).parent.parent.parent.parent.parent.parent.path; // .../flutter
-  await family('MaterialIcons', ['$flutterRoot/bin/cache/artifacts/material_fonts/materialicons-regular.otf']);
-}
 
 void main() {
   if (Platform.environment['BOOKSTORE_SCREENSHOTS'] != '1') {
@@ -62,7 +43,7 @@ void main() {
 
   Future<void> start(WidgetTester tester) async {
     await useCachedCovers(tester);
-    await tester.runAsync(_loadFonts);
+    await tester.runAsync(loadRealFonts);
     tester.view.physicalSize = _size;
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.reset);
@@ -107,8 +88,13 @@ void main() {
     await tester.tap(find.widgetWithText(AppButton, 'Cancel'));
     await tester.pumpAndSettle();
 
+    await tester.tap(find.bySemanticsLabel('Reports'));
+    await tester.pumpAndSettle();
+    await shoot(tester, 'manager-reports-light');
+
     await tester.tap(find.byTooltip('Switch to dark mode'));
     await tester.pumpAndSettle();
+    await shoot(tester, 'manager-reports-dark');
     await tester.tap(find.bySemanticsLabel('Orders'));
     await tester.pumpAndSettle();
     await shoot(tester, 'manager-orders-dark');

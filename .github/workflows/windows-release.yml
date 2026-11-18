@@ -93,6 +93,11 @@ jobs:
           & $iscc "/DAppVersion=$env:VERSION" installer\bookstore.iss
           if ($LASTEXITCODE) { exit 1 }
 
+      - name: Test the installer (install, open both apps, uninstall)
+        run: |
+          ./installer/test-installer.ps1 -Setup (Resolve-Path "dist/Bookstore-Apps-Setup-$env:VERSION.exe")
+          if ($LASTEXITCODE) { exit 1 }
+
       - name: Portable apps zip and server zip
         run: |
           New-Item -ItemType Directory -Force dist, stage\apps | Out-Null

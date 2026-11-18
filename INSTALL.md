@@ -82,6 +82,7 @@ MAIL_FROM=your.address@gmail.com
 
 | What you see | What to do |
 |---|---|
+| "An Application Control policy has blocked this file", or Windows says Smart App Control blocked the app | Smart App Control is on, and it blocks every program that is not code-signed. These apps are not signed (signing costs money), so it blocks them. It is on only on some new Windows 11 installs. Use a computer where it is off, or build the apps from the source ("Building from the source", below). Turning it off cannot be undone without reinstalling Windows, so it is not recommended just for this |
 | The app says a service "is not answering" | Run `start-services.cmd`. If a port does not answer, restore its minimized window to read why |
 | setup.cmd: "MySQL Server 8 is not installed" | Do step 1, then run setup.cmd again |
 | setup.cmd: MySQL "Access denied" | The root password was mistyped; it asks up to three times. Run setup.cmd again to retry |
@@ -92,4 +93,10 @@ To reset the test data at any time: `python database\seed.py` in the server fold
 
 ## Building from the source instead
 
-For developers: the tools and versions are in [docs/05-setup/environment.md](docs/05-setup/environment.md). Run the apps with `flutter run -d windows` in `clients/customer-app` or `clients/management-app`. The release files above are built by GitHub Actions (`.github/workflows/windows-release.yml`) from the tagged commit.
+For developers, or where Smart App Control blocks the installed apps: install the [Flutter SDK](https://docs.flutter.dev/get-started/install/windows/desktop) and Visual Studio 2022 Build Tools with "Desktop development with C++" (versions in [docs/05-setup/environment.md](docs/05-setup/environment.md)). Then, in `clients/customer-app` or `clients/management-app`:
+
+```
+flutter run -d windows
+```
+
+A debug build made on the computer itself runs even with Smart App Control on. That is how the apps were developed and tested. The release files above are built by GitHub Actions (`.github/workflows/windows-release.yml`) from the tagged commit.

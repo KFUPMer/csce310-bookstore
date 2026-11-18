@@ -20,6 +20,8 @@ A beta because the release builds of the apps are made on GitHub's Windows machi
 
 ### Added
 - `setup.cmd`, `start-services.cmd`, `stop-services.cmd` in the project folder: set up the services on a new computer (installing Java, Python, and MongoDB through winget when missing), start them, stop them. The only question asked is the MySQL root password, typed into MySQL's own prompt, once
+- `HANDOVER.md`: for the instructor. How to install and try it, a five-minute walk through every requirement, where each piece of evidence is, extra credit claimed, and known limits
+- `installer/test-installer.ps1`: on GitHub, before release, installs silently, checks every file and Start menu entry, opens both apps, and uninstalls
 - `INSTALL.md`: installing on a new computer, the test accounts, and what to do when something goes wrong
 - `.github/workflows/windows-release.yml`: on each version tag, runs every test, builds both apps in release mode, makes the installer (`installer/bookstore.iss`) and the zips, and attaches them to the release
 - `database/check_setup.py`: says in plain words whether each database is ready

@@ -56,6 +56,17 @@ Each requirement is shown three ways, so that no single kind of test is trusted 
 | Account page (orders, rentals due back, profile, preferences) | order-service: 3 tests for `GET /api/orders/mine`; customer app `account_test.dart` (6) and 2 screen tests | `manual_check.py`: only the customer's own orders; managers refused | Tried by the owner |
 | Pretend checkout | order-service: 5 tests for `POST /api/orders/{id}/pay`; customer app screen test | `manual_check.py`: pays, twice refused, someone else's refused, manager refused | Tried by the owner |
 
+## The release files, as a grader gets them
+
+| Check | Where | Result |
+|---|---|---|
+| Every test suite (user-service, both Python services, the shared package, both apps) | GitHub's Windows machine, before building | Pass |
+| Installer: silent install for the current user, every file, both Start menu entries, both apps open and keep running, clean uninstall | GitHub's Windows machine (`installer/test-installer.ps1`) | See the release's build log |
+| Server zip: unzipped into a new folder; `setup.cmd` passes all seven steps; the 41 service checks pass using the jar GitHub built (slowest 176 ms); `start-services.cmd` and `stop-services.cmd` work | Development computer, 2026-11-17 (with its existing `services/.env` copied in, so no new MySQL password was needed) | Pass |
+| The zips contain no secrets (`services/.env`, `setup.local.sql`) | Server zip | None there |
+| Both apps' live checks against the running services, again: customer login 201 ms, order 96 ms, pay 40 ms; manager orders 24 ms, one order 21 ms | Development computer, 2026-11-17 | Pass; the test order was removed afterwards |
+| The installer on the development computer | Development computer | **Blocked by Smart App Control**, as is every unsigned program there (P-017) |
+
 ## Not checked
 
 | What | Why | Plan |
@@ -64,7 +75,8 @@ Each requirement is shown three ways, so that no single kind of test is trusted 
 | A color-blindness simulation of the screenshots | Not run. States are told by icons and words, never by color alone | Optional |
 | Trackpad scrolling, and how the motion feels | Needs a person and real hardware | The owner, if wanted |
 | The bill email in mail programs other than Gmail on the web | Only Gmail was tried | Optional |
-| A release build of the apps | Blocked by Smart App Control (P-017); debug builds are used | Decide before v1.0.0 |
+| `setup.cmd` on a brand-new computer (its winget installs and the MySQL root step) | Everything was already installed on the development computer | The owner or the instructor, on another computer |
+| The installed apps on a computer a person uses, other than GitHub's | Smart App Control blocks them on the development computer (P-017) | The owner or the instructor |
 
 ## How to repeat this
 

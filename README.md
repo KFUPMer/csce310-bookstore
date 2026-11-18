@@ -4,7 +4,7 @@ An online bookstore: customers search for books and place orders from a desktop 
 
 This repository records the **whole process** of the project, not only the final code: the idea, the design, the problems we hit and how we solved them, and the plan (milestones, tasks, deadlines, versions).
 
-**To install and run it:** [INSTALL.md](INSTALL.md). Download the installer and the server zip from the [releases](https://github.com/KFUPMer/csce310-bookstore/releases), run `setup.cmd`, then `start-services.cmd`.
+**For the instructor:** [HANDOVER.md](HANDOVER.md), with everything needed to install, try, and grade the project. **To install and run it:** [INSTALL.md](INSTALL.md). Download the installer and the server zip from the [releases](https://github.com/KFUPMer/csce310-bookstore/releases), run `setup.cmd`, then `start-services.cmd`.
 
 ## Project status
 

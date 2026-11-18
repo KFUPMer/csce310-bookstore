@@ -24,7 +24,7 @@ Much of this project was built with an AI coding assistant (Claude). Its mistake
 | P-014 | A manual check failed and left a service running | Assistant | Solved |
 | P-015 | order-service passed all its tests with faults a review then found | Assistant | Solved, with three limits left open |
 | P-016 | The first real bill email arrived with its layout broken | Assistant | Solved |
-| P-017 | Release builds of the apps are blocked by Windows security | Environment | Open: debug builds used |
+| P-017 | Release builds of the apps are blocked by Windows security | Environment | Solved: built and tested on GitHub's Windows machine |
 
 ## How to add an entry
 
@@ -451,8 +451,16 @@ Smart App Control (see P-002, P-003) blocks this unsigned program. Unlike P-002,
 **Solution so far**
 The apps are built and run in debug mode, which is also how they are run from VS Code (F5). No security setting was changed. Debug builds are slower to start and larger, but behave the same.
 
-**Still to decide (before v1.0.0)**
-Whether the submission needs a release build. If it does, the options are the owner's: turn off Smart App Control (Windows cannot turn it back on without a reinstall), or build on another machine.
+**Solution (2026-11-17)**
+The owner asked for an installable build. Release builds are now made on another machine: GitHub's Windows machine, by the release workflow (`.github/workflows/windows-release.yml`), which has no Smart App Control. Smart App Control stays on here.
+
+**What that showed**
+The installer and the portable apps built there are blocked on this computer too: "An Application Control policy has blocked this file". It blocks unsigned programs it does not know, downloaded or not. Debug builds compiled on this computer still run. So:
+
+1. The installer is tested on GitHub's machine instead, by `installer/test-installer.ps1`. It installs silently, checks every file and Start menu entry, opens both apps, and uninstalls; the release is not published unless it passes.
+2. A grader whose computer has Smart App Control on will be blocked the same way. INSTALL.md says so and gives the way round: build from source, as debug builds work. Code signing would fix it, but costs money and was not done.
+
+**Status:** solved for building; the unsigned-installer limit is recorded under Known gaps.
 
 ## Known gaps
 
@@ -461,7 +469,8 @@ Things that are known to be unfinished or unverified, so nobody is surprised lat
 | Gap | Since | Plan |
 |---|---|---|
 | `uml.py` still writes the three diagrams that were removed, and has not been run from `tools/diagrams`. (`flows.py` was run from there on 2026-11-16 and changed only the diagram that was meant to change) | M2 | Remove the three from `uml.py`; run it once and check `git status` shows no change |
-| Release builds are blocked (P-017) | M4 | Decide before v1.0.0 |
+| The installer and the apps are not code-signed: Windows warns "unknown publisher", and where Smart App Control is on (as on the development computer) it blocks them (P-017) | M5 | Documented in INSTALL.md with the way round (build from source). Signing would need a paid certificate |
+| `setup.cmd` has not been run on a brand-new computer: on the development computer everything was already installed, so its winget installs and the MySQL root step did not run there | M5 | The owner, or the instructor, runs it on another computer |
 | The bill email has been seen to look right in Gmail in a desktop browser only. Other mail programs (Outlook, phone apps) are untested | M3 | Test others in M5 if wanted |
 | If book-service takes copies for an order but its answer does not arrive within 3 seconds, the order fails and those copies are not given back. order-service logs an error naming the book | M3 | Accept and document; a manager can correct the number of copies (FR14). Rare on one machine |
 | The MySQL tests of order-service run in the real `bookstore` database and use up order numbers, so real order ids are not consecutive | M3 | Accept, or have the owner grant the services' account a `bookstore_test` database |

@@ -23,7 +23,8 @@ The live plan is `docs/04-planning/milestones.md`; tasks are GitHub issues on `K
 | management-app (Flutter) | Built (issue 12), 15 tests, checked against the running services. The owner tried it: it works (`manager1` / `manager123`) |
 | Customer account page + pretend checkout | Built 2026-11-17, beyond the PRD (asked for by the owner). No card details are ever asked for or stored. Preferences in `%APPDATA%\CSCE310 Bookstore\preferences.json` |
 | Requirements testing (issue 13) | Done: `docs/06-testing/requirements-test.md`. `manual_check.py` covers every order endpoint (41 checks) |
-| **Next** | Issue 14: final documentation and release v1.0.0. Open decision for the owner: whether the submission needs a release build (P-017) |
+| Installable build | `setup.cmd` etc., `INSTALL.md`, `HANDOVER.md` (for the instructor). The release build, installer, and installer test run on GitHub Actions on each `v*` tag. The installer cannot run on this machine (Smart App Control, P-017) |
+| **Next** | Issue 14: the owner gives the instructor access (the repo is private), someone tries the installer on another computer, then v1.0.0 |
 | Testing and final release | M5 |
 
 Known unfinished or unverified things: the "Known gaps" table at the end of `docs/03-problems/problem-log.md`.

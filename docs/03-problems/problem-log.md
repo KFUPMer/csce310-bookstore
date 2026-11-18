@@ -472,6 +472,22 @@ The installer and the portable apps built there are blocked on this computer too
 
 **Status:** solved for building; the unsigned-installer limit is recorded under Known gaps.
 
+## P-018 — user-service once did not start in the fresh-machine test of v1.2.0
+
+- **Date found:** 2026-11-18
+- **Phase / milestone:** M6 extra credit (release v1.2.0)
+- **Who:** environment (cause unknown); assistant (the check could not say why)
+- **Status:** Not reproduced. Better reporting added
+
+**What happened**
+In the fresh-machine test of v1.2.0 on GitHub, setup and the demo data loaded fine, but `manual_check.py` stopped at once: "user-service did not start". The Java process ended about 14 seconds in, before opening its port.
+
+**Cause**
+Unknown. The message gave only the path of the service's log, and that file is gone when GitHub's machine is thrown away. The same 41 checks passed here with the demo data loaded, and the same test, run again on a new GitHub machine with nothing changed, passed every step.
+
+**Solution**
+`manual_check.py` now prints the last 20 lines of a service's log when it does not start, so a repeat would show why. v1.2.0 itself is not changed: the failure was not in its files.
+
 ## Known gaps
 
 Things that are known to be unfinished or unverified, so nobody is surprised later.

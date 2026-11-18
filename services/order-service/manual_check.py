@@ -54,7 +54,10 @@ def start(name: str, command: list[str], folder: Path, port: int, logs: Path) ->
     while not port_is_open(port):
         if process.poll() is not None or time.monotonic() > deadline:
             process.kill()
-            raise RuntimeError(f"{name} did not start. Its log: {logs / (name + '.log')}")
+            log.close()
+            # The log's end is printed too: on a test machine (GitHub) the file is gone afterwards.
+            tail = (logs / f"{name}.log").read_text(encoding="utf-8", errors="replace").splitlines()[-20:]
+            raise RuntimeError(f"{name} did not start. Its log: {logs / (name + '.log')}\n" + "\n".join(tail))
         time.sleep(0.1)
     return process
 

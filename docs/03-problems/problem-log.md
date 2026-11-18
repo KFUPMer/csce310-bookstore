@@ -488,6 +488,38 @@ Unknown. The message gave only the path of the service's log, and that file is g
 **Solution**
 `manual_check.py` now prints the last 20 lines of a service's log when it does not start, so a repeat would show why. v1.2.0 itself is not changed: the failure was not in its files.
 
+## P-019 — The README described a branch-and-pull-request workflow that was never used
+
+- **Date found:** 2026-11-18
+- **Phase / milestone:** after M6 (front page redone)
+- **Who:** assistant
+- **Status:** Fixed
+
+**What happened**
+The README's "Workflow" section said every task was done on its own branch and merged into `main` through a pull request. A checker found that this never happened: `git log --merges` shows no merges, and `main` is the only branch. Work was committed straight to `main`, with GitHub issues for the tasks.
+
+**Cause**
+The section was written at the start (M1) as the plan, and was not checked against what was actually done.
+
+**Solution**
+The new README describes what was really done. `docs/04-planning/versioning.md` still gives the branch rule for later patches (v1.1.x on a fix branch).
+
+## P-020 — Smart App Control began blocking Flutter's dart.exe
+
+- **Date found:** 2026-11-18
+- **Phase / milestone:** after M6
+- **Who:** environment
+- **Status:** Open. The tests run on GitHub instead
+
+**What happened**
+`flutter test` stopped with "dart.exe was blocked by your organization's Device Guard policy". It was blocked twice in a row. Earlier the same day it worked: the screenshots in this change were drawn with it.
+
+**Cause**
+Smart App Control (as in P-002, P-003, P-017). `dart.exe` is unsigned, and it has not changed since 2026-11-09 (Flutter 3.50.0, Dart 3.14.0), so the block comes from Windows, not from a new file.
+
+**Solution so far**
+No security setting was changed. The Flutter tests of this change were run on GitHub's Windows machine with a manual run of the release workflow, which runs every test suite and publishes nothing when it is not started by a tag.
+
 ## Known gaps
 
 Things that are known to be unfinished or unverified, so nobody is surprised later.

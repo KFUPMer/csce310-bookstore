@@ -170,6 +170,9 @@ class FakeOrders extends OrderApi {
   FakeOrders(super.session) : super(baseUrl: 'http://unused');
   ApiException? failure;
   DateTime now = DateTime(2026, 11, 17, 10, 5);
+
+  /// The number the next placed order gets. The screenshots set it so their orders match the manager app's.
+  int nextId = 1042;
   final List<Order> placed = [];
   final List<int> paid = [];
 
@@ -194,7 +197,7 @@ class FakeOrders extends OrderApi {
 
   Order _order(OrderDraft draft) {
     return Order(
-      id: 1042,
+      id: nextId,
       username: session.username!,
       createdAt: now,
       paymentStatus: 'PENDING',

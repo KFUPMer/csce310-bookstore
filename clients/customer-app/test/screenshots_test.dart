@@ -108,6 +108,10 @@ void main() {
 
   testWidgets('search, order, and bill', (tester) async {
     final services = await start(tester);
+    // Order 1045, placed after the three orders the manager app's screenshots show (1042 to 1044).
+    (services.orders as FakeOrders)
+      ..nextId = 1045
+      ..now = DateTime(2026, 11, 17, 15, 10);
     await logIn(tester);
     await shoot(tester, 'customer-search-light');
 
@@ -169,9 +173,7 @@ void main() {
     await logIn(tester);
 
     await tester.tap(find.bySemanticsLabel(RegExp('^Atomic Habits by')));
-    await tester.pumpAndSettle();
-    await tester.ensureVisible(find.text('Useful, but the same idea is repeated in many chapters.'));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(); // the panel stays at its top, so the cover and title show whole
     await shoot(tester, 'customer-reviews-light');
     await tester.pumpAndSettle(const Duration(seconds: 7));
   });
@@ -180,6 +182,7 @@ void main() {
     final services = await start(tester);
     PlacedItem item(String title, String author, ItemType type, double price, {DateTime? due}) =>
         PlacedItem(title: title, author: author, type: type, quantity: 1, unitPrice: price, dueBack: due);
+    // The same orders the other screenshots show: 1044 as in the manager app, 1045 as on the bill.
     (services.orders as FakeOrders).placed.addAll([
       Order(
         id: 1031,
@@ -190,15 +193,27 @@ void main() {
         items: [item('Refactoring', 'Martin Fowler', ItemType.rent, 5.5, due: DateTime(2026, 11, 15))],
       ),
       Order(
-        id: 1042,
+        id: 1044,
         username: 'alice',
-        createdAt: DateTime(2026, 11, 17, 10, 5),
+        createdAt: DateTime(2026, 11, 17, 14, 20),
         paymentStatus: Order.pending,
         total: 103,
         items: [
-          item('Java Concurrency in Practice', 'Brian Goetz', ItemType.rent, 8, due: DateTime(2026, 11, 24)),
           item('Clean Code', 'Robert C. Martin', ItemType.buy, 40),
           item('Database System Concepts', 'Abraham Silberschatz', ItemType.buy, 55),
+          item('Java Concurrency in Practice', 'Brian Goetz', ItemType.rent, 8, due: DateTime(2026, 11, 24)),
+        ],
+      ),
+      Order(
+        id: 1045,
+        username: 'alice',
+        createdAt: DateTime(2026, 11, 17, 15, 10),
+        paymentStatus: Order.pending,
+        total: 58,
+        items: [
+          item("Charlotte's Web", 'E. B. White', ItemType.rent, 1, due: DateTime(2026, 11, 24)),
+          item('Clean Code', 'Robert C. Martin', ItemType.buy, 40),
+          item('Cosmos', 'Carl Sagan', ItemType.buy, 17),
         ],
       ),
     ]);
@@ -207,10 +222,10 @@ void main() {
     await tester.pumpAndSettle();
     await shoot(tester, 'customer-account-light');
 
-    await tester.tap(find.widgetWithText(AppButton, 'Pay'));
+    await tester.tap(find.widgetWithText(AppButton, 'Pay').first); // the newest order, 1045
     await tester.pumpAndSettle();
     await shoot(tester, 'customer-pay-light');
-    await tester.tap(find.widgetWithText(AppButton, 'Pay \$103.00'));
+    await tester.tap(find.widgetWithText(AppButton, 'Pay \$58.00'));
     await tester.pumpAndSettle();
 
     await tester.tap(find.bySemanticsLabel('Dark mode'));

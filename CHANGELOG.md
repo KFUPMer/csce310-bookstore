@@ -4,7 +4,11 @@ All versions and patches of the project, newest first.
 
 ## Unreleased
 
-Nothing yet.
+- The front page (README.md) redone for anyone passing by: a picture of both apps at the top, a gallery of eight screenshots, how to try it, how it is built, and the project in numbers.
+- HANDOVER.md, for the instructor, tidied: an "at a glance" table, the accounts in one table, screenshots of key steps, and up-to-date counts.
+- The architecture diagram now shows the apps' names, reviews, the sales report, and the emailed bill.
+- The customer app's screenshots now use one consistent set of orders (the bill, the account page, and the pay dialog all show order 1045).
+- `manual_check.py` prints the end of a service's log when that service does not start (P-018).
 
 ## v1.2.0 — 2026-11-18 — A full shop: 81 books and demo sales
 

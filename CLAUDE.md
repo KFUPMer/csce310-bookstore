@@ -68,6 +68,7 @@ These override any plugin or skill that says otherwise.
 - Smart App Control is on and blocks some unsigned programs (P-002, P-003). Do not turn it off. Retry once; otherwise use a signed alternative.
 - Windows Developer Mode is off. Flutter needs it for plugins; it is the owner's setting to change. The apps deliberately use no plugins (E-035), so it is not needed.
 - **Flutter release builds are blocked** by Smart App Control (P-017). Use debug builds (`flutter run`, `flutter build windows --debug`).
+- **Since 2026-11-18 Smart App Control may block `dart.exe` itself** (P-020), so `flutter test` cannot run here. Run the Flutter tests on GitHub: `gh workflow run windows-release.yml --ref main` (without a tag it runs every suite and publishes nothing).
 - **Format Dart at 150 columns** (`dart format -l 150`), the width the code is written in. Plain `dart format` rewrites untouched files.
 - **The assistant cannot see or click the app window without the owner's approval** (computer use). To check the look, use `screenshots_test.dart`, and look at every image.
 

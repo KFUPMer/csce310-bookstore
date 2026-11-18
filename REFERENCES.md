@@ -74,6 +74,8 @@ Tools are used, not included: none of their code is in the repository. The licen
 | Microsoft Edge (headless) | Rendering the sample bill to an image | Microsoft product license |
 | Inno Setup 6.7.1 (Jordan Russell, Martijn Laan), preinstalled on GitHub's Windows machine; version read from the build log | Making the apps' installer, on GitHub Actions (`installer/bookstore.iss`) | Inno Setup License (free, including for commercial use) |
 | GitHub Actions: `actions/checkout@v4`, `actions/setup-java@v4`, `actions/setup-python@v5`, `actions/upload-artifact@v4` (GitHub), `subosito/flutter-action@v2` (Alif Rachmawadi) | The release build (`.github/workflows/windows-release.yml`) | MIT |
+| Windows PowerShell 5.1 with .NET System.Drawing, and the Segoe UI font that comes with Windows | Drawing the README's top picture (`tools/screenshots/make-hero.ps1`); Segoe UI writes the two window titles in it. The font file is not in the repository | Microsoft product license (part of Windows) |
+| GitHub Actions status badge (GitHub) | The build-status badge at the top of README.md and HANDOVER.md | GitHub Terms of Service |
 | winget (Windows Package Manager) | `setup.cmd` installs Java, Python, and MongoDB with it when missing | MIT (Microsoft) |
 
 **Shipped inside the release files, not stored in the repository:** the apps' installer and portable zip contain the Flutter engine (BSD 3-Clause, Google) and three Microsoft Visual C++ runtime files (`msvcp140.dll`, `vcruntime140.dll`, `vcruntime140_1.dll`), which Microsoft allows to be shipped with an application, as Flutter's Windows deployment guide describes. The server zip contains `user-service.jar`, which bundles the Java libraries of section 2 under their own licenses.

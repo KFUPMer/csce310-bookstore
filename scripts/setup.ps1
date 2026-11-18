@@ -111,6 +111,16 @@ Ok 'services\.env is ready (ignored by git; has a generated password for the ser
 Step "5. The database and the services' MySQL account"
 python database\check_setup.py
 $state = $LASTEXITCODE
+if ($state -eq 2 -and $env:BOOKSTORE_MYSQL_ROOT_PASSWORD) {
+    # For automated tests only (the fresh-machine test on GitHub): no person is there to type it.
+    # "(none)" stands for an empty root password, because Windows cannot hold an empty variable.
+    Info 'Using the MySQL root password given to this automated test.'
+    if ($env:BOOKSTORE_MYSQL_ROOT_PASSWORD -ne '(none)') { $env:MYSQL_PWD = $env:BOOKSTORE_MYSQL_ROOT_PASSWORD }
+    cmd /c "`"$mysql`" -u root < `"$root\database\mysql\setup.local.sql`""
+    Remove-Item Env:MYSQL_PWD -ErrorAction SilentlyContinue
+    python database\check_setup.py
+    $state = $LASTEXITCODE
+}
 if ($state -eq 2) {
     Write-Host ""
     Write-Host "   MySQL now asks for YOUR MySQL root password, once." -ForegroundColor Yellow

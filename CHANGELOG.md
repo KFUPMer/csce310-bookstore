@@ -6,6 +6,17 @@ All versions and patches of the project, newest first.
 
 Work towards v1.0.0 (milestone M5, Testing & final release).
 
+## v1.0.0-beta.2 — 2026-11-17 — Tested on a second computer
+
+The same apps and services as beta.1, made to be tested on a computer that has never seen the project. Installation: [INSTALL.md](INSTALL.md).
+
+### Added
+- `.github/workflows/fresh-machine-test.yml`: downloads a release onto a new GitHub Windows machine and follows INSTALL.md. It unzips the server, runs `setup.cmd`'s script twice, runs the 41 service checks, starts the services, installs the apps, opens both, and uninstalls
+- `setup.ps1` takes the MySQL root password from `BOOKSTORE_MYSQL_ROOT_PASSWORD` when it is set, for automated tests only; a person is still asked by MySQL itself
+
+### Fixed
+- Links in the release notes are full addresses, so they work on the release page
+
 ## v1.0.0-beta.1 — 2026-11-17 — Installable build
 
 The first build anyone can install without the development tools. Every requirement FR1–FR14 and N1–N5 is checked ([requirements test report](docs/06-testing/requirements-test.md)). Installation: [INSTALL.md](INSTALL.md).

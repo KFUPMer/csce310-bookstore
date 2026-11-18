@@ -1,0 +1,104 @@
+# Tests a published release the way a grader installs it, on a Windows machine that has never
+# seen this project: download the release, unzip the server, setup.cmd, the 41 service checks,
+# start-services.cmd, the apps installer, open both apps while the services run, then clean up.
+#
+# GitHub's Windows machine is the "second computer": the development computer's Smart App
+# Control blocks the unsigned apps (P-017), and it already has everything installed.
+#
+# What it cannot cover: setup.cmd installing Java, Python, and MongoDB with winget (this machine
+# has no winget, so the step "Prerequisites" does what winget would), and a person typing the
+# MySQL root password (it is passed to setup.ps1 instead; see BOOKSTORE_MYSQL_ROOT_PASSWORD there).
+#
+# Run from the Actions tab: "Fresh machine test" > Run workflow, with the release tag.
+
+name: Fresh machine test
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Release to test'
+        required: true
+        default: 'v1.0.0-beta.1'
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: pwsh
+    env:
+      GRADER: C:\grader
+    steps:
+      - name: Download the release, as a grader would
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release download '${{ inputs.tag }}' --repo '${{ github.repository }}' --dir $env:GRADER
+          Get-ChildItem $env:GRADER | ForEach-Object { "{0}  {1:N1} MB" -f $_.Name, ($_.Length / 1MB) }
+
+      - name: What this machine has
+        run: |
+          cmd /c "java -version 2>&1"
+          python --version
+          Get-Service *mysql*, *mongo* -ErrorAction SilentlyContinue | Format-Table Name, Status, StartType
+          "winget: $([bool](Get-Command winget -ErrorAction SilentlyContinue))"
+
+      - name: Prerequisites (what winget and the MySQL Installer would do on a real PC)
+        run: |
+          # Java 21 first on the machine PATH: setup.ps1 reads PATH from the registry, as a new window would.
+          $machine = [Environment]::GetEnvironmentVariable('Path', 'Machine')
+          [Environment]::SetEnvironmentVariable('Path', "$env:JAVA_HOME_21_X64\bin;$machine", 'Machine')
+          # MongoDB is installed here but disabled.
+          Set-Service MongoDB -StartupType Manual
+          Start-Service MongoDB
+          # MySQL: start its service, or create one as the MySQL Installer would.
+          $svc = Get-Service -Name 'MySQL*' -ErrorAction SilentlyContinue | Select-Object -First 1
+          if (-not $svc) {
+            $bin = (Get-ChildItem 'C:\Program Files\MySQL\MySQL Server *\bin\mysqld.exe' | Select-Object -First 1).DirectoryName
+            & "$bin\mysqld.exe" --initialize-insecure --console
+            & "$bin\mysqld.exe" --install MySQL
+            $svc = Get-Service MySQL
+          }
+          Set-Service $svc.Name -StartupType Manual
+          Start-Service $svc.Name
+          Start-Sleep -Seconds 5
+          # Find the root password this machine's MySQL has: empty, or "root".
+          $mysql = (Get-ChildItem 'C:\Program Files\MySQL\MySQL Server *\bin\mysql.exe' | Select-Object -First 1).FullName
+          $found = $null
+          foreach ($pw in '(none)', 'root') {
+            if ($pw -eq '(none)') { Remove-Item Env:MYSQL_PWD -ErrorAction SilentlyContinue } else { $env:MYSQL_PWD = $pw }
+            & $mysql -u root -e 'SELECT VERSION()' 2>$null
+            if ($LASTEXITCODE -eq 0) { $found = $pw; break }
+          }
+          Remove-Item Env:MYSQL_PWD -ErrorAction SilentlyContinue
+          if (-not $found) { 'Could not log in to MySQL as root'; exit 1 }
+          "BOOKSTORE_MYSQL_ROOT_PASSWORD=$found" >> $env:GITHUB_ENV
+
+      - name: Unzip the server and run setup.cmd's script
+        run: |
+          Expand-Archive (Get-ChildItem "$env:GRADER\Bookstore-Server-*.zip").FullName "$env:GRADER\server"
+          powershell -NoProfile -ExecutionPolicy Bypass -File "$env:GRADER\server\scripts\setup.ps1"
+          if ($LASTEXITCODE) { exit 1 }
+          # Running it again must change nothing and ask nothing.
+          powershell -NoProfile -ExecutionPolicy Bypass -File "$env:GRADER\server\scripts\setup.ps1"
+          if ($LASTEXITCODE) { exit 1 }
+
+      - name: The 41 service checks, from the unzipped server
+        working-directory: C:\grader\server\services\order-service
+        run: |
+          python manual_check.py
+          if ($LASTEXITCODE) { exit 1 }
+
+      - name: start-services.cmd, the installer, and both apps
+        run: |
+          powershell -NoProfile -ExecutionPolicy Bypass -File "$env:GRADER\server\scripts\start-services.ps1"
+          if ($LASTEXITCODE) { exit 1 }
+          $setup = (Get-ChildItem "$env:GRADER\Bookstore-Apps-Setup-*.exe").FullName
+          & "$env:GRADER\server\installer\test-installer.ps1" -Setup $setup
+          $result = $LASTEXITCODE
+          powershell -NoProfile -ExecutionPolicy Bypass -File "$env:GRADER\server\scripts\stop-services.ps1"
+          if ($result -or $LASTEXITCODE) { exit 1 }

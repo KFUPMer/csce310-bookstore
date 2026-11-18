@@ -16,7 +16,7 @@ An online bookstore built to the course PRD: three RESTful services and two nati
 2. From the release, download `Mooneys-Server-…zip` and `Mooneys-Apps-Setup-…exe`.
 3. In the unzipped server folder, double-click `setup.cmd`. It installs anything missing (Java, Python, MongoDB) and creates the data. It asks one thing: your MySQL root password, once, typed into MySQL itself.
 4. Double-click `start-services.cmd`, then run the apps installer.
-5. Log in: customer `customer1` / `customer123`; manager `manager1` / `manager123`.
+5. Log in: customer `customer1` / `customer123`; manager `manager1` / `manager123`. setup also loads demo data: 81 books, 14 invented customers (password `demo12345`, e.g. `omar.aziz`), 100 past sales over the last 60 days, and their reviews, so the Reports tab and the star ratings have something to show.
 
 ### A five-minute walk through every requirement
 

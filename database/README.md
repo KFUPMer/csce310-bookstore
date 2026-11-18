@@ -3,7 +3,8 @@
 | File | What it is |
 |---|---|
 | [mysql/schema.sql](mysql/schema.sql) | Creates the `bookstore` database and its four tables |
-| [mongodb/books.json](mongodb/books.json) | 27 sample books (title, author, price, copies, shelf, cover photo address) |
+| [mongodb/books.json](mongodb/books.json) | 81 sample books (title, author, price, copies, shelf, cover photo address) |
+| [demo_data.py](demo_data.py) | Invented demo customers, 100 past sales at random dates, and their reviews, so the reports and ratings have something to show. `--reset` loads them again, `--remove` takes them away |
 | [make_local_setup.py](make_local_setup.py) | Generates the local setup: a dedicated MySQL account and `services/.env` |
 | [seed.py](seed.py) | Creates the test accounts and loads the books. `--if-empty` (used by setup.cmd) keeps existing data and only brings it up to date |
 | [check_setup.py](check_setup.py) | Says in plain words whether each database is ready |
@@ -31,7 +32,8 @@ python database/seed.py
 ## Test data
 
 - **Accounts:** one customer (`customer1`) and one manager (`manager1`). Their test passwords are at the top of `seed.py`.
-- **Books:** 27 titles on five shelves: 15 Technology (the original computing books), and 3 each of Fiction, Nonfiction, Kids, and Science, added so every shelf has books. One has 0 copies, to test the "not available" case; two share an author, to test searching by author.
+- **Books:** 81 titles on five shelves: 23 Technology, 16 Fiction, 14 Nonfiction, 14 Kids, 14 Science. The first 15 were the original computing books; the rest were added so the shelves look like a real shop.
+- **Demo data** (`demo_data.py`, run by setup.cmd): 14 invented customers with randomly combined names (password `demo12345`, emails at the reserved domain `demo.mooneys.example`), 100 orders at random dates and times over the last 60 days (mostly bought, a quarter rented; older ones mostly paid, recent ones about half pending), and about 96 reviews, each by a customer who ordered that book. The same seed gives the same data each time. Demo orders do not reduce the books' copies. Real orders and the test accounts are never touched. One has 0 copies, to test the "not available" case; two share an author, to test searching by author.
 - **Covers:** each book links to its cover photo on Open Library (https://openlibrary.org), checked by eye for the right title and edition. The photos are not stored here. Without internet the apps draw a cover instead.
 - **Upgrading an existing database:** `python database/seed.py --if-empty` adds the books that are missing and gives existing ones a shelf and a cover if they have none. It changes nothing else, so copies and edits made in the manager app are kept.
 

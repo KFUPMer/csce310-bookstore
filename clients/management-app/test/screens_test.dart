@@ -114,7 +114,7 @@ void main() {
     await start(tester);
     await logIn(tester);
     await openBooks(tester);
-    expect(find.text('27 books. Click a book to change it, including its copies.'), findsOneWidget);
+    expect(find.text('81 books. Click a book to change it, including its copies.'), findsOneWidget);
 
     await tester.tap(find.widgetWithText(AppButton, 'Add book'));
     await tester.pumpAndSettle();
@@ -145,6 +145,8 @@ void main() {
     await start(tester);
     await logIn(tester);
     await openBooks(tester);
+    await tester.ensureVisible(find.bySemanticsLabel(RegExp('^Clean Code by'))); // scrolled to, as a manager would
+    await tester.pumpAndSettle();
     await tester.tap(find.bySemanticsLabel(RegExp('^Clean Code by')));
     await tester.pumpAndSettle();
     expect(find.text('Edit book'), findsOneWidget);

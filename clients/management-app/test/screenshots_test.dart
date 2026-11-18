@@ -79,7 +79,9 @@ void main() {
     await tester.pumpAndSettle();
     await shoot(tester, 'manager-books-light');
 
-    await tester.tap(find.bySemanticsLabel(RegExp('^Clean Code by'))); // near the top of the 27 books
+    await tester.ensureVisible(find.bySemanticsLabel(RegExp('^Clean Code by'))); // scrolled to, as a manager would
+    await tester.pumpAndSettle();
+    await tester.tap(find.bySemanticsLabel(RegExp('^Clean Code by')));
     await tester.pumpAndSettle();
     await tester.enterText(find.descendant(of: find.byType(Dialog), matching: find.byType(TextField)).at(2), '');
     await tester.tap(find.widgetWithText(AppButton, 'Save changes'));

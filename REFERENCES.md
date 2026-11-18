@@ -100,9 +100,10 @@ No text or images were copied from these; they are cited because the design foll
 
 | Data | Source | Note |
 |---|---|---|
-| The 27 book titles and their authors in `database/mongodb/books.json` | Real, published books | Titles and author names are facts and are not protected by copyright. No descriptions or text from the books are used |
+| The 81 book titles and their authors in `database/mongodb/books.json` | Real, published books | Titles and author names are facts and are not protected by copyright. No descriptions or text from the books are used |
 | Book cover photos (one address per book in `books.json`) | **Open Library Covers API**, Internet Archive, https://openlibrary.org/dev/docs/api/covers. Looked up on 2026-11-17 by title and author, or by ISBN, each checked by eye | The covers are the publishers' artwork. They are **linked, not copied**: the apps load them from Open Library at run time, and the repository holds only their addresses. The screenshot tests download them into `clients/build-cover-cache`, which git ignores. Without internet the apps draw a cover from the title instead |
 | Prices and numbers of copies | Invented | For testing only |
+| The demo customers, their orders, and their reviews (`database/demo_data.py`) | Invented: names combined at random from common first and last names; review sentences written for this project | Sample data only, marked by the reserved domain `demo.mooneys.example`. Not real people or real opinions |
 | The names `alice`, `omar`, `customer1`, `manager1` and the `example.com` email addresses | Invented | `example.com` is reserved for examples (RFC 2606) |
 
 ## 6. Use of an AI assistant

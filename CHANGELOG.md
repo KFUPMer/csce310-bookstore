@@ -4,7 +4,9 @@ All versions and patches of the project, newest first.
 
 ## Unreleased
 
-Nothing yet.
+### Added
+- 54 more books (81 in all), each with a checked Open Library cover: Fiction 16, Nonfiction 14, Kids 14, Science 14, Technology 23
+- `database/demo_data.py`: 14 invented customers with random names, 100 past sales at random dates over the last 60 days, and 96 reviews by customers of books they ordered; run by setup.cmd, removable with `--remove`
 
 ## v1.1.0 — 2026-11-18 — Extra credit: reviews, ratings, and sales reports
 

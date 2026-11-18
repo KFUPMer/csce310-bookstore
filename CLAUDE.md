@@ -89,6 +89,7 @@ These override any plugin or skill that says otherwise.
 | Owner's Terminal panel cannot read the pub cache | Build with `flutter build windows --debug`, run `build\windows\x64\runner\Debug\<app>.exe` |
 | Redraw the app screenshots | `clients/customer-app`: `set BOOKSTORE_SCREENSHOTS=1 && flutter test test/screenshots_test.dart` |
 | Reset test data | repo root: `python database/seed.py` |
+| Demo data (14 customers, 100 past sales, reviews; password `demo12345`) | repo root: `python database/demo_data.py` (`--reset`, `--remove`); setup.cmd runs it |
 | Set up / start / stop the services, as a grader would | repo root: `setup.cmd`, `start-services.cmd`, `stop-services.cmd` (they pause at the end; from a script run `scripts\*.ps1` with `powershell -ExecutionPolicy Bypass -File`) |
 | Release build and installer | Pushing a tag `v*` runs `.github/workflows/windows-release.yml` on GitHub (release builds cannot be made on this machine, P-017) |
 

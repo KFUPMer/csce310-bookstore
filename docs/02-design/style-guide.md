@@ -75,7 +75,7 @@ Added for the extra credit (course section 6). Nothing new brings color: the cov
 
 ## Customer app as built (M4)
 
-Every screen of the customer app, in the approved style. Drawn by Flutter from the app's real widgets, with the real typefaces, on the 27 sample books, with their real cover photos, and stand-in services, at 1440 x 900 (`test/screenshots_test.dart`). They are not captures of the running window; that the app works against the real services was checked separately.
+Every screen of the customer app, in the approved style. Drawn by Flutter from the app's real widgets, with the real typefaces, on the 81 sample books, with their real cover photos, and stand-in services, at 1440 x 900 (`test/screenshots_test.dart`). They are not captures of the running window; that the app works against the real services was checked separately.
 
 **Log in**, and **a wrong password** in dark mode. The sign and the fan of covers are the only color on the screen.
 
@@ -119,7 +119,7 @@ Every screen of the customer app, in the approved style. Drawn by Flutter from t
 
 ## Management app as built (M4)
 
-The same style, the same shared widgets. Drawn the same way as the customer app's screenshots, on sample orders and the 27 sample books.
+The same style, the same shared widgets. Drawn the same way as the customer app's screenshots, on sample orders and the 81 sample books.
 
 **Log in**: the same form as the customer app, for managers only.
 

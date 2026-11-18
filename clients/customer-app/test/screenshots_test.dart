@@ -117,13 +117,16 @@ void main() {
     await tester.pumpAndSettle();
     await shoot(tester, 'customer-search-light-detail');
 
-    await tester.tap(find.bySemanticsLabel(RegExp('^Clean Code by')));
-    await tester.pumpAndSettle();
-    await tester.tap(find.widgetWithText(AppButton, 'Buy'));
-    await tester.pumpAndSettle();
-    await tester.tap(find.bySemanticsLabel(RegExp('^Cosmos by')));
-    await tester.pumpAndSettle();
-    await tester.tap(find.widgetWithText(AppButton, 'Buy'));
+    // With 81 books, these are found by searching, as a customer would.
+    for (final title in ['Clean Code', 'Cosmos']) {
+      await tester.enterText(find.byType(TextField).first, title);
+      await tester.pumpAndSettle(const Duration(seconds: 1));
+      await tester.tap(find.bySemanticsLabel(RegExp('^$title by')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.widgetWithText(AppButton, 'Buy'));
+      await tester.pumpAndSettle();
+    }
+    await tester.enterText(find.byType(TextField).first, '');
     await tester.pumpAndSettle(const Duration(seconds: 7));
 
     await tester.tap(find.widgetWithText(AppButton, 'Your order (3)'));

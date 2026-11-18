@@ -7,7 +7,7 @@
 #   4. services/.env and a dedicated MySQL account for the services (make_local_setup.py).
 #   5. The database and that account: the ONLY question asked is the MySQL root password,
 #      typed into MySQL's own prompt. It is never stored. Skipped if already done.
-#   6. The test accounts and the 15 books, only if they are not there yet.
+#   6. The test accounts and the books (only what is missing), and the demo data (customers, sales, reviews).
 #   7. user-service.jar: built with Maven if it is not in the folder already.
 #
 # Plain ASCII on purpose: Windows PowerShell 5.1 misreads UTF-8 scripts (problem log P-013).
@@ -138,7 +138,10 @@ Ok 'MySQL and MongoDB are ready'
 Step "6. Test accounts and books"
 python database\seed.py --if-empty
 if ($LASTEXITCODE -ne 0) { Stop-Setup 'Loading the test data failed (see the messages above).' }
-Ok 'customer1 / customer123 and manager1 / manager123'
+# Invented customers, 100 past sales, and reviews, so the reports and ratings have something to show.
+python database\demo_data.py
+if ($LASTEXITCODE -ne 0) { Stop-Setup 'Loading the demo data failed (see the messages above).' }
+Ok 'customer1 / customer123, manager1 / manager123, and demo customers (password demo12345)'
 
 Step "7. user-service.jar"
 $jar = 'services\user-service\target\user-service.jar'

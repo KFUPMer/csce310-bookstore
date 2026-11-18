@@ -50,6 +50,7 @@ Windows may warn about an "unknown publisher", because the installer is not code
 | App | Username | Password |
 |---|---|---|
 | Mooney's (customer) | `customer1` | `customer123` |
+| A demo customer, with past orders and reviews | for example `omar.aziz` | `demo12345` |
 | Mooney's Manager | `manager1` | `manager123` |
 
 You can also create a new customer account from the Mooney's login screen.

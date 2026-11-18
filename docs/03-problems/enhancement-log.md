@@ -58,6 +58,7 @@ Each entry says whether the PRD required it. "No" means it was a choice, and cou
 | E-048 | 2026-11-18 | Book reviews and ratings | book-service, customer app | No (extra credit, course section 6) |
 | E-049 | 2026-11-18 | A sales report for managers: a period's orders, sales by day, best sellers | order-service, management app | No (extra credit, course section 6) |
 | E-050 | 2026-11-18 | Built by several agents, with a separate review stage that tried to break the work | Process | No |
+| E-051 | 2026-11-18 | A lived-in shop: 81 books, demo customers, 100 past sales, and reviews | Sample data | No (asked for by the owner) |
 
 ## Details
 
@@ -352,3 +353,9 @@ At the owner's request ("ultracode"), E-048 and E-049 were built by a multi-agen
 **Why:** P-015 showed that code which passes its own tests can still be wrong around them. A reviewer whose job is to break the code, and who did not write it, looks where the builder did not.
 **Effect:** five findings in the four areas, all fixed before anything was committed (P-013): a book id in capital letters that let one customer review a book twice and hid those reviews from the rating; best sellers sorted with capitals first; a review dialog that could be closed during a save; a character count that disagreed with the service for emoji; and a top-bar fix that only worked for short usernames. The first could not have been found by the tests as written: the stand-in database was stricter than MongoDB. Its new test passed while the bug was still there, until the stand-in ids were given letters (P-015's lesson again).
 **Then:** 333 tests pass, `manual_check.py` passed 41 of 41 (slowest 88 ms), and both apps' live checks passed.
+
+### E-051 — A lived-in shop: 81 books, demo customers, 100 past sales, and reviews
+
+54 more books, each with a real cover checked by eye, so the shelves look like a shop's (81 in all). `database/demo_data.py` adds 14 invented customers with random names, 100 orders at random dates and times over the last 60 days, and reviews by customers of books they ordered. It is run by setup.cmd, does nothing if the data is already there, and `--remove` takes it all away; real orders and the test accounts are never touched.
+**Why:** the owner asked for it, so the sales report, the best sellers, and the star ratings show something real on the first day.
+**Verified on the running services:** 82 books, 47 of them rated (96 reviews); the all-time report shows 103 orders on 51 different days, $4,127.87, best sellers led by two books at 10 copies; a demo customer logs in with the demo password and sees their own 9 orders.

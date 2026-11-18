@@ -214,5 +214,437 @@
     "copiesAvailable": 3,
     "category": "Science",
     "coverUrl": "https://covers.openlibrary.org/b/id/133936-L.jpg"
+  },
+  {
+    "title": "To Kill a Mockingbird",
+    "author": "Harper Lee",
+    "price": 9.99,
+    "copiesAvailable": 12,
+    "category": "Fiction",
+    "coverUrl": "https://covers.openlibrary.org/b/isbn/9780446310789-L.jpg"
+  },
+  {
+    "title": "The Hobbit",
+    "author": "J. R. R. Tolkien",
+    "price": 14.99,
+    "copiesAvailable": 10,
+    "category": "Fiction",
+    "coverUrl": "https://covers.openlibrary.org/b/isbn/9780618968633-L.jpg"
+  },
+  {
+    "title": "Dune",
+    "author": "Frank Herbert",
+    "price": 10.99,
+    "copiesAvailable": 9,
+    "category": "Fiction",
+    "coverUrl": "https://covers.openlibrary.org/b/isbn/9780441172719-L.jpg"
+  },
+  {
+    "title": "Jane Eyre",
+    "author": "Charlotte Bronte",
+    "price": 10,
+    "copiesAvailable": 7,
+    "category": "Fiction",
+    "coverUrl": "https://covers.openlibrary.org/b/isbn/9780141441146-L.jpg"
+  },
+  {
+    "title": "The Catcher in the Rye",
+    "author": "J. D. Salinger",
+    "price": 9.99,
+    "copiesAvailable": 11,
+    "category": "Fiction",
+    "coverUrl": "https://covers.openlibrary.org/b/isbn/9780316769174-L.jpg"
+  },
+  {
+    "title": "Brave New World",
+    "author": "Aldous Huxley",
+    "price": 15,
+    "copiesAvailable": 8,
+    "category": "Fiction",
+    "coverUrl": "https://covers.openlibrary.org/b/isbn/9780099518471-L.jpg"
+  },
+  {
+    "title": "And Then There Were None",
+    "author": "Agatha Christie",
+    "price": 11.99,
+    "copiesAvailable": 13,
+    "category": "Fiction",
+    "coverUrl": "https://covers.openlibrary.org/b/isbn/9780007136834-L.jpg"
+  },
+  {
+    "title": "The Hound of the Baskervilles",
+    "author": "Arthur Conan Doyle",
+    "price": 9,
+    "copiesAvailable": 6,
+    "category": "Fiction",
+    "coverUrl": "https://covers.openlibrary.org/b/isbn/9780140437867-L.jpg"
+  },
+  {
+    "title": "Frankenstein",
+    "author": "Mary Shelley",
+    "price": 8.99,
+    "copiesAvailable": 10,
+    "category": "Fiction",
+    "coverUrl": "https://covers.openlibrary.org/b/isbn/9780486282114-L.jpg"
+  },
+  {
+    "title": "The Road",
+    "author": "Cormac McCarthy",
+    "price": 16,
+    "copiesAvailable": 5,
+    "category": "Fiction",
+    "coverUrl": "https://covers.openlibrary.org/b/isbn/9780307387899-L.jpg"
+  },
+  {
+    "title": "Never Let Me Go",
+    "author": "Kazuo Ishiguro",
+    "price": 16.95,
+    "copiesAvailable": 7,
+    "category": "Fiction",
+    "coverUrl": "https://covers.openlibrary.org/b/isbn/9781400078776-L.jpg"
+  },
+  {
+    "title": "Fahrenheit 451",
+    "author": "Ray Bradbury",
+    "price": 11.99,
+    "copiesAvailable": 14,
+    "category": "Fiction",
+    "coverUrl": "https://covers.openlibrary.org/b/isbn/9781451673319-L.jpg"
+  },
+  {
+    "title": "One Hundred Years of Solitude",
+    "author": "Gabriel Garcia Marquez",
+    "price": 17.99,
+    "copiesAvailable": 6,
+    "category": "Fiction",
+    "coverUrl": "https://covers.openlibrary.org/b/isbn/9780060883287-L.jpg"
+  },
+  {
+    "title": "Thinking, Fast and Slow",
+    "author": "Daniel Kahneman",
+    "price": 18,
+    "copiesAvailable": 9,
+    "category": "Nonfiction",
+    "coverUrl": "https://covers.openlibrary.org/b/isbn/9780374533557-L.jpg"
+  },
+  {
+    "title": "Quiet: The Power of Introverts in a World That Can't Stop Talking",
+    "author": "Susan Cain",
+    "price": 17,
+    "copiesAvailable": 8,
+    "category": "Nonfiction",
+    "coverUrl": "https://covers.openlibrary.org/b/isbn/9780307352156-L.jpg"
+  },
+  {
+    "title": "The Power of Habit",
+    "author": "Charles Duhigg",
+    "price": 18,
+    "copiesAvailable": 10,
+    "category": "Nonfiction",
+    "coverUrl": "https://covers.openlibrary.org/b/isbn/9780812981605-L.jpg"
+  },
+  {
+    "title": "Outliers: The Story of Success",
+    "author": "Malcolm Gladwell",
+    "price": 19.99,
+    "copiesAvailable": 12,
+    "category": "Nonfiction",
+    "coverUrl": "https://covers.openlibrary.org/b/isbn/9780316017930-L.jpg"
+  },
+  {
+    "title": "Becoming",
+    "author": "Michelle Obama",
+    "price": 32.5,
+    "copiesAvailable": 7,
+    "category": "Nonfiction",
+    "coverUrl": "https://covers.openlibrary.org/b/isbn/9781524763138-L.jpg"
+  },
+  {
+    "title": "Man's Search for Meaning",
+    "author": "Viktor E. Frankl",
+    "price": 11.99,
+    "copiesAvailable": 11,
+    "category": "Nonfiction",
+    "coverUrl": "https://covers.openlibrary.org/b/isbn/9780807014271-L.jpg"
+  },
+  {
+    "title": "The 7 Habits of Highly Effective People",
+    "author": "Stephen R. Covey",
+    "price": 20,
+    "copiesAvailable": 13,
+    "category": "Nonfiction",
+    "coverUrl": "https://covers.openlibrary.org/b/isbn/9781982137274-L.jpg"
+  },
+  {
+    "title": "Freakonomics",
+    "author": "Steven D. Levitt and Stephen J. Dubner",
+    "price": 17.99,
+    "copiesAvailable": 9,
+    "category": "Nonfiction",
+    "coverUrl": "https://covers.openlibrary.org/b/isbn/9780060731335-L.jpg"
+  },
+  {
+    "title": "The Immortal Life of Henrietta Lacks",
+    "author": "Rebecca Skloot",
+    "price": 18,
+    "copiesAvailable": 6,
+    "category": "Nonfiction",
+    "coverUrl": "https://covers.openlibrary.org/b/isbn/9781400052189-L.jpg"
+  },
+  {
+    "title": "How to Win Friends and Influence People",
+    "author": "Dale Carnegie",
+    "price": 17.99,
+    "copiesAvailable": 14,
+    "category": "Nonfiction",
+    "coverUrl": "https://covers.openlibrary.org/b/isbn/9780671027032-L.jpg"
+  },
+  {
+    "title": "Born a Crime: Stories from a South African Childhood",
+    "author": "Trevor Noah",
+    "price": 18,
+    "copiesAvailable": 8,
+    "category": "Nonfiction",
+    "coverUrl": "https://covers.openlibrary.org/b/isbn/9780399588198-L.jpg"
+  },
+  {
+    "title": "Where the Wild Things Are",
+    "author": "Maurice Sendak",
+    "price": 19.99,
+    "copiesAvailable": 9,
+    "category": "Kids",
+    "coverUrl": "https://covers.openlibrary.org/b/isbn/9780060254926-L.jpg"
+  },
+  {
+    "title": "Goodnight Moon",
+    "author": "Margaret Wise Brown",
+    "price": 9.99,
+    "copiesAvailable": 12,
+    "category": "Kids",
+    "coverUrl": "https://covers.openlibrary.org/b/isbn/9780064430173-L.jpg"
+  },
+  {
+    "title": "The Cat in the Hat",
+    "author": "Dr. Seuss",
+    "price": 10.99,
+    "copiesAvailable": 14,
+    "category": "Kids",
+    "coverUrl": "https://covers.openlibrary.org/b/isbn/9780394800011-L.jpg"
+  },
+  {
+    "title": "The Giving Tree",
+    "author": "Shel Silverstein",
+    "price": 19.99,
+    "copiesAvailable": 8,
+    "category": "Kids",
+    "coverUrl": "https://covers.openlibrary.org/b/isbn/9780060256654-L.jpg"
+  },
+  {
+    "title": "Harry Potter and the Sorcerer's Stone",
+    "author": "J. K. Rowling",
+    "price": 26.99,
+    "copiesAvailable": 15,
+    "category": "Kids",
+    "coverUrl": "https://covers.openlibrary.org/b/isbn/9780590353427-L.jpg"
+  },
+  {
+    "title": "Wonder",
+    "author": "R. J. Palacio",
+    "price": 17.99,
+    "copiesAvailable": 11,
+    "category": "Kids",
+    "coverUrl": "https://covers.openlibrary.org/b/isbn/9780375869020-L.jpg"
+  },
+  {
+    "title": "The Lion, the Witch and the Wardrobe",
+    "author": "C. S. Lewis",
+    "price": 8.99,
+    "copiesAvailable": 10,
+    "category": "Kids",
+    "coverUrl": "https://covers.openlibrary.org/b/isbn/9780064404990-L.jpg"
+  },
+  {
+    "title": "Holes",
+    "author": "Louis Sachar",
+    "price": 9.99,
+    "copiesAvailable": 9,
+    "category": "Kids",
+    "coverUrl": "https://covers.openlibrary.org/b/isbn/9780440414803-L.jpg"
+  },
+  {
+    "title": "Charlie and the Chocolate Factory",
+    "author": "Roald Dahl",
+    "price": 8.99,
+    "copiesAvailable": 13,
+    "category": "Kids",
+    "coverUrl": "https://covers.openlibrary.org/b/isbn/9780142410318-L.jpg"
+  },
+  {
+    "title": "The Gruffalo",
+    "author": "Julia Donaldson",
+    "price": 8.99,
+    "copiesAvailable": 7,
+    "category": "Kids",
+    "coverUrl": "https://covers.openlibrary.org/b/isbn/9780142403877-L.jpg"
+  },
+  {
+    "title": "Diary of a Wimpy Kid",
+    "author": "Jeff Kinney",
+    "price": 14.99,
+    "copiesAvailable": 12,
+    "category": "Kids",
+    "coverUrl": "https://covers.openlibrary.org/b/isbn/9780810993136-L.jpg"
+  },
+  {
+    "title": "The Gene: An Intimate History",
+    "author": "Siddhartha Mukherjee",
+    "price": 19.99,
+    "copiesAvailable": 9,
+    "category": "Science",
+    "coverUrl": "https://covers.openlibrary.org/b/isbn/9781476733524-L.jpg"
+  },
+  {
+    "title": "The Emperor of All Maladies: A Biography of Cancer",
+    "author": "Siddhartha Mukherjee",
+    "price": 19.99,
+    "copiesAvailable": 7,
+    "category": "Science",
+    "coverUrl": "https://covers.openlibrary.org/b/isbn/9781439170915-L.jpg"
+  },
+  {
+    "title": "Silent Spring",
+    "author": "Rachel Carson",
+    "price": 16.99,
+    "copiesAvailable": 8,
+    "category": "Science",
+    "coverUrl": "https://covers.openlibrary.org/b/isbn/9780618249060-L.jpg"
+  },
+  {
+    "title": "Astrophysics for People in a Hurry",
+    "author": "Neil deGrasse Tyson",
+    "price": 18.95,
+    "copiesAvailable": 13,
+    "category": "Science",
+    "coverUrl": "https://covers.openlibrary.org/b/isbn/9780393609394-L.jpg"
+  },
+  {
+    "title": "The Elegant Universe",
+    "author": "Brian Greene",
+    "price": 18.95,
+    "copiesAvailable": 6,
+    "category": "Science",
+    "coverUrl": "https://covers.openlibrary.org/b/isbn/9780393338102-L.jpg"
+  },
+  {
+    "title": "A Short History of Nearly Everything",
+    "author": "Bill Bryson",
+    "price": 19.99,
+    "copiesAvailable": 12,
+    "category": "Science",
+    "coverUrl": "https://covers.openlibrary.org/b/isbn/9780767908184-L.jpg"
+  },
+  {
+    "title": "The Man Who Mistook His Wife for a Hat",
+    "author": "Oliver Sacks",
+    "price": 17.99,
+    "copiesAvailable": 8,
+    "category": "Science",
+    "coverUrl": "https://covers.openlibrary.org/b/isbn/9780684853949-L.jpg"
+  },
+  {
+    "title": "The Body: A Guide for Occupants",
+    "author": "Bill Bryson",
+    "price": 30,
+    "copiesAvailable": 10,
+    "category": "Science",
+    "coverUrl": "https://covers.openlibrary.org/b/isbn/9780385539302-L.jpg"
+  },
+  {
+    "title": "I Contain Multitudes",
+    "author": "Ed Yong",
+    "price": 29.99,
+    "copiesAvailable": 5,
+    "category": "Science",
+    "coverUrl": "https://covers.openlibrary.org/b/isbn/9780062368591-L.jpg"
+  },
+  {
+    "title": "Brief Answers to the Big Questions",
+    "author": "Stephen Hawking",
+    "price": 14.99,
+    "copiesAvailable": 14,
+    "category": "Science",
+    "coverUrl": "https://covers.openlibrary.org/b/isbn/9781473695993-L.jpg"
+  },
+  {
+    "title": "The Sixth Extinction: An Unnatural History",
+    "author": "Elizabeth Kolbert",
+    "price": 18,
+    "copiesAvailable": 9,
+    "category": "Science",
+    "coverUrl": "https://covers.openlibrary.org/b/isbn/9781250062185-L.jpg"
+  },
+  {
+    "title": "The Mythical Man-Month",
+    "author": "Frederick P. Brooks Jr.",
+    "price": 39.99,
+    "copiesAvailable": 7,
+    "category": "Technology",
+    "coverUrl": "https://covers.openlibrary.org/b/isbn/9780201835953-L.jpg"
+  },
+  {
+    "title": "Structure and Interpretation of Computer Programs",
+    "author": "Harold Abelson and Gerald Jay Sussman",
+    "price": 55,
+    "copiesAvailable": 5,
+    "category": "Technology",
+    "coverUrl": "https://covers.openlibrary.org/b/isbn/9780262510875-L.jpg"
+  },
+  {
+    "title": "The C Programming Language",
+    "author": "Brian W. Kernighan and Dennis M. Ritchie",
+    "price": 67.99,
+    "copiesAvailable": 9,
+    "category": "Technology",
+    "coverUrl": "https://covers.openlibrary.org/b/isbn/9780131103627-L.jpg"
+  },
+  {
+    "title": "Clean Architecture",
+    "author": "Robert C. Martin",
+    "price": 37.99,
+    "copiesAvailable": 8,
+    "category": "Technology",
+    "coverUrl": "https://covers.openlibrary.org/b/isbn/9780134494166-L.jpg"
+  },
+  {
+    "title": "Domain-Driven Design",
+    "author": "Eric Evans",
+    "price": 64.99,
+    "copiesAvailable": 6,
+    "category": "Technology",
+    "coverUrl": "https://covers.openlibrary.org/b/isbn/9780321125217-L.jpg"
+  },
+  {
+    "title": "Working Effectively with Legacy Code",
+    "author": "Michael C. Feathers",
+    "price": 54.99,
+    "copiesAvailable": 6,
+    "category": "Technology",
+    "coverUrl": "https://covers.openlibrary.org/b/isbn/9780131177055-L.jpg"
+  },
+  {
+    "title": "Test Driven Development: By Example",
+    "author": "Kent Beck",
+    "price": 49.99,
+    "copiesAvailable": 7,
+    "category": "Technology",
+    "coverUrl": "https://covers.openlibrary.org/b/isbn/9780321146533-L.jpg"
+  },
+  {
+    "title": "Designing Data-Intensive Applications",
+    "author": "Martin Kleppmann",
+    "price": 59.99,
+    "copiesAvailable": 10,
+    "category": "Technology",
+    "coverUrl": "https://covers.openlibrary.org/b/isbn/9781449373320-L.jpg"
   }
 ]

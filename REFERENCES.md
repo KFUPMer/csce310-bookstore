@@ -72,6 +72,11 @@ Tools are used, not included: none of their code is in the repository. The licen
 | Visual Studio 2022 Build Tools | Compiling Flutter Windows apps | Microsoft product license |
 | draw.io Desktop (diagrams.net) | Every diagram | Apache License 2.0 |
 | Microsoft Edge (headless) | Rendering the sample bill to an image | Microsoft product license |
+| Inno Setup 6 (Jordan Russell, Martijn Laan) | Making the apps' installer, on GitHub Actions (`installer/bookstore.iss`) | Inno Setup License (free, including for commercial use) |
+| GitHub Actions: `actions/checkout@v4`, `actions/setup-java@v4`, `actions/setup-python@v5`, `actions/upload-artifact@v4` (GitHub), `subosito/flutter-action@v2` (Alif Rachmawadi) | The release build (`.github/workflows/windows-release.yml`) | MIT |
+| winget (Windows Package Manager) | `setup.cmd` installs Java, Python, and MongoDB with it when missing | MIT (Microsoft) |
+
+**Shipped inside the release files, not stored in the repository:** the apps' installer and portable zip contain the Flutter engine (BSD 3-Clause, Google) and three Microsoft Visual C++ runtime files (`msvcp140.dll`, `vcruntime140.dll`, `vcruntime140_1.dll`), which Microsoft allows to be shipped with an application, as Flutter's Windows deployment guide describes. The server zip contains `user-service.jar`, which bundles the Java libraries of section 2 under their own licenses.
 
 ## 4. Ideas, standards, and sources the design follows
 

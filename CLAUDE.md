@@ -72,7 +72,7 @@ These override any plugin or skill that says otherwise.
 | What | Command (from the folder shown) |
 |---|---|
 | user-service tests and jar | `services/user-service`: `mvn package` |
-| user-service | `java -jar target/user-service-0.3.0.jar` |
+| user-service | `java -jar target/user-service.jar` |
 | book-service tests | `services/book-service`: `python -m unittest discover -s tests -t .` |
 | book-service | `python -m book_service` |
 | order-service tests | `services/order-service`: `python -m unittest discover -s tests -t .` |
@@ -85,6 +85,8 @@ These override any plugin or skill that says otherwise.
 | Owner's Terminal panel cannot read the pub cache | Build with `flutter build windows --debug`, run `build\windows\x64\runner\Debug\<app>.exe` |
 | Redraw the app screenshots | `clients/customer-app`: `set BOOKSTORE_SCREENSHOTS=1 && flutter test test/screenshots_test.dart` |
 | Reset test data | repo root: `python database/seed.py` |
+| Set up / start / stop the services, as a grader would | repo root: `setup.cmd`, `start-services.cmd`, `stop-services.cmd` (they pause at the end; from a script run `scripts\*.ps1` with `powershell -ExecutionPolicy Bypass -File`) |
+| Release build and installer | Pushing a tag `v*` runs `.github/workflows/windows-release.yml` on GitHub (release builds cannot be made on this machine, P-017) |
 
 ## Installed plugins
 

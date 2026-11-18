@@ -6,6 +6,29 @@ All versions and patches of the project, newest first.
 
 Work towards v1.0.0 (milestone M5, Testing & final release).
 
+## v1.0.0-beta.1 — 2026-11-17 — Installable build
+
+The first build anyone can install without the development tools. Every requirement FR1–FR14 and N1–N5 is checked ([requirements test report](docs/06-testing/requirements-test.md)). Installation: [INSTALL.md](INSTALL.md).
+
+| File | What it is |
+|---|---|
+| `Bookstore-Apps-Setup-1.0.0-beta.1.exe` | Installs both apps, Bookstore and Bookstore Manager, for the current user (no administrator needed) |
+| `Bookstore-Apps-1.0.0-beta.1-portable.zip` | The same two apps, to unzip and run |
+| `Bookstore-Server-1.0.0-beta.1.zip` | The services and the whole source, with `user-service.jar` already built |
+
+A beta because the release builds of the apps are made on GitHub's Windows machine (this project's own computer cannot make them, P-017), and nobody had installed them on a second computer when this was published.
+
+### Added
+- `setup.cmd`, `start-services.cmd`, `stop-services.cmd` in the project folder: set up the services on a new computer (installing Java, Python, and MongoDB through winget when missing), start them, stop them. The only question asked is the MySQL root password, typed into MySQL's own prompt, once
+- `INSTALL.md`: installing on a new computer, the test accounts, and what to do when something goes wrong
+- `.github/workflows/windows-release.yml`: on each version tag, runs every test, builds both apps in release mode, makes the installer (`installer/bookstore.iss`) and the zips, and attaches them to the release
+- `database/check_setup.py`: says in plain words whether each database is ready
+- `database/seed.py --if-empty`: loads the test data only if it is not there yet, so running setup again never resets data
+- The requirements test report (`docs/06-testing`), and `manual_check.py` covering every order endpoint (41 checks)
+
+### Changed
+- user-service is version 1.0.0, and its jar is always `target/user-service.jar`
+
 ## v0.4.0 — 2026-11-17 — Desktop clients (M4)
 
 Both desktop apps are built in Flutter on the three real services, and the owner has run both and tried every screen. The owner also asked for a customer account page and a pretend checkout, beyond the PRD; both are built. All 225 tests pass.

@@ -73,7 +73,29 @@ def seed_books():
     print(f"MongoDB: {len(books)} books loaded")
 
 
+def is_seeded() -> bool:
+    """True when the test accounts and the books are already there."""
+    db = mysql.connector.connect(
+        host=os.getenv("MYSQL_HOST", "localhost"),
+        user=os.getenv("MYSQL_USER", "root"),
+        password=os.getenv("MYSQL_PASSWORD", ""),
+        database=os.getenv("MYSQL_DATABASE", "bookstore"),
+    )
+    cur = db.cursor()
+    cur.execute("SELECT COUNT(*) FROM users WHERE username IN (%s, %s)", tuple(u[0] for u in TEST_USERS))
+    users = cur.fetchone()[0]
+    db.close()
+    books = MongoClient(os.getenv("MONGO_URL", "mongodb://localhost:27017"))["bookstore"]["books"].count_documents({})
+    return users == len(TEST_USERS) and books > 0
+
+
 if __name__ == "__main__":
+    import sys
+
     load_env_file()
-    seed_users()
-    seed_books()
+    # --if-empty: used by setup.cmd, so running setup again never resets data that is already there.
+    if "--if-empty" in sys.argv and is_seeded():
+        print("Test data already there: left as it is (run without --if-empty to reset it)")
+    else:
+        seed_users()
+        seed_books()

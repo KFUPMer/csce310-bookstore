@@ -4,6 +4,8 @@ An online bookstore: customers search for books and place orders from a desktop 
 
 This repository records the **whole process** of the project, not only the final code: the idea, the design, the problems we hit and how we solved them, and the plan (milestones, tasks, deadlines, versions).
 
+**To install and run it:** [INSTALL.md](INSTALL.md). Download the installer and the server zip from the [releases](https://github.com/KFUPMer/csce310-bookstore/releases), run `setup.cmd`, then `start-services.cmd`.
+
 ## Project status
 
 | Phase | Milestone | Version | Status |
@@ -29,6 +31,8 @@ Dates and tasks: [docs/04-planning/milestones.md](docs/04-planning/milestones.md
 | [docs/05-setup](docs/05-setup/environment.md) | The development environment: every tool, its version, and how to check it |
 | [docs/06-testing](docs/06-testing/requirements-test.md) | The requirements test report: every requirement and the tests that prove it |
 | `tools/diagrams/` | The scripts that generate the draw.io diagrams |
+| `setup.cmd`, `start-services.cmd`, `stop-services.cmd`, `scripts/` | Set up, start, and stop the services on any Windows computer ([INSTALL.md](INSTALL.md)) |
+| `installer/`, `.github/workflows/` | The apps' installer script and the release build on GitHub Actions |
 | [CLAUDE.md](CLAUDE.md) | Notes for the AI assistant: the standing rules, where things stand, and what is next |
 | [services/](services/README.md) | The three backend RESTful web services, each with a README on how to run and test it |
 | [clients/](clients/README.md) | The two desktop GUI applications and their shared package |

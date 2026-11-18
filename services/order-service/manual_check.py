@@ -100,7 +100,7 @@ def main() -> int:
     taken: dict[str, int] = {}
     temp_user = "check_" + secrets.token_hex(4)
     try:
-        processes.append(start("user-service", ["java", "-jar", "target/user-service-0.3.0.jar"], SERVICES / "user-service", 8081, logs))
+        processes.append(start("user-service", ["java", "-jar", "target/user-service.jar"], SERVICES / "user-service", 8081, logs))
         processes.append(start("book-service", [sys.executable, "-m", "book_service"], SERVICES / "book-service", 8082, logs))
         order_process = start("order-service", [sys.executable, "-m", "order_service"], HERE, 8083, logs)
         processes.append(order_process)

@@ -51,6 +51,7 @@ Each entry says whether the PRD required it. "No" means it was a choice, and cou
 | E-041 | 2026-11-17 | An account page: profile, rentals due back, every order and its bill | Customer app, order-service | No (asked for by the owner) |
 | E-042 | 2026-11-17 | A pretend checkout, with no card details | Customer app, order-service | No (asked for by the owner) |
 | E-043 | 2026-11-17 | Each customer's preferences are remembered on the computer | Customer app | No (asked for by the owner) |
+| E-044 | 2026-11-17 | Installable on a new computer with three double-clicks | Whole project | No (asked for by the owner) |
 
 ## Details
 
@@ -302,3 +303,9 @@ The customer's name in the top bar opens "Your account": who they are and where 
 Dark mode, and whether search opens as covers or a list, are saved per username in `%APPDATA%\CSCE310 Bookstore\preferences.json`, and applied at log in. The top-bar buttons and the account page's switches change the same setting. A missing or damaged file falls back to the defaults.
 **Why:** the owner asked for preferences. They are only about how the app looks on this computer, so they stay on it and need no service.
 **Verified:** five tests (kept per customer, damaged file, logged out, no file, and the screen test that logs out and in again).
+
+### E-044 — Installable on a new computer with three double-clicks
+
+`setup.cmd` checks every part, installs Java, Python, and MongoDB with winget when missing, creates the database with a limited account, loads the test data only if it is not there, and says in a sentence what to fix if something is wrong; it can be run again safely. `start-services.cmd` and `stop-services.cmd` start and stop the three services. The apps come as an installer that needs no administrator rights, built in release mode by GitHub Actions on each version tag, after every test passes there.
+**Why:** the owner asked that whoever grades the project can install it without asking anything. The only question left is the grader's own MySQL root password, which only MySQL may see.
+**Verified on the development computer:** setup.cmd passed all seven steps without a question, kept the existing settings and data, and start and stop worked, including starting twice. The GitHub build: see the release's run.

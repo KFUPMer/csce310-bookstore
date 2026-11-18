@@ -39,5 +39,9 @@ build/
 .flutter-plugins-dependencies
 *.g.dart
 
+# Release files made by the installer and the release workflow
+dist/
+stage/
+
 # Machine-specific database setup (contains a generated password)
 *.local.sql

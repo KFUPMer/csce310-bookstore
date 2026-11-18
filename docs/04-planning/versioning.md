@@ -7,6 +7,9 @@ Versions follow `vMAJOR.MINOR.PATCH`.
 | MINOR | A milestone is completed | M3 done → `v0.3.0` |
 | PATCH | A bug is fixed in an already released version | fix in the backend release → `v0.3.1` |
 | MAJOR | The final, submittable system is released | `v1.0.0` |
+| Pre-release | A build of the next version that is complete but not yet confirmed on another computer; published as a GitHub pre-release | `v1.0.0-beta.1` |
+
+Pushing a tag `v*` makes GitHub Actions build the installer and the zips and attach them to the release (`.github/workflows/windows-release.yml`).
 
 ## Releasing a version
 

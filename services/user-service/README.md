@@ -21,20 +21,20 @@ Exact requests, responses, and errors: [api-design.md](../../docs/02-design/api-
 mvn package
 ```
 
-This compiles, runs the 26 tests, and produces `target/user-service-0.3.0.jar`.
+This compiles, runs the 26 tests, and produces `target/user-service.jar`.
 
 ## Run
 
 **With MySQL** (the real mode). Needs the `bookstore` database (see [environment.md](../../docs/05-setup/environment.md)) and the MySQL settings in `services/.env`:
 
 ```bash
-java -jar target/user-service-0.3.0.jar
+java -jar target/user-service.jar
 ```
 
 **Without a database** (memory mode), for trying the service or building the apps against it. It starts with the two test accounts of `database/seed.py`, and forgets everything when stopped. In Command Prompt:
 
 ```bash
-set STORAGE=memory && java -jar target/user-service-0.3.0.jar
+set STORAGE=memory && java -jar target/user-service.jar
 ```
 
 The service listens on port 8081 (change with `USER_SERVICE_PORT`), on this machine only.

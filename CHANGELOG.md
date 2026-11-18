@@ -4,6 +4,20 @@ All versions and patches of the project, newest first.
 
 ## Unreleased
 
+Nothing yet.
+
+## v1.2.0 — 2026-11-18 — A full shop: 81 books and demo sales
+
+A lived-in shop from the first start: 54 more books on the shelves, and demo customers with past sales and reviews, so the Reports tab, the best sellers, and the star ratings show real figures straight away. Asked for by the owner. Nothing in the API or the apps' behaviour changed; all tests pass. Install: [INSTALL.md](INSTALL.md).
+
+| File | What it is |
+|---|---|
+| `Mooneys-Apps-Setup-1.2.0.exe` | Installs both apps for the current user (no administrator needed) |
+| `Mooneys-Apps-1.2.0-portable.zip` | The same two apps, to unzip and run |
+| `Mooneys-Server-1.2.0.zip` | The services and the whole source; `setup.cmd` now also loads the 81 books and the demo data |
+
+Demo customers log in with the password `demo12345` (for example `omar.aziz`). The test accounts are unchanged: `customer1` / `customer123`, `manager1` / `manager123`.
+
 ### Added
 - 54 more books (81 in all), each with a checked Open Library cover: Fiction 16, Nonfiction 14, Kids 14, Science 14, Technology 23
 - `database/demo_data.py`: 14 invented customers with random names, 100 past sales at random dates over the last 60 days, and 96 reviews by customers of books they ordered; run by setup.cmd, removable with `--remove`

@@ -66,6 +66,7 @@ Each requirement is shown three ways, so that no single kind of test is trusted 
 | The zips contain no secrets (`services/.env`, `setup.local.sql`) | Server zip | None there |
 | Both apps' live checks against the running services, again: customer login 201 ms, order 96 ms, pay 40 ms; manager orders 24 ms, one order 21 ms | Development computer, 2026-11-17 | Pass; the test order was removed afterwards |
 | The installer on the development computer | Development computer | **Blocked by Smart App Control**, as is every unsigned program there (P-017) |
+| **A second computer**: the published v1.0.0-beta.2, downloaded onto a new GitHub Windows machine that had never seen the project, following INSTALL.md (`.github/workflows/fresh-machine-test.yml`). Its Java was too old (17), and MySQL and MongoDB were installed but off; the test switched them on and put Java 21 first, which on a real PC `setup.cmd` does with winget | GitHub, 2026-11-17 | Pass. setup created the database, the account, and the data from nothing, and a second run changed nothing; all 41 service checks passed (slowest 99 ms); the services started; the installer installed both apps and both opened while the services ran. The first attempt failed only because the test's own step used Java 17; fixed in the test |
 
 ## Not checked
 
@@ -75,8 +76,8 @@ Each requirement is shown three ways, so that no single kind of test is trusted 
 | A color-blindness simulation of the screenshots | Not run. States are told by icons and words, never by color alone | Optional |
 | Trackpad scrolling, and how the motion feels | Needs a person and real hardware | The owner, if wanted |
 | The bill email in mail programs other than Gmail on the web | Only Gmail was tried | Optional |
-| `setup.cmd` on a brand-new computer (its winget installs and the MySQL root step) | Everything was already installed on the development computer | The owner or the instructor, on another computer |
-| The installed apps on a computer a person uses, other than GitHub's | Smart App Control blocks them on the development computer (P-017) | The owner or the instructor |
+| `setup.cmd` installing Java, Python, and MongoDB with winget, and a person typing the MySQL root password | The fresh-machine test did these steps itself (see above) | Optional |
+| A person clicking through the installed release apps on a computer other than GitHub's | Smart App Control blocks them on the development computer (P-017) | The instructor, when grading |
 
 ## How to repeat this
 

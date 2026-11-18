@@ -61,7 +61,7 @@ Each requirement is shown three ways, so that no single kind of test is trusted 
 | Check | Where | Result |
 |---|---|---|
 | Every test suite (user-service, both Python services, the shared package, both apps) | GitHub's Windows machine, before building | Pass |
-| Installer: silent install for the current user, every file, both Start menu entries, both apps open and keep running, clean uninstall | GitHub's Windows machine (`installer/test-installer.ps1`) | See the release's build log |
+| Installer: silent install for the current user, every file, both Start menu entries, both apps open and keep running, clean uninstall | GitHub's Windows machine (`installer/test-installer.ps1`), in the build that published v1.0.0-beta.1 | Pass: all 19 checks; the apps opened windows titled "Bookstore" and "Bookstore Management"; installed size 64 MB |
 | Server zip: unzipped into a new folder; `setup.cmd` passes all seven steps; the 41 service checks pass using the jar GitHub built (slowest 176 ms); `start-services.cmd` and `stop-services.cmd` work | Development computer, 2026-11-17 (with its existing `services/.env` copied in, so no new MySQL password was needed) | Pass |
 | The zips contain no secrets (`services/.env`, `setup.local.sql`) | Server zip | None there |
 | Both apps' live checks against the running services, again: customer login 201 ms, order 96 ms, pay 40 ms; manager orders 24 ms, one order 21 ms | Development computer, 2026-11-17 | Pass; the test order was removed afterwards |

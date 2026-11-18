@@ -128,6 +128,8 @@ jobs:
           $text = Get-Content CHANGELOG.md -Raw -Encoding utf8
           $m = [regex]::Match($text, "(?ms)^## ${{ github.ref_name }} .*?\r?\n(.*?)(?=^## v)")
           $notes = if ($m.Success) { $m.Groups[1].Value.Trim() } else { 'See CHANGELOG.md.' }
+          # Links in the changelog are relative to the repository; on the release page they must be full.
+          $notes = $notes -replace '\]\((?!https?:)', "](https://github.com/${{ github.repository }}/blob/${{ github.ref_name }}/"
           Set-Content release-notes.md $notes -Encoding utf8
           $extra = @(); if ($env:VERSION -match '-') { $extra += '--prerelease' }   # e.g. -beta.1
           gh release view '${{ github.ref_name }}' 2>$null

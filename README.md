@@ -14,7 +14,7 @@ This repository records the **whole process** of the project, not only the final
 | 2. Design | M2 | v0.2.0 | Done — released 2026-11-13 |
 | 3. Backend services | M3 | v0.3.0 | Done — released 2026-11-17 |
 | 4. Desktop clients | M4 | v0.4.0 | Done — released 2026-11-17 |
-| 5. Testing & final release | M5 | v1.0.0 | In progress |
+| 5. Testing & final release | M5 | v1.0.0 | In progress — v1.0.0-beta.1 published 2026-11-17 |
 
 Dates and tasks: [docs/04-planning/milestones.md](docs/04-planning/milestones.md)
 

@@ -4,7 +4,7 @@
 
 Each requirement is shown three ways, so that no single kind of test is trusted alone:
 
-- **Automated**: tests that run with no server (`mvn package`, `python -m unittest`, `flutter test`). All 340 pass (counted again after the repository audit's fixes, 2026-11-20, P-023).
+- **Automated**: tests that run with no server (`mvn package`, `python -m unittest`, `flutter test`). All 341 pass (counted again after the second audit's fixes, 2026-11-20, P-024).
 - **Live**: calls to the three real services running against the real MySQL and MongoDB: `services/order-service/manual_check.py` (41 checks, all passed on 2026-11-18) and the apps' own clients in `live_services_test.dart` (customer and management app, both passed on 2026-11-18).
 - **Window**: the owner using the real app windows. The owner ran the customer app, the management app, and the account page and checkout on 2026-11-17 and reported that everything works.
 
@@ -16,9 +16,9 @@ Each requirement is shown three ways, so that no single kind of test is trusted 
 | book-service | `python -m unittest discover -s tests -t .` | 76 | Pass, including 18 against the real MongoDB |
 | order-service | `python -m unittest discover -s tests -t .` | 117 | Pass, including 10 against the real MySQL |
 | Shared package | `flutter test` in `clients/bookstore-ui` | 41 | Pass |
-| Customer app | `flutter test` | 46 | Pass |
+| Customer app | `flutter test` | 47 | Pass |
 | Management app | `flutter test` | 34 | Pass |
-| **Total** | | **340** | **Pass** |
+| **Total** | | **341** | **Pass** |
 
 ## Functional requirements
 

@@ -83,39 +83,6 @@ d.edge(gen, savebill, '«include»', DASH)
 d.edge(gen, email, '«include»', DASH)
 d.save('use-case', 'Use case')
 
-# =============================================================== sequence
-d = D()
-P = [('Customer', 90, GREY), ('Customer app\n(JavaFX)', 290, BLUE), ('order-service\n(Flask)', 490, GREEN), ('user-service\n(HttpServer)', 720, GREEN),
-     ('book-service\n(Flask)', 920, GREEN), ('MySQL', 1110, YELLOW), ('bills/ folder', 1290, RED)]
-P = [(n, x, WHITE) for n, x, c in P]
-X = {}
-BOTTOM = 900
-for name, x, col in P:
-    X[name.split('\n')[0]] = x
-    d.box(name.replace('\n', '<br>'), x - 70, 40, 140, 50, 'rounded=0;whiteSpace=wrap;html=1;fontStyle=1;fontSize=12;' + fill(col))
-    d.line(x, 90, x, BOTTOM, '', 'endArrow=none;dashed=1;html=1;strokeColor=#888888;')
-CALL = 'endArrow=block;endFill=1;html=1;rounded=0;fontSize=11;verticalAlign=bottom;'
-RET = 'endArrow=open;endSize=8;dashed=1;html=1;rounded=0;fontSize=11;verticalAlign=bottom;'
-y = [140]
-def msg(a, b, label, ret=False):
-    d.line(X[a], y[0], X[b], y[0], label, RET if ret else CALL); y[0] += 50
-msg('Customer', 'Customer app', '1. click "Place order"')
-msg('Customer app', 'order-service', '2. POST /api/orders (token, items) — asynchronous')
-msg('order-service', 'user-service', '3. GET /api/auth/session (token)')
-msg('user-service', 'MySQL', '4. find session by token')
-msg('MySQL', 'user-service', '5. session + role', True)
-msg('user-service', 'order-service', '6. valid, role = CUSTOMER', True)
-msg('order-service', 'book-service', '7. GET /api/books/{id} (for each book)')
-msg('book-service', 'order-service', '8. price, copies available', True)
-d.box('9. calculate charges:<br>buy = price, rent = 10% of price,<br>rent due date = today + 7 days', X['order-service'] + 12, y[0] - 30, 200, 56, 'rounded=0;whiteSpace=wrap;html=1;fontSize=11;align=left;spacingLeft=6;' + fill(WHITE)); y[0] += 60
-msg('order-service', 'MySQL', '10. INSERT order + items (payment status PENDING)')
-msg('MySQL', 'order-service', '11. order id', True)
-msg('order-service', 'bills/ folder', '12. write bill-&lt;orderId&gt;.html')
-msg('order-service', 'Customer app', '13. 201 Created: order + bill', True)
-msg('Customer app', 'Customer', '14. show the bill', True)
-d.box('The window stays usable between steps 2 and 13, because the call runs in the background (N2).', 60, 930, 420, 50, NOTE)
-d.save('sequence-place-order', 'Sequence: place an order')
-
 # =============================================================== activity
 d = D()
 ACT = 'rounded=1;arcSize=40;whiteSpace=wrap;html=1;fontSize=12;' + fill(BLUE)
@@ -195,55 +162,6 @@ d.edge(svc['book-service'], svc['user-service'], '', DASH + 'edgeStyle=orthogona
 d.box('Circle: REST interface a service provides.<br>Dashed arrow: uses (HTTP / JSON).<br>Solid arrow: reads and writes data.', 40, 520, 300, 66, NOTE)
 d.save('component', 'Component')
 
-# =============================================================== deployment
-d = D()
-NODE = 'shape=cube;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;darkOpacity=0.05;darkOpacity2=0.1;size=14;verticalAlign=top;align=left;spacingLeft=8;spacingTop=2;fontSize=12;'
-ENV = 'rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;align=left;spacingLeft=8;spacingTop=4;fontSize=12;'
-ART = 'rounded=0;whiteSpace=wrap;html=1;fontSize=12;'
-pc1 = d.box('«device» <b>Customer PC</b>', 40, 70, 300, 170, NODE + fill(GREY))
-d.box('«artifact»<br><b>customer-app.jar</b><br>Java 21 + JavaFX', 80, 125, 220, 80, ART + fill(BLUE))
-pc2 = d.box('«device» <b>Manager PC</b>', 40, 400, 300, 170, NODE + fill(GREY))
-d.box('«artifact»<br><b>management-app.jar</b><br>Java 21 + JavaFX', 80, 455, 220, 80, ART + fill(BLUE))
-srv = d.box('«device» <b>Server</b>', 480, 30, 800, 610, NODE + fill(GREY))
-jvm = d.box('«execution environment» <b>Java 21 (JVM)</b>', 520, 90, 320, 130, ENV + fill(WHITE))
-d.box('«artifact»<br><b>user-service.jar</b><br>HttpServer, port 8081', 550, 130, 260, 70, ART + fill(GREEN))
-py = d.box('«execution environment» <b>Python 3 + Flask</b>', 520, 270, 320, 220, ENV + fill(WHITE))
-d.box('«artifact»<br><b>order-service</b><br>port 8083', 550, 310, 260, 70, ART + fill(GREEN))
-d.box('«artifact»<br><b>book-service</b><br>port 8082', 550, 400, 260, 70, ART + fill(GREEN))
-my = d.box('«execution environment» <b>MySQL Server, port 3306</b>', 920, 90, 320, 130, ENV + fill(WHITE))
-d.box('«database»<br><b>bookstore</b><br>users, sessions, orders, order_items', 950, 130, 260, 70, ART + fill(YELLOW))
-mo = d.box('«execution environment» <b>MongoDB Server, port 27017</b>', 920, 270, 320, 130, ENV + fill(WHITE))
-d.box('«database»<br><b>bookstore</b><br>books collection', 950, 310, 260, 70, ART + fill(YELLOW))
-bl = d.box('«folder» <b>bills/</b><br>bill-&lt;orderId&gt;.html', 920, 440, 320, 60, ENV + fill(RED))
-d.edge(pc1, srv, 'HTTP / JSON<br>ports 8081–8083', LINE + 'exitX=1;exitY=0.5;entryX=0;entryY=0.2;')
-d.edge(pc2, srv, 'HTTP / JSON<br>ports 8081–8083', LINE + 'exitX=1;exitY=0.5;entryX=0;entryY=0.75;')
-d.edge(jvm, my, 'JDBC', LINE)
-d.edge(py, my, 'SQL', LINE + 'exitX=1;exitY=0.25;entryX=0;entryY=0.75;')
-d.edge(py, mo, 'PyMongo', LINE + 'exitX=1;exitY=0.5;entryX=0;entryY=0.5;')
-d.edge(py, bl, 'file write', LINE + 'exitX=1;exitY=0.85;entryX=0;entryY=0.5;')
-d.box('For the course demo, the two apps and the server all run on one computer (localhost).', 520, 540, 420, 50, NOTE)
-d.save('deployment', 'Deployment')
-
-# =============================================================== package
-d = D()
-PK = 'shape=folder;fontStyle=1;tabWidth=130;tabHeight=22;tabPosition=left;html=1;whiteSpace=wrap;verticalAlign=top;spacingTop=26;fontSize=13;'
-PKS = 'shape=folder;tabWidth=50;tabHeight=12;tabPosition=left;html=1;whiteSpace=wrap;verticalAlign=middle;spacingTop=10;fontSize=12;'
-clients = d.box('clients', 40, 40, 1180, 270, PK + fill(GREY))
-services = d.box('services', 40, 420, 1180, 300, PK + fill(GREY))
-def pkg(label, x, y, color, inner, deps, w=540, h=170):
-    d.box(label, x, y, w, h, PK.replace('fontSize=13', 'fontSize=12') + fill(WHITE))
-    ids = {n: d.box(n, x + dx, y + dy, 140, 50, PKS + fill(color)) for n, dx, dy in inner}
-    for a, b in deps: d.edge(ids[a], ids[b], '', DASH)
-row = lambda names: [(n, 30 + i * 170, 85) for i, n in enumerate(names)]
-pkg('customer-app<br><span style="font-weight:normal">com.bookstore.customer</span>', 70, 110, BLUE, row(['controller', 'api', 'model']), [('controller', 'api'), ('api', 'model')])
-pkg('management-app<br><span style="font-weight:normal">com.bookstore.manager</span>', 650, 110, BLUE, row(['controller', 'api', 'model']), [('controller', 'api'), ('api', 'model')])
-grid = lambda a, b, c, e: [(a, 25, 75), (b, 195, 75), (c, 25, 145), (e, 195, 145)]
-pkg('user-service (Java)<br><span style="font-weight:normal">com.bookstore.user</span>', 70, 480, GREEN, grid('handler', 'service', 'security', 'repository'), [('handler', 'service'), ('service', 'repository'), ('service', 'security')], 360, 215)
-pkg('book-service (Python)<br><span style="font-weight:normal">book_service</span>', 450, 480, GREEN, grid('routes', 'services', 'auth', 'repository'), [('routes', 'services'), ('services', 'repository'), ('routes', 'auth')], 360, 215)
-pkg('order-service (Python)<br><span style="font-weight:normal">order_service</span>', 830, 480, GREEN, grid('routes', 'services', 'billing', 'repository'), [('routes', 'services'), ('services', 'repository'), ('services', 'billing')], 360, 215)
-d.edge(clients, services, '«use»  HTTP / JSON', DASH)
-d.save('package', 'Package')
-
 # =============================================================== object
 d = D()
 OBJ = 'rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingTop=2;fontSize=12;'
@@ -263,31 +181,9 @@ for it, ia, bk, ba, yy in rows:
 d.box('One moment in time: alice has just placed order 1042.<br>She buys two books and rents one.<br>Rent = 10% of 80.00 = 8.00, due back 7 days later.<br>Total = 40.00 + 55.00 + 8.00 = 103.00', 40, 430, 290, 100, NOTE)
 d.save('object', 'Object')
 
-# =============================================================== composite structure
-d = D()
-d.box('order-service', 160, 40, 820, 560, 'rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;fontStyle=1;fontSize=14;spacingTop=6;fillColor=none;strokeColor=#000000;')
-PART = 'rounded=0;whiteSpace=wrap;html=1;fontSize=12;'
-PORT = 'rounded=0;html=1;fillColor=#ffffff;strokeColor=#000000;'
-pin = d.box('', 150, 310, 20, 20, PORT); d.box('REST API<br>port 8083', 60, 300, 85, 40, TEXT.replace('align=left', 'align=right'))
-routes = d.box('routes : OrderRoutes', 220, 295, 180, 50, PART + fill(BLUE))
-service = d.box('service : OrderService', 460, 295, 200, 50, PART + fill(GREEN))
-pricing = d.box('pricing : PriceCalculator', 460, 440, 200, 50, PART + fill(GREEN))
-d.edge(pin, routes, '', LINE); d.edge(routes, service, '', LINE); d.edge(service, pricing, '', LINE)
-for label, yy, portlabel, opt in (('auth : SessionChecker', 90, 'to user-service (validate session)', False), ('books : BookClient', 190, 'to book-service (price, copies)', False),
-                                  ('repo : OrderRepository', 295, 'to MySQL (orders, order_items)', False), ('bills : BillGenerator', 400, 'to bills/ folder (HTML file)', False),
-                                  ('mail : EmailSender [0..1]', 500, 'to mail server (optional, FR10)', True)):
-    p = d.box(label, 720, yy, 200, 50, PART + fill(WHITE if opt else GREEN) + ('dashed=1;' if opt else ''))
-    port = d.box('', 970, yy + 15, 20, 20, PORT)
-    d.box(portlabel, 1000, yy + 5, 240, 40, TEXT)
-    d.edge(p, port, '', LINE + ('dashed=1;' if opt else ''))
-    if opt: d.edge(prev, p, '', LINE + 'dashed=1;')
-    else: d.edge(routes if label.startswith('auth') else service, p, '', LINE)
-    prev = p
-d.box('Small squares on the border are ports: the points where order-service talks to the outside.', 190, 500, 240, 70, NOTE)
-d.save('composite-structure', 'Composite structure: order-service')
-
 # =============================================================== profile
 d = D()
+PK = 'shape=folder;fontStyle=1;tabWidth=130;tabHeight=22;tabPosition=left;html=1;whiteSpace=wrap;verticalAlign=top;spacingTop=26;fontSize=13;'
 d.box('«profile» Bookstore', 20, 20, 1520, 420, PK.replace('tabWidth=130', 'tabWidth=170') + 'fillColor=none;strokeColor=#666666;')
 META = 'rounded=0;whiteSpace=wrap;html=1;fontSize=12;' + fill(GREY)
 STE = 'rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=6;spacingTop=2;fontSize=12;'

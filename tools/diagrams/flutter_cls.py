@@ -58,9 +58,6 @@ def write(name, title, cells):
 '''
     io.open(f'{out}/{name}.drawio', 'w', encoding='utf-8', newline='\n').write(xml)
 
-API_CLIENT = (['- baseUrl : String', '- session : Session'],
-              ['+ get(path) : Future<dynamic>', '+ post(path, body) : Future<dynamic>', '+ put(path, body) : Future<dynamic>', '+ patch(path, body) : Future<dynamic>'])
-SESSION = (['+ token : String?', '+ username : String?', '+ role : String?'], ['+ isLoggedIn : bool', '+ clear() : void'])
 COLORS = ['Colors', 'Blue: screens (Flutter widgets)', 'Green: calls to the web services', 'Yellow: data', 'Grey: application, session, order draft']
 ASYNC = ['Every Api method is async and returns a', 'Future. Screens await it and show a loading', 'state, so the window never freezes (N2).']
 BUILD = '+ build(context) : Widget'

@@ -1,362 +1,131 @@
-<h2 class="pagebreak">4. Architectural and class design</h2>
-
-<p>This section shows how the system is split into parts, which design patterns it follows, and every class in it. The class lists were checked against the source code as it is now.</p>
+<h2>4. Architectural and class design</h2>
 
 <h3>4.1 Components</h3>
-
 <figure class="diagram">
-  <img src="../02-design/diagrams/architecture.png" alt="Architecture: two Flutter apps call three services over HTTP and JSON; the services use MySQL, MongoDB, bill files, and Gmail SMTP">
-  <figcaption>Figure 4.1: The components. Solid arrows: calls from the apps and from the services to their data. Dotted arrows: calls between services. Not drawn: book-service also asks user-service to check a session (table 4.2.1). Gmail SMTP is not its own box; it is in the Bill box ("sent by Gmail SMTP").</figcaption>
+  <img src="../02-design/diagrams/architecture.png" alt="Architecture: two Flutter apps call three services over HTTP and JSON; user-service and order-service use MySQL, book-service uses MongoDB; order-service saves and emails the bill">
+  <figcaption>Figure 4.1. The two apps call the three services over HTTP with JSON. order-service asks user-service who is logged in and asks book-service for the books; it saves each bill as an HTML file and emails it through Gmail.</figcaption>
 </figure>
 
+<h3>4.2 The patterns it follows</h3>
+
 <table class="data">
-  <thead>
-    <tr><th>Component</th><th>Kind</th><th>Where</th><th>Role</th></tr>
-  </thead>
+  <thead><tr><th>Pattern</th><th>How it is followed here</th></tr></thead>
   <tbody>
-    <tr><td>Mooney's (customer app)</td><td>Flutter Windows app</td><td><code>clients/customer-app</code></td><td>Log in, create an account, search books by shelf, order (buy or rent), see the bill, pretend to pay, write reviews, see the account page</td></tr>
-    <tr><td>Mooney's Manager (management app)</td><td>Flutter Windows app</td><td><code>clients/management-app</code></td><td>Log in as a manager, list orders and set their payment status, view and print bills, add and edit books, see the sales report</td></tr>
-    <tr><td>bookstore-ui</td><td>Shared Dart package</td><td><code>clients/bookstore-ui</code></td><td>What both apps share: the look (colors, fonts, widgets), the log-in form, the HTTP client, the session, and the data classes <code>Book</code>, <code>Order</code>, <code>Review</code></td></tr>
-    <tr><td>user-service</td><td>Java 21 <code>HttpServer</code>, port 8081</td><td><code>services/user-service</code></td><td>Register, log in, log out, and check a session token for the other services</td></tr>
-    <tr><td>book-service</td><td>Python Flask under waitress, port 8082</td><td><code>services/book-service</code></td><td>Search, add, and update books; change copies; reviews and ratings</td></tr>
-    <tr><td>order-service</td><td>Python Flask under waitress, port 8083</td><td><code>services/order-service</code></td><td>Place orders, make and save the bill, email it, payment status, pretend checkout, sales report</td></tr>
-    <tr><td>MySQL (database <code>bookstore</code>)</td><td>Relational database</td><td><code>database/mysql/schema.sql</code></td><td>Tables <code>users</code>, <code>sessions</code>, <code>orders</code>, <code>order_items</code></td></tr>
-    <tr><td>MongoDB</td><td>Document database</td><td><code>database/mongodb</code></td><td>Collections <code>books</code> and <code>reviews</code></td></tr>
-    <tr><td>Bill files</td><td>HTML files on disk</td><td><code>services/order-service/bills</code> (the default; setting <code>BILLS_FOLDER</code> changes it)</td><td>One HTML bill per order (FR8), written by <code>BillStore</code></td></tr>
-    <tr><td>Gmail SMTP</td><td>Outside mail server</td><td>Reached by <code>SmtpMailer</code></td><td>Sends the bill to the customer by email (FR10). If mail is not set up, <code>NoMailer</code> is used and no email is sent</td></tr>
+    <tr><td><strong>Client/server</strong></td><td>The two apps are clients. The three services are servers, reached only over HTTP with JSON. The apps never touch a database.</td></tr>
+    <tr><td><strong>Three tiers</strong></td><td><b>Presentation:</b> Mooney's, Mooney's Manager, and their shared package. <b>Logic:</b> the three services (who may do what, prices, renting, copies, bills, reports). <b>Data:</b> MySQL, MongoDB, and the bill files. Only the logic tier reads or writes the data.</td></tr>
+    <tr><td><strong>Four layers in each service</strong></td><td><b>Routes</b> read the request and write the answer → <b>services</b> hold the rules → <b>repositories</b> read and write the database → <b>models</b> are plain data. A layer calls only the one below. Every service is built the same way, in Java and in Python.</td></tr>
+    <tr><td><strong>Model-View-Controller</strong></td><td><b>Services:</b> models are the model, routes are the controller, the JSON answer and the HTML bill are the view. <b>Apps:</b> data classes (<code>Book</code>, <code>Order</code>) are the model, screens are the view, and the <code>*Api</code> classes with each screen's state act as the controller. Flutter is built from widgets, so a screen's state both draws and reacts: the fit is loose there.</td></tr>
   </tbody>
 </table>
 
-<p>The services listen on <code>127.0.0.1</code> and <code>::1</code> only, never on the network. The apps reach them at <code>http://127.0.0.1:8081</code>, <code>:8082</code>, and <code>:8083</code> (constants in <code>bookstore-ui/lib/src/api/apis.dart</code>).</p>
+<h3 class="pagebreak">4.3 Classes and their roles</h3>
+<p>The main classes of each part. Every class, with its fields and methods, is in the class diagrams in 4.4.</p>
 
-<h3>4.2 How the design follows the patterns</h3>
-
-<h4>4.2.1 Client/server</h4>
-
+<h4>4.3.1 user-service (Java)</h4>
 <table class="data">
-  <thead>
-    <tr><th>Client</th><th>Server</th><th>What crosses the wire</th></tr>
-  </thead>
+  <thead><tr><th>Class</th><th>Layer</th><th>Role</th></tr></thead>
   <tbody>
-    <tr><td>Both apps</td><td>user-service</td><td>HTTP requests with JSON bodies; JSON answers. Log in returns a session token</td></tr>
-    <tr><td>Both apps</td><td>book-service, order-service</td><td>HTTP with JSON, and the header <code>Authorization: Bearer &lt;token&gt;</code>. One exception: <code>GET /api/orders/{id}/bill</code> answers with the HTML bill, not JSON</td></tr>
-    <tr><td>book-service, order-service</td><td>user-service</td><td><code>GET /api/auth/session</code> with the caller's token, to learn who is asking and their role. Timeout 2 s to connect, 3 s to read; no answer becomes <code>503</code></td></tr>
-    <tr><td>order-service</td><td>book-service</td><td><code>PATCH /api/books/{id}/copies</code> with the header <code>X-Service-Key</code>, to take copies when an order is placed and give them back if it fails</td></tr>
-    <tr><td>order-service</td><td>Gmail SMTP</td><td>The bill as an email, sent in the background</td></tr>
+    <tr><td><code>UserServer</code></td><td>Start-up</td><td>Builds the parts and starts the HTTP server on port 8081</td></tr>
+    <tr><td><code>AuthHandler</code>, <code>UserHandler</code></td><td>Routes</td><td>Log in, log out, session check; register</td></tr>
+    <tr><td><code>BaseHandler</code></td><td>Routes</td><td>Reads JSON and turns every error into <code>{ "error": ... }</code> in one place</td></tr>
+    <tr><td><code>AuthService</code></td><td>Service</td><td>The rules of logging in, sessions, and registering</td></tr>
+    <tr><td><code>PasswordHasher</code>, <code>TokenGenerator</code></td><td>Service</td><td>bcrypt hashes; random 64-character tokens</td></tr>
+    <tr><td><code>JdbcUserRepository</code>, <code>JdbcSessionRepository</code>, <code>Database</code></td><td>Repository</td><td>The <code>users</code> and <code>sessions</code> tables, through a connection pool</td></tr>
+    <tr><td><code>User</code>, <code>Session</code>, <code>Role</code></td><td>Model</td><td>Plain data</td></tr>
   </tbody>
 </table>
 
-<p>The apps never touch a database. Each service is the only owner of its data. Errors always come back in one shape, <code>{ "error": "message" }</code>, with the right status code. In the apps, <code>ApiClient</code> turns every failure into one <code>ApiException</code>.</p>
-
-<h4>4.2.2 Three tiers</h4>
-
+<h4>4.3.2 book-service (Python)</h4>
 <table class="data">
-  <thead>
-    <tr><th>Tier</th><th>Components</th><th>Job</th></tr>
-  </thead>
+  <thead><tr><th>Class or module</th><th>Layer</th><th>Role</th></tr></thead>
   <tbody>
-    <tr><td>Presentation</td><td>Mooney's, Mooney's Manager, bookstore-ui</td><td>Show data and take input. They check form fields first so the user sees a problem at once, but the services check again and have the last word</td></tr>
-    <tr><td>Logic</td><td>user-service, book-service, order-service</td><td>The rules: who may do what, prices, renting (10% of the price, 7 days), copies, bills, reports</td></tr>
-    <tr><td>Data</td><td>MySQL, MongoDB, bill files</td><td>Keep the data. Only the logic tier reads or writes it</td></tr>
+    <tr><td><code>routes.py</code>, <code>schemas.py</code></td><td>Routes</td><td>The 8 endpoints; the checks on each request (<code>BookInput</code>, <code>ReviewInput</code>)</td></tr>
+    <tr><td><code>BookService</code>, <code>ReviewService</code></td><td>Service</td><td>Search, add, change, copies; reviews and ratings</td></tr>
+    <tr><td><code>UserServiceSessionChecker</code></td><td>Service</td><td>Asks user-service who owns a token</td></tr>
+    <tr><td><code>MongoBookRepository</code>, <code>MongoReviewRepository</code></td><td>Repository</td><td>The <code>books</code> and <code>reviews</code> collections; copies change in one atomic step</td></tr>
+    <tr><td><code>Book</code>, <code>Review</code>, <code>CurrentUser</code></td><td>Model</td><td>Plain data, written as JSON by <code>to_json()</code></td></tr>
   </tbody>
 </table>
 
-<p>Gmail SMTP is outside the three tiers: it is an outside service that order-service calls.</p>
-
-<h4>4.2.3 The four layers inside each service</h4>
-
-<p>Every service is split into the same four layers (<code>docs/02-design/engineering-rules.md</code>, section 2). A layer calls only the layers below it; every layer may use the models and raise the errors.</p>
-
+<h4>4.3.3 order-service (Python)</h4>
 <table class="data">
-  <thead>
-    <tr><th>Layer</th><th>Does</th><th>user-service (Java)</th><th>book-service (Python)</th><th>order-service (Python)</th></tr>
-  </thead>
+  <thead><tr><th>Class or module</th><th>Layer</th><th>Role</th></tr></thead>
   <tbody>
-    <tr><td>Routes / handlers</td><td>Read the request, ask the login check who is calling, call the service, write JSON</td><td><code>BaseHandler</code>, <code>AuthHandler</code>, <code>UserHandler</code>, <code>Json</code>; request and response records in <code>http/dto</code></td><td><code>routes.py</code> (<code>create_routes</code>); request shapes in <code>schemas.py</code></td><td><code>routes.py</code> (<code>create_routes</code>, <code>create_report_routes</code>); request shapes in <code>schemas.py</code></td></tr>
-    <tr><td>Services</td><td>The rules. No request handling and no SQL; calls to other services go through interfaces</td><td><code>AuthService</code>, <code>PasswordHasher</code>, <code>TokenGenerator</code></td><td><code>BookService</code>, <code>ReviewService</code>; the login check: <code>auth.py</code> and <code>SessionChecker</code> (asks user-service)</td><td><code>OrderService</code>, <code>ReportService</code>, <code>pricing.py</code>, <code>bill.py</code>; the login check: <code>auth.py</code> and <code>SessionChecker</code>; other services behind <code>BookCatalog</code> and <code>Mailer</code></td></tr>
-    <tr><td>Repositories</td><td>Read and write the database</td><td><code>UserRepository</code>, <code>SessionRepository</code> (interfaces) with JDBC and in-memory versions; <code>Database</code></td><td><code>BookRepository</code>, <code>ReviewRepository</code> (abstract) with MongoDB and in-memory versions</td><td><code>OrderRepository</code> (abstract) with MySQL and in-memory versions; <code>BillStore</code> for bill files</td></tr>
-    <tr><td>Models</td><td>Plain data</td><td><code>User</code>, <code>Session</code>, <code>Role</code></td><td><code>models.py</code>: <code>Book</code>, <code>Review</code>, <code>RatingTotals</code>, <code>CurrentUser</code></td><td><code>models.py</code>: <code>Order</code>, <code>OrderItem</code>, <code>SalesReport</code>, and others</td></tr>
+    <tr><td><code>routes.py</code>, <code>schemas.py</code></td><td>Routes</td><td>The 8 endpoints; the checks on each request (<code>OrderInput</code>, <code>SalesReportQuery</code>)</td></tr>
+    <tr><td><code>OrderService</code></td><td>Service</td><td>Place an order (all or nothing), list, pay, bills</td></tr>
+    <tr><td><code>ReportService</code></td><td>Service</td><td>The sales report of a period</td></tr>
+    <tr><td><code>pricing.py</code>, <code>bill.py</code></td><td>Service</td><td>The renting rule (10%, 7 days); the HTML bill and its file</td></tr>
+    <tr><td><code>BookServiceCatalog</code>, <code>SmtpMailer</code></td><td>Service</td><td>Takes copies from book-service; emails the bill in the background</td></tr>
+    <tr><td><code>MySqlOrderRepository</code></td><td>Repository</td><td>The <code>orders</code> and <code>order_items</code> tables, saved in one transaction</td></tr>
+    <tr><td><code>Order</code>, <code>OrderItem</code>, <code>SalesReport</code></td><td>Model</td><td>Plain data</td></tr>
   </tbody>
 </table>
 
-<p>Around the layers, each service also has a start-up part (<code>UserServer</code>, <code>__main__.py</code>, <code>app.py</code>), its settings (<code>Config</code>), and its errors (<code>error/</code> in Java, <code>errors.py</code> in Python). The start-up part is the only place that picks the real classes; tests hand in the in-memory ones instead.</p>
-
-<p class="note">The repository layer is defined by interfaces (Java) and abstract classes (Python). This is why each service can be tested without a database: the tests use the in-memory versions.</p>
-
-<h4>4.2.4 Model-View-Controller</h4>
-
-<p>The project was not built on an MVC framework. The table shows where the MVC roles fall in the code, and where the fit is loose.</p>
-
+<h4>4.3.4 bookstore-ui (shared by both apps)</h4>
 <table class="data">
-  <thead>
-    <tr><th>Part</th><th>Model</th><th>View</th><th>Controller</th></tr>
-  </thead>
+  <thead><tr><th>Class</th><th>Role</th></tr></thead>
   <tbody>
-    <tr><td>Services</td><td>The model classes (<code>User</code>, <code>Book</code>, <code>Order</code> ...) with the services and repositories that hold the rules and the data</td><td>The JSON answer (each model's <code>to_json()</code>, or <code>UserResponse</code> in Java), and the HTML bill made by <code>render_bill()</code></td><td>The routes and handlers: they take the request, call the service layer, and choose the answer</td></tr>
-    <tr><td>Flutter apps</td><td>The data classes: <code>Book</code>, <code>Order</code>, <code>PlacedItem</code>, <code>Review</code>, <code>OrderDraft</code>, <code>SalesReport</code> ...</td><td>Widgets and screens: <code>SearchScreen</code>, <code>OrdersView</code>, <code>BillView</code> ...</td><td>Controller-like: the <code>*Api</code> classes, <code>Session</code>, <code>AppServices</code> / <code>ManagerServices</code>, and each screen's <code>State</code> class, which reacts to a button and calls an API</td></tr>
+    <tr><td><code>ApiClient</code>, <code>UserApi</code>, <code>BookApi</code></td><td>Talk to the services; turn every failure into one <code>ApiException</code> with a readable message</td></tr>
+    <tr><td><code>Session</code></td><td>Who is logged in, and the token</td></tr>
+    <tr><td><code>Book</code>, <code>Order</code>, <code>Review</code></td><td>Data read from JSON</td></tr>
+    <tr><td><code>LoginForm</code>, <code>BillView</code>, <code>BookCover</code>, <code>RatingStars</code>, <code>MooneysSign</code> ...</td><td>Widgets both apps use, in one look (colors, fonts, light and dark)</td></tr>
   </tbody>
 </table>
 
-<p>Where the apps do <strong>not</strong> follow strict MVC:</p>
-<ul>
-  <li>Flutter is built from widgets. A screen's <code>State</code> class both draws the screen (<code>build</code>) and handles its events (for example <code>SearchScreen</code> calls <code>BookApi.search</code> itself). There is no separate controller class per screen.</li>
-  <li>Some classes notify the view directly: the models <code>OrderDraft</code> and <code>Preferences</code>, and the controller-like <code>Session</code>, extend Flutter's <code>ChangeNotifier</code>, and the app redraws when they change.</li>
-  <li>Some models hold small rules, such as <code>OrderItem.charge</code> (the rent price), and the form checks <code>checkBook()</code> and <code>checkRegistration()</code> are plain functions, not classes.</li>
-</ul>
-<p>In the services, the split into routes, services, repositories, and models is stricter than MVC needs: the controller (routes) never touches the database, and the rules live in the service layer, not in the routes.</p>
+<h4>4.3.5 Mooney's (customer app)</h4>
+<table class="data">
+  <thead><tr><th>Class</th><th>Role</th></tr></thead>
+  <tbody>
+    <tr><td><code>CustomerApp</code>, <code>AppServices</code></td><td>Start-up; holds the session, the APIs, the order being prepared, and the preferences</td></tr>
+    <tr><td><code>LoginScreen</code>, <code>RegisterScreen</code></td><td>Log in; create an account</td></tr>
+    <tr><td><code>SearchScreen</code></td><td>Search, shelves, a book's details and reviews</td></tr>
+    <tr><td><code>OrderScreen</code>, <code>BillScreen</code></td><td>The order being prepared; the bill after placing it</td></tr>
+    <tr><td><code>AccountScreen</code></td><td>Profile, preferences, rentals due back, every order</td></tr>
+    <tr><td><code>OrderDraft</code>, <code>OrderApi</code></td><td>The chosen books; places orders and reads my orders</td></tr>
+  </tbody>
+</table>
 
-<h3>4.3 Classes</h3>
+<h4>4.3.6 Mooney's Manager</h4>
+<table class="data">
+  <thead><tr><th>Class</th><th>Role</th></tr></thead>
+  <tbody>
+    <tr><td><code>ManagerApp</code>, <code>ManagerServices</code></td><td>Start-up; holds the session and the APIs</td></tr>
+    <tr><td><code>LoginScreen</code>, <code>HomeScreen</code></td><td>Log in (managers only); the tabs</td></tr>
+    <tr><td><code>OrdersView</code></td><td>Every order, mark as paid, open and print the bill</td></tr>
+    <tr><td><code>BooksView</code>, <code>BookFormDialog</code></td><td>The books; add or change one</td></tr>
+    <tr><td><code>ReportsView</code>, <code>ReportApi</code>, <code>SalesReport</code></td><td>The sales report</td></tr>
+  </tbody>
+</table>
 
-<p>Colors in all class diagrams mean the layer. In the services: blue is HTTP (the routes, and <code>app.py</code>, which registers them), purple the request shapes, green the rules and what they ask of other services (the login check, book-service, the mail server), yellow storage, grey start-up, settings and plain data, red errors. In the apps: blue is screens, green the calls to the services, yellow data, grey the application, session, and rules. Private classes (names starting with <code>_</code>) are parts of one screen; they are listed together and not drawn.</p>
-
-<p class="note">The class diagrams are large, so on a printed A4 page their text is very small. Zoom in on the PDF, or open the full-size images in <code>docs/02-design/diagrams</code>: <code>class-user-service.png</code>, <code>class-book-service.png</code>, <code>class-order-service.png</code>, <code>class-bookstore-ui.png</code>, <code>class-customer-app.png</code>, <code>class-manager-app.png</code>. The tables under each figure carry the same content in readable size.</p>
+<h3>4.4 Class diagrams</h3>
+<p>One per part, drawn in draw.io. Colors mark the layers.</p>
 
 <div class="wide">
-<h4>4.3.1 user-service</h4>
-
-<figure class="diagram">
-  <img src="../02-design/diagrams/class-user-service.png" alt="user-service class diagram">
-  <figcaption>Figure 4.2: user-service classes (Java, package <code>com.bookstore.user</code>).</figcaption>
-</figure>
+<h4>4.4.1 user-service (Java)</h4>
+<figure class="diagram"><img src="../02-design/diagrams/class-user-service.png" alt="user-service class diagram"></figure>
 </div>
-
-<table class="data">
-  <thead>
-    <tr><th>Class</th><th>Layer</th><th>MVC role</th><th>Responsibility</th></tr>
-  </thead>
-  <tbody>
-    <tr><td><code>UserServer</code></td><td>Start-up</td><td>&mdash;</td><td>Builds the parts, warms up, listens on both loopback addresses</td></tr>
-    <tr><td><code>Config</code> (record)</td><td>Settings</td><td>&mdash;</td><td>Port, storage mode, and MySQL settings from the environment or <code>.env</code></td></tr>
-    <tr><td><code>BaseHandler</code> (abstract)</td><td>Handlers</td><td>Controller</td><td>Reads JSON and the token, writes JSON, turns every error into a response in one place</td></tr>
-    <tr><td><code>AuthHandler</code></td><td>Handlers</td><td>Controller</td><td><code>/api/auth/login</code>, <code>/logout</code>, <code>/session</code></td></tr>
-    <tr><td><code>UserHandler</code></td><td>Handlers</td><td>Controller</td><td><code>/api/users/register</code></td></tr>
-    <tr><td><code>Json</code></td><td>Handlers</td><td>View (helper)</td><td>The one place that knows the JSON library (Gson)</td></tr>
-    <tr><td><code>LoginRequest</code> (record)</td><td>Handlers</td><td>&mdash;</td><td>Body of log in, with its validation</td></tr>
-    <tr><td><code>RegisterRequest</code> (record)</td><td>Handlers</td><td>&mdash;</td><td>Body of register, with its validation (lengths, email shape)</td></tr>
-    <tr><td><code>UserResponse</code> (record)</td><td>Handlers</td><td>View</td><td>What callers are told about a user; never the password hash</td></tr>
-    <tr><td><code>AuthService</code></td><td>Services</td><td>Model (rules)</td><td>Log in, log out, check a session, register</td></tr>
-    <tr><td><code>AuthService.Login</code> (record)</td><td>Services</td><td>Model</td><td>The result of a log in: the session and the user</td></tr>
-    <tr><td><code>PasswordHasher</code></td><td>Services</td><td>Model (rules)</td><td>bcrypt hashing and checking (N3)</td></tr>
-    <tr><td><code>TokenGenerator</code></td><td>Services</td><td>Model (rules)</td><td>Random session tokens</td></tr>
-    <tr><td><code>UserRepository</code> (interface)</td><td>Repositories</td><td>Model (data access)</td><td>What the rules need from user storage</td></tr>
-    <tr><td><code>SessionRepository</code> (interface)</td><td>Repositories</td><td>Model (data access)</td><td>What the rules need from session storage</td></tr>
-    <tr><td><code>JdbcUserRepository</code></td><td>Repositories</td><td>Model (data access)</td><td>Users in the MySQL table <code>users</code></td></tr>
-    <tr><td><code>JdbcSessionRepository</code></td><td>Repositories</td><td>Model (data access)</td><td>Sessions in the MySQL table <code>sessions</code></td></tr>
-    <tr><td><code>InMemoryUserRepository</code></td><td>Repositories</td><td>Model (data access)</td><td>Users in memory, for tests and memory mode</td></tr>
-    <tr><td><code>InMemorySessionRepository</code></td><td>Repositories</td><td>Model (data access)</td><td>Sessions in memory, for tests and memory mode</td></tr>
-    <tr><td><code>Database</code></td><td>Repositories</td><td>Model (data access)</td><td>Lends out MySQL connections from a small pool</td></tr>
-    <tr><td><code>User</code> (record)</td><td>Models</td><td>Model</td><td>A user: id, username, email, password hash, role, created at</td></tr>
-    <tr><td><code>Session</code> (record)</td><td>Models</td><td>Model</td><td>A session: token, user id, created at</td></tr>
-    <tr><td><code>Role</code> (enum)</td><td>Models</td><td>Model</td><td><code>CUSTOMER</code> or <code>MANAGER</code></td></tr>
-    <tr><td><code>ApiException</code></td><td>Errors</td><td>&mdash;</td><td>An error that is safe to show, with its HTTP status</td></tr>
-    <tr><td><code>ValidationException</code></td><td>Errors</td><td>&mdash;</td><td>400</td></tr>
-    <tr><td><code>UnauthorizedException</code></td><td>Errors</td><td>&mdash;</td><td>401</td></tr>
-    <tr><td><code>ConflictException</code></td><td>Errors</td><td>&mdash;</td><td>409</td></tr>
-    <tr><td><code>DataAccessException</code></td><td>Errors</td><td>&mdash;</td><td>A database failure; logged, answered as a plain 500</td></tr>
-  </tbody>
-</table>
 
 <div class="wide">
-<h4>4.3.2 book-service</h4>
-
-<figure class="diagram">
-  <img src="../02-design/diagrams/class-book-service.png" alt="book-service class diagram">
-  <figcaption>Figure 4.3: book-service classes and modules (Python, package <code>book_service</code>). Modules that hold functions rather than a class are drawn as &laquo;module&raquo;.</figcaption>
-</figure>
+<h4>4.4.2 book-service (Python)</h4>
+<figure class="diagram"><img src="../02-design/diagrams/class-book-service.png" alt="book-service class diagram"></figure>
 </div>
-
-<table class="data">
-  <thead>
-    <tr><th>Class or module</th><th>Layer</th><th>MVC role</th><th>Responsibility</th></tr>
-  </thead>
-  <tbody>
-    <tr><td><code>__main__.py</code> (module)</td><td>Start-up</td><td>&mdash;</td><td>Starts waitress on both loopback addresses, port 8082</td></tr>
-    <tr><td><code>app.py</code> (module)</td><td>Start-up</td><td>&mdash;</td><td>Puts the parts together; the only place that knows the concrete classes</td></tr>
-    <tr><td><code>Config</code></td><td>Settings</td><td>&mdash;</td><td>Port, MongoDB address, user-service address, service key</td></tr>
-    <tr><td><code>routes.py</code> (module)</td><td>Routes</td><td>Controller</td><td>The eight endpoints: five for books, three for reviews</td></tr>
-    <tr><td><code>BookInput</code></td><td>Routes (request shape)</td><td>&mdash;</td><td>What a new or changed book must contain, with validation</td></tr>
-    <tr><td><code>CopiesChange</code></td><td>Routes (request shape)</td><td>&mdash;</td><td>A change in copies, sent by order-service</td></tr>
-    <tr><td><code>ReviewInput</code></td><td>Routes (request shape)</td><td>&mdash;</td><td>A rating from 1 to 5 and optional text of at most 1000 characters</td></tr>
-    <tr><td><code>auth.py</code> (module)</td><td>Services (login check)</td><td>Controller (helper)</td><td><code>token_from</code>, <code>require_manager</code>, <code>require_customer</code>, <code>require_service_key</code>: who may do what</td></tr>
-    <tr><td><code>SessionChecker</code> (abstract)</td><td>Services (other service)</td><td>Controller (helper)</td><td>Turns a token into the current user</td></tr>
-    <tr><td><code>UserServiceSessionChecker</code></td><td>Services (other service)</td><td>Controller (helper)</td><td>Asks user-service <code>GET /api/auth/session</code>; 503 if it does not answer</td></tr>
-    <tr><td><code>BookService</code></td><td>Services</td><td>Model (rules)</td><td>Search, get, add, update, change copies; fills in each book's rating</td></tr>
-    <tr><td><code>ReviewService</code></td><td>Services</td><td>Model (rules)</td><td>List a book's reviews; save or delete the customer's own</td></tr>
-    <tr><td><code>BookRepository</code> (abstract)</td><td>Repositories</td><td>Model (data access)</td><td>What the rules need from book storage</td></tr>
-    <tr><td><code>MongoBookRepository</code></td><td>Repositories</td><td>Model (data access)</td><td>Books in the MongoDB collection <code>books</code></td></tr>
-    <tr><td><code>InMemoryBookRepository</code></td><td>Repositories</td><td>Model (data access)</td><td>Books in memory, for tests</td></tr>
-    <tr><td><code>ReviewRepository</code> (abstract)</td><td>Repositories</td><td>Model (data access)</td><td>What the rules need from review storage</td></tr>
-    <tr><td><code>MongoReviewRepository</code></td><td>Repositories</td><td>Model (data access)</td><td>Reviews in the collection <code>reviews</code>, one per customer per book (unique index); ratings in one aggregation</td></tr>
-    <tr><td><code>InMemoryReviewRepository</code></td><td>Repositories</td><td>Model (data access)</td><td>Reviews in memory, for tests</td></tr>
-    <tr><td><code>Book</code></td><td>Models</td><td>Model; <code>to_json()</code> is the view</td><td>A book, with its shelf and rating</td></tr>
-    <tr><td><code>Review</code></td><td>Models</td><td>Model; <code>to_json()</code> is the view</td><td>One customer's review of one book</td></tr>
-    <tr><td><code>RatingTotals</code></td><td>Models</td><td>Model</td><td>The stars and the number of reviews of a book, added up</td></tr>
-    <tr><td><code>CurrentUser</code></td><td>Models</td><td>Model</td><td>Who is asking, as user-service said</td></tr>
-    <tr><td><code>ApiError</code> and its six subclasses</td><td>Errors</td><td>&mdash;</td><td><code>ValidationError</code> 400, <code>UnauthorizedError</code> 401, <code>ForbiddenError</code> 403, <code>NotFoundError</code> 404, <code>ConflictError</code> 409, <code>ServiceUnavailableError</code> 503</td></tr>
-    <tr><td><code>errors.py</code> (module)</td><td>Errors</td><td>View (error answer)</td><td><code>register_error_handlers</code>: the one place that turns errors into <code>{ "error": ... }</code></td></tr>
-  </tbody>
-</table>
 
 <div class="wide">
-<h4>4.3.3 order-service</h4>
-
-<figure class="diagram">
-  <img src="../02-design/diagrams/class-order-service.png" alt="order-service class diagram">
-  <figcaption>Figure 4.4: order-service classes and modules (Python, package <code>order_service</code>).</figcaption>
-</figure>
+<h4>4.4.3 order-service (Python)</h4>
+<figure class="diagram"><img src="../02-design/diagrams/class-order-service.png" alt="order-service class diagram"></figure>
 </div>
-
-<table class="data">
-  <thead>
-    <tr><th>Class or module</th><th>Layer</th><th>MVC role</th><th>Responsibility</th></tr>
-  </thead>
-  <tbody>
-    <tr><td><code>__main__.py</code> (module)</td><td>Start-up</td><td>&mdash;</td><td>Starts waitress on both loopback addresses, port 8083; a clear message if MySQL or a setting is wrong</td></tr>
-    <tr><td><code>app.py</code> (module)</td><td>Start-up</td><td>&mdash;</td><td>Puts the parts together; picks <code>SmtpMailer</code> or <code>NoMailer</code></td></tr>
-    <tr><td><code>Config</code></td><td>Settings</td><td>&mdash;</td><td>Port, MySQL, the other services' addresses, service key, bills folder, mail settings; secrets never printed</td></tr>
-    <tr><td><code>routes.py</code> (module)</td><td>Routes</td><td>Controller</td><td>The seven order endpoints and <code>GET /api/reports/sales</code></td></tr>
-    <tr><td><code>OrderInput</code>, <code>OrderLine</code></td><td>Routes (request shape)</td><td>&mdash;</td><td>A new order: at most 50 books, each a book id and <code>BUY</code> or <code>RENT</code>. The same book with the same type becomes one <code>OrderLine</code> with a quantity</td></tr>
-    <tr><td><code>PaymentStatusInput</code></td><td>Routes (request shape)</td><td>&mdash;</td><td><code>PENDING</code> or <code>PAID</code></td></tr>
-    <tr><td><code>SalesReportQuery</code></td><td>Routes (request shape)</td><td>&mdash;</td><td>Optional <code>from</code> and <code>to</code> dates, and <code>top</code> from 1 to 50</td></tr>
-    <tr><td><code>auth.py</code> (module)</td><td>Services (login check)</td><td>Controller (helper)</td><td><code>token_from</code>, <code>require_customer</code>, <code>require_manager</code></td></tr>
-    <tr><td><code>SessionChecker</code> (abstract), <code>UserServiceSessionChecker</code></td><td>Services (other service)</td><td>Controller (helper)</td><td>Turns a token into the current user by asking user-service</td></tr>
-    <tr><td><code>OrderService</code></td><td>Services</td><td>Model (rules)</td><td>Place an order (all or nothing), list, get one, the bill, payment status, pay</td></tr>
-    <tr><td><code>PlacedOrder</code></td><td>Services</td><td>Model</td><td>The result of placing an order: the order, its bill, and whether an email was queued</td></tr>
-    <tr><td><code>ReportService</code></td><td>Services</td><td>Model (rules)</td><td>The sales report of a period, added up from that period's orders</td></tr>
-    <tr><td><code>pricing.py</code> (module)</td><td>Services</td><td>Model (rules)</td><td><code>RENT_RATE = 0.10</code>, <code>RENT_DAYS = 7</code>, <code>charge_for()</code> (FR7)</td></tr>
-    <tr><td><code>bill.py</code> (module)</td><td>Services</td><td>View</td><td><code>render_bill()</code> makes the HTML bill from an order</td></tr>
-    <tr><td><code>BookCatalog</code> (abstract), <code>BookServiceCatalog</code></td><td>Services (other service)</td><td>Model (data access)</td><td>Takes and gives back copies through book-service</td></tr>
-    <tr><td><code>Mailer</code> (abstract), <code>SmtpMailer</code>, <code>NoMailer</code></td><td>Services (other service)</td><td>&mdash;</td><td>Email the bill in the background; a failure is logged, never raised. <code>build_message()</code> in <code>mailer.py</code> makes the email</td></tr>
-    <tr><td><code>OrderRepository</code> (abstract)</td><td>Repositories</td><td>Model (data access)</td><td>What the rules need from order storage</td></tr>
-    <tr><td><code>MySqlOrderRepository</code></td><td>Repositories</td><td>Model (data access)</td><td>Orders in MySQL (<code>orders</code>, <code>order_items</code>; reads <code>users</code> for name and email), one transaction per order</td></tr>
-    <tr><td><code>InMemoryOrderRepository</code></td><td>Repositories</td><td>Model (data access)</td><td>Orders in memory, for tests</td></tr>
-    <tr><td><code>BillStore</code></td><td>Repositories (files)</td><td>Model (data access)</td><td>Writes and reads bill files</td></tr>
-    <tr><td><code>Order</code>, <code>OrderItem</code></td><td>Models</td><td>Model; <code>to_json()</code> is the view</td><td>An order and its lines; money is <code>Decimal</code></td></tr>
-    <tr><td><code>CurrentUser</code></td><td>Models</td><td>Model</td><td>Who is asking</td></tr>
-    <tr><td><code>CatalogBook</code></td><td>Models</td><td>Model</td><td>A book as book-service gave it: id, title, author, price</td></tr>
-    <tr><td><code>SalesReport</code>, <code>DaySales</code>, <code>BestSeller</code></td><td>Models</td><td>Model; <code>to_json()</code> is the view</td><td>The report, one day of it, one best seller</td></tr>
-    <tr><td><code>ApiError</code> and its six subclasses</td><td>Errors</td><td>&mdash;</td><td>The same six as in book-service (400, 401, 403, 404, 409, 503)</td></tr>
-    <tr><td><code>errors.py</code> (module)</td><td>Errors</td><td>View (error answer)</td><td><code>register_error_handlers</code></td></tr>
-  </tbody>
-</table>
-
-<h4 class="pagebreak">4.3.4 bookstore-ui (shared package)</h4>
-
-<figure class="diagram">
-  <img src="../02-design/diagrams/class-bookstore-ui.png" alt="bookstore-ui class diagram">
-  <figcaption>Figure 4.5: The shared package. Both apps use it, so nothing is written twice.</figcaption>
-</figure>
-
-<table class="data">
-  <thead>
-    <tr><th>Class</th><th>Layer</th><th>MVC role</th><th>Responsibility</th></tr>
-  </thead>
-  <tbody>
-    <tr><td><code>ApiClient</code></td><td>API</td><td>Controller-like</td><td>Sends <code>get</code>, <code>post</code>, <code>put</code>, <code>patch</code>, <code>delete</code> with the token; 8 s timeout</td></tr>
-    <tr><td><code>ApiException</code></td><td>API</td><td>&mdash;</td><td>Every failure as one readable message, with the status (0 when the service does not answer)</td></tr>
-    <tr><td><code>UserApi</code></td><td>API</td><td>Controller-like</td><td>user-service: <code>login</code>, <code>logout</code>, <code>register</code></td></tr>
-    <tr><td><code>BookApi</code></td><td>API</td><td>Controller-like</td><td>book-service: <code>search</code>, <code>add</code>, <code>update</code>, <code>reviews</code>, <code>saveMyReview</code>, <code>deleteMyReview</code></td></tr>
-    <tr><td><code>Session</code> (<code>ChangeNotifier</code>)</td><td>API</td><td>Controller-like (state)</td><td>Who is logged in; ending it sends the app back to log in</td></tr>
-    <tr><td><code>Book</code></td><td>Data</td><td>Model</td><td>A book, its shelf, its rating, and its rent price (10%, in whole cents)</td></tr>
-    <tr><td><code>ItemType</code> (enum)</td><td>Data</td><td>Model</td><td>Buy or rent</td></tr>
-    <tr><td><code>Order</code>, <code>PlacedItem</code></td><td>Data</td><td>Model</td><td>An order as order-service returns it, and one of its lines</td></tr>
-    <tr><td><code>Review</code></td><td>Data</td><td>Model</td><td>A review as book-service returns it</td></tr>
-    <tr><td><code>BookstoreColors</code>, <code>Space</code>, <code>Radii</code>, <code>Motion</code>, <code>Fonts</code></td><td>Look</td><td>View (style)</td><td>The design values in one place (<code>tokens.dart</code>); <code>buildBookstoreTheme()</code> builds the light or dark theme</td></tr>
-    <tr><td><code>LoginForm</code>, <code>InfoNote</code></td><td>Widgets</td><td>View</td><td>The log-in form of both apps, letting in one role only; a neutral note</td></tr>
-    <tr><td><code>AuthLayout</code></td><td>Widgets</td><td>View</td><td>The layout of the log-in and create-account screens</td></tr>
-    <tr><td><code>BillView</code></td><td>Widgets</td><td>View</td><td>The bill of an <code>Order</code>, drawn in the app with the same parts as the HTML bill</td></tr>
-    <tr><td><code>AppButton</code>, <code>AppButtonStyle</code>, <code>AppIconButton</code></td><td>Widgets</td><td>View</td><td>Buttons with hover, press, focus, and loading states</td></tr>
-    <tr><td><code>AppTextField</code>, <code>ErrorMessage</code></td><td>Widgets</td><td>View</td><td>A labelled field with its problem written under it</td></tr>
-    <tr><td><code>RatingStars</code>, <code>StarPicker</code></td><td>Widgets</td><td>View</td><td>The stars of a rating; the five stars to choose a rating with</td></tr>
-    <tr><td><code>ToastHost</code>, <code>ToastHostState</code></td><td>Widgets</td><td>View</td><td>The toast that confirms an action and offers Undo</td></tr>
-    <tr><td><code>BookCover</code>, <code>Glass</code>, <code>MooneysSign</code>, <code>SearchField</code>, <code>SmoothScroll</code>, <code>StatusChip</code></td><td>Widgets</td><td>View</td><td>A cover (drawn from the title when there is no image), a glass panel, the store's sign, the search field, smooth scrolling, a state as icon and word</td></tr>
-    <tr><td>Functions: <code>money()</code>, <code>toCents()</code>, <code>formatDay()</code>, <code>formatMoment()</code>, <code>fadeRoute()</code></td><td>Helpers</td><td>View (format)</td><td>Money and dates written as the bill writes them; the page change</td></tr>
-  </tbody>
-</table>
 
 <div class="wide">
-<h4>4.3.5 customer-app (Mooney's)</h4>
-
-<figure class="diagram">
-  <img src="../02-design/diagrams/class-customer-app.png" alt="customer-app class diagram">
-  <figcaption>Figure 4.6: The customer app. Classes marked &laquo;bookstore-ui&raquo; come from the shared package.</figcaption>
-</figure>
+<h4>4.4.4 bookstore-ui (shared by both apps)</h4>
+<figure class="diagram"><img src="../02-design/diagrams/class-bookstore-ui.png" alt="bookstore-ui class diagram"></figure>
 </div>
-
-<table class="data">
-  <thead>
-    <tr><th>Class</th><th>Layer</th><th>MVC role</th><th>Responsibility</th></tr>
-  </thead>
-  <tbody>
-    <tr><td><code>CustomerApp</code></td><td>Application</td><td>&mdash;</td><td>Starts at the log-in screen; light or dark from the preferences; back to log in when the session ends</td></tr>
-    <tr><td><code>AppServices</code></td><td>Application</td><td>Controller-like</td><td>Holds the session, the order draft, the preferences, the clock, and the three API classes</td></tr>
-    <tr><td><code>AppScope</code> (<code>InheritedWidget</code>)</td><td>Application</td><td>&mdash;</td><td>Gives <code>AppServices</code> and the light/dark switch to every screen</td></tr>
-    <tr><td><code>LoginScreen</code></td><td>Screens</td><td>View + controller</td><td>Log in with the shared <code>LoginForm</code>; refuses a manager (FR1, N5)</td></tr>
-    <tr><td><code>RegisterScreen</code></td><td>Screens</td><td>View + controller</td><td>Create an account; each field's problem shown under it (FR3)</td></tr>
-    <tr><td><code>SearchScreen</code></td><td>Screens</td><td>View + controller</td><td>Search and browse by shelf, add books to the order, see ratings and reviews (FR4&ndash;FR6)</td></tr>
-    <tr><td><code>OrderScreen</code></td><td>Screens</td><td>View + controller</td><td>Choose buy or rent, remove with Undo, place the order (FR6, FR7)</td></tr>
-    <tr><td><code>BillScreen</code></td><td>Screens</td><td>View + controller</td><td>The bill of the order just placed, and Pay now (FR8, FR10)</td></tr>
-    <tr><td><code>AccountScreen</code></td><td>Screens</td><td>View + controller</td><td>Profile, preferences, rentals due back, every order with its bill</td></tr>
-    <tr><td><code>showPayDialog()</code> / <code>_PayDialog</code></td><td>Screens</td><td>View + controller</td><td>The pretend checkout; no card details are asked for</td></tr>
-    <tr><td><code>showReviewDialog()</code> / <code>_ReviewDialog</code></td><td>Screens</td><td>View + controller</td><td>Write or edit the customer's own review; <code>reviewLength()</code> counts its characters for the 1000-character limit</td></tr>
-    <tr><td><code>OrderApi</code></td><td>API</td><td>Controller-like</td><td>order-service: <code>createOrder</code>, <code>myOrders</code>, <code>pay</code></td></tr>
-    <tr><td><code>OrderDraft</code> (<code>ChangeNotifier</code>)</td><td>Data</td><td>Model</td><td>The order being prepared; survives moving between screens and a failed attempt</td></tr>
-    <tr><td><code>OrderItem</code></td><td>Data</td><td>Model</td><td>One book in the draft, buy or rent; works out its charge and due date</td></tr>
-    <tr><td><code>Preferences</code> (<code>ChangeNotifier</code>)</td><td>Data</td><td>Model</td><td>Dark mode and covers-or-list per customer, in a JSON file in AppData</td></tr>
-    <tr><td><code>Rental</code>, <code>rentalsOf()</code>, <code>dueText()</code></td><td>Data</td><td>Model</td><td>The rented books, soonest due first, and "Due back in 3 days"</td></tr>
-    <tr><td><code>checkRegistration()</code></td><td>Data (rules)</td><td>Model</td><td>The account rules of user-service, checked in the app first</td></tr>
-    <tr><td>40 private classes (the two dialogs above among them)</td><td>Screens</td><td>View</td><td>Parts of one screen, such as <code>_BookCard</code>, <code>_DetailPanel</code>, <code>_ItemRow</code>, <code>_OrderRow</code>, and each screen's <code>State</code> class</td></tr>
-  </tbody>
-</table>
 
 <div class="wide">
-<h4>4.3.6 management-app (Mooney's Manager)</h4>
-
-<figure class="diagram">
-  <img src="../02-design/diagrams/class-manager-app.png" alt="management-app class diagram">
-  <figcaption>Figure 4.7: The management app.</figcaption>
-</figure>
+<h4>4.4.5 Mooney's (customer app)</h4>
+<figure class="diagram"><img src="../02-design/diagrams/class-customer-app.png" alt="customer-app class diagram"></figure>
 </div>
 
-<table class="data">
-  <thead>
-    <tr><th>Class</th><th>Layer</th><th>MVC role</th><th>Responsibility</th></tr>
-  </thead>
-  <tbody>
-    <tr><td><code>ManagerApp</code></td><td>Application</td><td>&mdash;</td><td>Starts at the log-in screen, holds light or dark mode; back to log in when the session ends</td></tr>
-    <tr><td><code>ManagerServices</code></td><td>Application</td><td>Controller-like</td><td>Holds the session, <code>UserApi</code>, <code>BookApi</code>, <code>OrderApi</code>, <code>ReportApi</code>, the file opener, and the clock</td></tr>
-    <tr><td><code>ManagerScope</code> (<code>InheritedWidget</code>)</td><td>Application</td><td>&mdash;</td><td>Gives <code>ManagerServices</code> to every screen</td></tr>
-    <tr><td><code>FileOpener</code> (typedef)</td><td>Application</td><td>&mdash;</td><td>Opens a saved HTML bill in the browser, so it can be printed</td></tr>
-    <tr><td><code>LoginScreen</code></td><td>Screens</td><td>View</td><td>Log in with the shared <code>LoginForm</code>; refuses anyone who is not a manager (FR11, N5)</td></tr>
-    <tr><td><code>HomeScreen</code></td><td>Screens</td><td>View + controller</td><td>The glass bar with the Orders, Books, and Reports tabs, light/dark, the user's name, log out</td></tr>
-    <tr><td><code>Tabs</code></td><td>Screens</td><td>View</td><td>A row of tabs; also the order filter</td></tr>
-    <tr><td><code>OrdersView</code></td><td>Screens</td><td>View + controller</td><td>Every order, Pending/Paid filter, mark as paid with Undo, open the bill and print it (FR9, FR12, FR13)</td></tr>
-    <tr><td><code>BooksView</code></td><td>Screens</td><td>View + controller</td><td>Search books; open the add or edit dialog</td></tr>
-    <tr><td><code>BookFormDialog</code></td><td>Screens</td><td>View + controller</td><td>Add or edit a book, its copies, and its shelf (FR14)</td></tr>
-    <tr><td><code>ReportsView</code></td><td>Screens</td><td>View + controller</td><td>The sales report of a chosen period: totals, sales by day, best sellers, orders</td></tr>
-    <tr><td><code>Message</code></td><td>Screens</td><td>View</td><td>The "nothing here" or "could not load" message of the tabs</td></tr>
-    <tr><td><code>OrderApi</code></td><td>API</td><td>Controller-like</td><td>order-service: <code>listOrders</code>, <code>getOrder</code>, <code>setPaymentStatus</code>, <code>billHtml</code></td></tr>
-    <tr><td><code>ReportApi</code></td><td>API</td><td>Controller-like</td><td>order-service: <code>salesReport</code> (<code>GET /api/reports/sales</code>)</td></tr>
-    <tr><td><code>SalesReport</code>, <code>DayTotal</code>, <code>BestSeller</code></td><td>Data</td><td>Model</td><td>The report, one day's totals, one best seller, read from JSON</td></tr>
-    <tr><td><code>ReportPeriod</code> (enum)</td><td>Data</td><td>Model</td><td>Today, Last 7 days, Last 30 days, This month, All time, as a range of whole days</td></tr>
-    <tr><td><code>BookCheck</code>, <code>checkBook()</code></td><td>Data (rules)</td><td>Model</td><td>The book rules of book-service, checked in the form first</td></tr>
-    <tr><td>Shared: <code>UserApi</code>, <code>BookApi</code>, <code>ApiClient</code>, <code>Session</code>, <code>Book</code>, <code>Order</code>, <code>PlacedItem</code></td><td>API, data</td><td>As in 4.3.4</td><td>From bookstore-ui</td></tr>
-    <tr><td>24 private classes</td><td>Screens</td><td>View</td><td>Parts of one screen, such as <code>_OrderDialog</code> (one order's bill), <code>_DayChart</code>, <code>_BestSellers</code>, and each screen's <code>State</code> class</td></tr>
-  </tbody>
-</table>
-
-<h4>4.3.7 Class counts</h4>
-
-<table class="data">
-  <thead>
-    <tr><th>Part</th><th>Classes, interfaces, records, enums</th><th>Also</th></tr>
-  </thead>
-  <tbody>
-    <tr><td>user-service</td><td>28 (27 files, plus the nested record <code>AuthService.Login</code>)</td><td>&mdash;</td></tr>
-    <tr><td>book-service</td><td>25</td><td>Modules with top-level functions: <code>__main__</code>, <code>app</code>, <code>routes</code>, <code>auth</code>, <code>errors</code>, <code>schemas</code> (<code>category_filter</code>), <code>services</code> (<code>average_rating</code>)</td></tr>
-    <tr><td>order-service</td><td>33</td><td>Modules with top-level functions: <code>__main__</code>, <code>app</code>, <code>routes</code>, <code>auth</code>, <code>errors</code>, <code>pricing</code>, <code>bill</code> (<code>render_bill</code>, <code>bill_file_name</code>, <code>money</code>), <code>mailer</code> (<code>build_message</code>), <code>repository</code> (<code>create_pool</code>)</td></tr>
-    <tr><td>bookstore-ui</td><td>34 public, 9 private</td><td>Functions: <code>buildBookstoreTheme()</code>, <code>fadeRoute()</code>, the four in <code>format.dart</code></td></tr>
-    <tr><td>customer-app</td><td>14 public, 40 private</td><td>Functions: <code>showPayDialog()</code>, <code>showReviewDialog()</code>, <code>reviewLength()</code>, <code>rentalsOf()</code>, <code>dueText()</code>, <code>checkRegistration()</code></td></tr>
-    <tr><td>management-app</td><td>18 public, 24 private</td><td>The typedef <code>FileOpener</code>; the function <code>checkBook()</code></td></tr>
-  </tbody>
-</table>
+<div class="wide">
+<h4>4.4.6 Mooney's Manager</h4>
+<figure class="diagram"><img src="../02-design/diagrams/class-manager-app.png" alt="management-app class diagram"></figure>
+</div>

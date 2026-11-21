@@ -42,7 +42,11 @@ class _OrderScreenState extends State<OrderScreen> {
     } on ApiException catch (e) {
       // 404 and 409 name the book; say what to do about it. Nothing was saved or charged.
       final advice = e.status == 404 || e.status == 409 ? ' Remove it from the order and try again. Nothing was charged.' : '';
-      if (mounted) setState(() => _error = '${e.message}.$advice'.replaceAll('..', '.'));
+      // No answer (0) is not a failure: the order may have been saved after the app stopped waiting (P-024).
+      final message = e.status == 0
+          ? 'No answer yet. Your order may have gone through: check Your account before you order again.'
+          : '${e.message}.$advice'.replaceAll('..', '.');
+      if (mounted) setState(() => _error = message);
     } finally {
       if (mounted) setState(() => _placing = false);
     }

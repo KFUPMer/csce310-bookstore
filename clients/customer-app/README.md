@@ -38,7 +38,7 @@ Or, in VS Code: Run and Debug, "Customer app", F5.
 flutter test
 ```
 
-46 tests, no server needed: the rules (the order draft, the account rules, rentals and due dates, preferences), writing, editing, and deleting reviews, and every screen driven the way a customer uses it, with stand-in services. One of them checks that every screen fits a 1024 x 700 window. The shared service client and data have their own tests in `../bookstore-ui`.
+47 tests, no server needed: the rules (the order draft, the account rules, rentals and due dates, preferences), writing, editing, and deleting reviews, and every screen driven the way a customer uses it, with stand-in services. One of them checks that every screen fits a 1024 x 700 window. The shared service client and data have their own tests in `../bookstore-ui`.
 
 Two more are skipped unless asked for:
 

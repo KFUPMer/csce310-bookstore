@@ -129,7 +129,7 @@ Every service has the same four layers and one error shape, `{ "error": "…" }`
 |---|---|
 | **Requirements** | All 14 functional (FR1–FR14) and 5 non-functional (N1–N5) met, each with evidence: [requirements test report](docs/06-testing/requirements-test.md) |
 | **Extra credit** | All 6 items: registration, emailed bills, a modern GUI framework (Flutter), and the three of the course's section 6: profiles with order history, book reviews and ratings, a sales report |
-| **Tests** | 340 automated tests, all passing, plus 41 checks against the three running services |
+| **Tests** | 341 automated tests, all passing, plus 41 checks against the three running services |
 | **Speed** | N1 allows 500 ms per call. In every recorded run of the 41 live checks, each started cold, the slowest order call took 176 ms or less |
 | **Design** | 23 diagrams in draw.io (UML, ER, architecture, wireframes), each as source and image |
 | **Process** | 6 milestones, 21 GitHub issues, 9 releases (7 versions and 2 betas), 23 problem-log entries, 51 enhancement-log entries |
@@ -143,9 +143,9 @@ Every service has the same four layers and one error shape, `{ "error": "…" }`
 | book-service | 76 |
 | order-service | 117 |
 | Shared package `bookstore-ui` | 41 |
-| Customer app (Mooney's) | 46 |
+| Customer app (Mooney's) | 47 |
 | Management app (Mooney's Manager) | 34 |
-| **Total** | **340** |
+| **Total** | **341** |
 
 Commands for each are in the [requirements test report](docs/06-testing/requirements-test.md). The release build on GitHub runs every suite before it builds.
 

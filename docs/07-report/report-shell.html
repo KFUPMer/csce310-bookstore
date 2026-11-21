@@ -97,7 +97,8 @@
   /* Figures: a screenshot or a diagram, full width, with a caption. */
   figure.shot, figure.diagram { margin: 3mm 0 5mm 0; break-inside: avoid; }
   figure.shot img, figure.diagram img { display: block; width: 100%; height: auto; }
-  figure.shot img { border: 0.6pt solid var(--hairline); border-radius: 1.5mm; }
+  figure.shot img { border: 0.6pt solid var(--hairline); border-radius: 1.5mm; width: 88%; margin: 0 auto; }
+  figure.shot figcaption { width: 88%; margin-left: auto; margin-right: auto; }
   figure.diagram img { max-height: 225mm; object-fit: contain; }
   figcaption { font-size: 8.5pt; color: var(--text-2); margin-top: 1.5mm; }
 
@@ -250,7 +251,7 @@
 
 <section id="videos">
   <h2>5. User acceptance test videos</h2>
-  <p>Each video shows the apps running against the real services, and walks through the requirements listed next to it.</p>
+  <p>One video shows the apps running against the real services, walking through every functional requirement in order. Its chapters (in the YouTube description) jump to each requirement.</p>
   <table class="data">
     <thead><tr><th style="width:6%">#</th><th style="width:38%">Video</th><th style="width:22%">Requirements covered</th><th>Link</th></tr></thead>
     <tbody>
@@ -258,24 +259,24 @@
     </tbody>
   </table>
 
-  <p>Every functional requirement is shown in at least one video. The step numbers are those of the recording script, <code>docs/07-report/uat-video-script.md</code>, section 8.</p>
+  <p>Where each requirement is shown. The step numbers are those of the recording script, <code>docs/07-report/uat-video-script.md</code>.</p>
   <table class="data">
-    <thead><tr><th style="width:8%">FR</th><th>Requirement</th><th style="width:10%">Video</th><th style="width:28%">Steps</th></tr></thead>
+    <thead><tr><th style="width:8%">FR</th><th>Requirement</th><th style="width:30%">Script steps</th></tr></thead>
     <tbody>
-      <tr><td>FR1</td><td>Log in with username and password</td><td>1</td><td>1.7 to 1.9</td></tr>
-      <tr><td>FR2</td><td>Stay logged in until logging out</td><td>1</td><td>1.10, 1.11</td></tr>
-      <tr><td>FR3</td><td>Create an account with a valid email; password hashed</td><td>1</td><td>1.2 to 1.6</td></tr>
-      <tr><td>FR4</td><td>Search by a keyword in title and author</td><td>2</td><td>2.2 to 2.4</td></tr>
-      <tr><td>FR5</td><td>Results as a list with title, author, price</td><td>2</td><td>2.5</td></tr>
-      <tr><td>FR6</td><td>Select one or more books</td><td>2</td><td>2.6 to 2.9</td></tr>
-      <tr><td>FR7</td><td>Buy and/or rent in a single order</td><td>2</td><td>2.8 to 2.11</td></tr>
-      <tr><td>FR8</td><td>Detailed bill: order ID, items, prices, total</td><td>2</td><td>2.12</td></tr>
-      <tr><td>FR9</td><td>Bill saved as an HTML file</td><td>2, 3</td><td>2.14, 3.8</td></tr>
-      <tr><td>FR10</td><td>Bill emailed to the customer</td><td>2</td><td>2.13, 2.15</td></tr>
-      <tr><td>FR11</td><td>Separate, secure management interface</td><td>3, 1</td><td>3.1 to 3.4, 1.12</td></tr>
-      <tr><td>FR12</td><td>Manager views all purchase orders</td><td>3</td><td>3.5, 3.6</td></tr>
-      <tr><td>FR13</td><td>Manager updates an order's payment status</td><td>3</td><td>3.7, 3.9 to 3.11</td></tr>
-      <tr><td>FR14</td><td>Manager adds books and updates them</td><td>3</td><td>3.12 to 3.16</td></tr>
+      <tr><td>FR1</td><td>Log in with username and password</td><td>1.7 to 1.9</td></tr>
+      <tr><td>FR2</td><td>Stay logged in until logging out</td><td>1.10, 1.11</td></tr>
+      <tr><td>FR3</td><td>Create an account with a valid email; password hashed</td><td>1.2 to 1.6</td></tr>
+      <tr><td>FR4</td><td>Search by a keyword in title and author</td><td>2.2 to 2.4</td></tr>
+      <tr><td>FR5</td><td>Results as a list with title, author, price</td><td>2.5</td></tr>
+      <tr><td>FR6</td><td>Select one or more books</td><td>2.6 to 2.9</td></tr>
+      <tr><td>FR7</td><td>Buy and/or rent in a single order</td><td>2.8 to 2.11</td></tr>
+      <tr><td>FR8</td><td>Detailed bill: order ID, items, prices, total</td><td>2.12</td></tr>
+      <tr><td>FR9</td><td>Bill saved as an HTML file</td><td>2.14, 3.8</td></tr>
+      <tr><td>FR10</td><td>Bill emailed to the customer</td><td>2.13, 2.15</td></tr>
+      <tr><td>FR11</td><td>Separate, secure management interface</td><td>3.1 to 3.4, 1.12</td></tr>
+      <tr><td>FR12</td><td>Manager views all purchase orders</td><td>3.5, 3.6</td></tr>
+      <tr><td>FR13</td><td>Manager updates an order's payment status</td><td>3.7, 3.9 to 3.11</td></tr>
+      <tr><td>FR14</td><td>Manager adds books and updates them</td><td>3.12 to 3.16</td></tr>
     </tbody>
   </table>
 </section>

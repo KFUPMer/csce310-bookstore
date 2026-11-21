@@ -5,7 +5,11 @@ $ErrorActionPreference = 'Continue'
 $pidFile = Join-Path $env:TEMP 'bookstore-services.pids'
 
 if (Test-Path $pidFile) {
-    foreach ($id in ((Get-Content $pidFile) -split ' ')) { Stop-Process -Id $id -Force -ErrorAction SilentlyContinue }
+    # Only if it is still one of ours: after a restart Windows may have given that id to another program (P-024).
+    foreach ($id in ((Get-Content $pidFile) -split ' ')) {
+        $process = Get-Process -Id $id -ErrorAction SilentlyContinue
+        if ($process -and $process.ProcessName -in 'java', 'python', 'pythonw') { Stop-Process -Id $id -Force -ErrorAction SilentlyContinue }
+    }
     Remove-Item $pidFile
 }
 # Also anything else still listening on the services' ports, if it is one of ours (java or python).

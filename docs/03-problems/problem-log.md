@@ -578,13 +578,31 @@ An audit of the whole repository (asked for by the owner) read every path where 
 
 All 340 automated tests and the 41 live checks pass afterwards.
 
+## P-024 — A second audit: the stop script could close another program, and a slow order invited a duplicate
+
+- **Date found:** 2026-11-20
+- **Phase / milestone:** before the submission
+- **Who:** assistant
+- **Status:** Fixed
+
+**What happened**
+A second audit read what the first had not (the apps' API client and order screen, the start and stop scripts, the email sender). Two faults:
+
+1. `stop-services` force-stopped every process id saved by `start-services`. The id file survives a restart, and Windows reuses ids, so after a restart it could close whatever program now had one of those ids, and lose its unsaved work.
+2. When placing an order got no answer within 8 seconds, the app said "try again in a moment". But the order may have been saved after the app stopped waiting; trying again would place it twice.
+
+**Solution**
+1. An id is stopped only if it is still java or python. Tried: a `ping` process whose id was put in the file survived `stop-services`.
+2. With no answer, the app now says "No answer yet. Your order may have gone through: check Your account before you order again." A new screen test.
+
+Also removed, as asked by the owner ("take out what we don't need"): two unused constants in `flutter_cls.py`, and the parts of `uml.py` that wrote three removed diagrams and an outdated sequence diagram (105 lines; it was a known gap). A search for names used nowhere else found nothing more in the services or the apps, and the Dart analyzer reports no issues. A broad rewrite was not done: the code had passed two audits, and the owner must be able to explain every line.
+
 ## Known gaps
 
 Things that are known to be unfinished or unverified, so nobody is surprised later.
 
 | Gap | Since | Plan |
 |---|---|---|
-| `uml.py` still writes the three diagrams that were removed, and has not been run from `tools/diagrams`. (`flows.py` was run from there on 2026-11-16 and changed only the diagram that was meant to change) | M2 | Remove the three from `uml.py`; run it once and check `git status` shows no change |
 | The installer and the apps are not code-signed: Windows warns "unknown publisher", and where Smart App Control is on (as on the development computer) it blocks them (P-017) | M5 | Documented in INSTALL.md with the way round (build from source). Signing would need a paid certificate |
 | `setup.cmd`'s winget installs have not run anywhere: the development computer had everything, and the fresh-machine test on GitHub switched on what that machine already had. The rest of setup was proven there from nothing | M5 | Accept; the instructions say what to install by hand if winget is missing |
 | The bill email has been seen to look right in Gmail in a desktop browser only. Other mail programs (Outlook, phone apps) are untested | M3 | Test others in M5 if wanted |

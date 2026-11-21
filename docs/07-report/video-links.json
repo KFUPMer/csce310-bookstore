@@ -1,22 +1,7 @@
 [
   {
-    "title": "Accounts: register, log in, stay logged in, log out",
-    "covers": "FR1, FR2, FR3",
-    "url": ""
-  },
-  {
-    "title": "Shopping: search, choose books, buy and rent, the bill saved and emailed",
-    "covers": "FR4, FR5, FR6, FR7, FR8, FR9, FR10",
-    "url": ""
-  },
-  {
-    "title": "Manager: the manager app, all orders, payment status, adding and editing books",
-    "covers": "FR11, FR12, FR13, FR14",
-    "url": ""
-  },
-  {
-    "title": "Extra credit: reviews and ratings, the sales report, the customer account page",
-    "covers": "Section-6 extra credit",
+    "title": "Every functional requirement, FR1 to FR14, then the extra credit (reviews and ratings, the sales report, the account page)",
+    "covers": "FR1 to FR14, extra credit",
     "url": ""
   }
 ]

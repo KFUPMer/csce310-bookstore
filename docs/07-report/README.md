@@ -5,22 +5,22 @@ The course asks for three things, uploaded as one file:
 | Asked for | Here |
 |---|---|
 | 1. Source code | This repository, as a zip made from git (below) |
-| 2. Links to YouTube recordings of user acceptance testing of all functional requirements | Four videos, recorded with [uat-video-script.md](uat-video-script.md); their links go in [video-links.json](video-links.json) and into section 5 of the report |
+| 2. Links to YouTube recordings of user acceptance testing of all functional requirements | One video, recorded with [uat-video-script.md](uat-video-script.md); its link goes in [video-links.json](video-links.json) and into section 5 of the report |
 | 3. A report on the database design and the application design and implementation | `report.pdf`, built from the files in this folder |
 
 ## The report
 
-Four sections, as the course lists them, plus the videos:
+Four sections, as the course lists them, plus the video. About 25 pages: short on purpose, so it proves the design without making the reader dig. The full detail stays in `docs/02-design`.
 
 | Section | File | What it holds |
 |---|---|---|
-| 1. Database design | [sections/1-database.html](sections/1-database.html) | Entities, every attribute with its type and keys, relationships (also across MySQL and MongoDB), the ER diagram |
-| 2. Backend design | [sections/2-backend.html](sections/2-backend.html) | All 20 REST endpoints: URL format, who may call it, request and response JSON, error statuses |
-| 3. Frontend design | [sections/3-frontend.html](sections/3-frontend.html) | The wireframes, then a screenshot of every major screen of both apps, with the requirements each serves |
-| 4. Architectural and class design | [sections/4-architecture.html](sections/4-architecture.html) | Components; client/server, three tiers, the four layers, Model-View-Controller; every class with its layer, MVC role and job |
-| 5. User acceptance test videos | [report-shell.html](report-shell.html), [video-links.json](video-links.json) | The video links, and which video and step shows each FR |
+| 1. Database design | [sections/1-database.html](sections/1-database.html) | The entities with their attributes and keys, the relationships (also across MySQL and MongoDB), the ER diagram |
+| 2. Backend design | [sections/2-backend.html](sections/2-backend.html) | The rules, all 20 endpoints with their input and output, and real JSON for the main flows (log in, search, order, payment, report) |
+| 3. Frontend design | [sections/3-frontend.html](sections/3-frontend.html) | A screenshot of every major screen of both apps, two to a page, with the requirements each serves |
+| 4. Architectural and class design | [sections/4-architecture.html](sections/4-architecture.html) | Components; client/server, three tiers, the four layers, Model-View-Controller; the main classes and their roles; the class diagrams |
+| 5. User acceptance test videos | [report-shell.html](report-shell.html), [video-links.json](video-links.json) | The video link, and where in it each FR is shown |
 
-Every fact was taken from the code and the schema as they are, and checked against them by a second reader.
+Every fact was taken from the code and the schema as they are.
 
 Build it from the repository root (needs Python and Microsoft Edge):
 
@@ -28,11 +28,11 @@ Build it from the repository root (needs Python and Microsoft Edge):
 python tools/report/build_report.py
 ```
 
-It writes `report.html` and `report.pdf` here. Both are rebuilt, not stored in git: the PDF is about 16 MB because it holds the screenshots at full size. The cover has blank lines for the student's name and ID.
+It writes `report.html` and `report.pdf` here. Both are rebuilt, not stored in git: the PDF is about 13 MB because it holds the screenshots at full size. The cover has blank lines for the student's name and ID.
 
 ## Making the files to upload
 
-1. Record the four videos with [uat-video-script.md](uat-video-script.md), upload them to YouTube as Unlisted, and put each link in [video-links.json](video-links.json).
+1. Record the video with [uat-video-script.md](uat-video-script.md), upload it to YouTube as Unlisted, and put its link in [video-links.json](video-links.json).
 2. Build the report: `python tools/report/build_report.py`.
 3. From the repository root, make the source zip from git, so only committed files go in (no `services/.env`, no build output):
 

@@ -33,7 +33,7 @@ Then export the image with draw.io Desktop, from `docs/02-design/diagrams`:
 
 ## Known faults
 
-- **`uml.py` still writes three diagrams that were removed** on request: `deployment`, `package`, `composite-structure`. Delete those three files after running it. It also writes an old colored `sequence-place-order`; run `flows.py` after it to put the right one back.
+- `uml.py` no longer writes the diagrams that were removed (`deployment`, `package`, `composite-structure`) or the old `sequence-place-order`; `flows.py` draws the sequence diagrams (P-024).
 - Importing `flutter_cls` rewrites the two app class diagrams. The result is identical, so `git status` should show no change to them.
 - Check `git status` after any run: only the diagram you meant to change should have changed.
 

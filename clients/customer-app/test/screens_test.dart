@@ -278,6 +278,21 @@ void main() {
     await finish(tester);
   });
 
+  testWidgets('when placing gets no answer, the customer is told to check before ordering again', (tester) async {
+    await start(tester);
+    await logIn(tester);
+    await addCleanCode(tester);
+    await tester.tap(find.widgetWithText(AppButton, 'Your order (1)'));
+    await tester.pumpAndSettle();
+
+    // No answer is not the same as failed: the order may have been saved after the app gave up (P-024).
+    orders().failure = const ApiException('The order service is not answering. Please try again in a moment.', 0);
+    await tester.tap(find.widgetWithText(AppButton, 'Place order'));
+    await tester.pumpAndSettle();
+    expect(find.text('No answer yet. Your order may have gone through: check Your account before you order again.'), findsOneWidget);
+    await finish(tester);
+  });
+
   testWidgets('a removed book can be put back with Undo', (tester) async {
     await start(tester);
     await logIn(tester);

@@ -1,8 +1,8 @@
 # User acceptance test videos: recording script
 
-The course asks for YouTube recordings of user acceptance testing of **all** functional requirements (FR1 to FR14). This is the script to follow when recording them. There are four videos:
+The course asks for YouTube recordings of user acceptance testing of **all** functional requirements (FR1 to FR14). This is the script to follow when recording them. It is **one video**, recorded as four parts back to back (about 16 to 20 minutes); below, "video 1" to "video 4" mean those parts. Add a YouTube chapter (a timestamp in the description) at the start of each part:
 
-| Video | What it shows | Requirements | Length |
+| Part | What it shows | Requirements | Length |
 |---|---|---|---|
 | 1 | Accounts: create an account, log in, stay logged in, log out | FR1, FR2, FR3 | 3 to 4 min |
 | 2 | Shopping: search, choose, buy and rent, bill, saved bill, emailed bill | FR4 to FR10 | 5 to 6 min |

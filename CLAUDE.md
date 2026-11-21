@@ -28,7 +28,7 @@ The live plan is `docs/04-planning/milestones.md`; tasks are GitHub issues on `K
 | Installable build | `setup.cmd` etc., `INSTALL.md`, `HANDOVER.md` (for the instructor). The release build, installer, and installer test run on GitHub Actions on each `v*` tag. The installer cannot run on this machine (Smart App Control, P-017) |
 | Mooney's (M5) | The store's name and sign (`MooneysSign`), five shelves (`category` in book-service, `categories` in bookstore-ui), real covers linked from Open Library (never stored in git). Screenshot tests need `python tools/screenshots/fetch_covers.py` first |
 | Course submission | Report built (docs/07-report, `python tools/report/build_report.py`; PDF not stored in git). Still to do: the owner records the 4 YouTube videos with `docs/07-report/uat-video-script.md` and gives the links (into `video-links.json`), fills name and ID on the cover; then make `submission/` as in `docs/07-report/README.md` |
-| **Next** | v1.2.0 is released; M1 to M6 are closed. Only patches from now, per versioning.md. The repo is **public** since 2026-11-17 (history checked: no secret file or value was ever committed), so never commit anything from `services/.env` |
+| **Next** | v1.3.0 is released (2026-11-20, the apps start the services); M1 to M6 are closed. Only patches from now, per versioning.md. The repo is **public** since 2026-11-17 (history checked: no secret file or value was ever committed), so never commit anything from `services/.env` |
 | Testing and final release | M5, closed with v1.0.0 (2026-11-17). M6 (course section-6 extra credit) open until v1.1.0 |
 
 Known unfinished or unverified things: the "Known gaps" table at the end of `docs/03-problems/problem-log.md`.

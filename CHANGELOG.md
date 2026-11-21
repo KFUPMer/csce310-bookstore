@@ -4,18 +4,35 @@ All versions and patches of the project, newest first.
 
 ## Unreleased
 
-- The front page (README.md) redone for anyone passing by: a picture of both apps at the top, a gallery of eight screenshots, how to try it, how it is built, and the project in numbers.
-- HANDOVER.md, for the instructor, tidied: an "at a glance" table, the accounts in one table, screenshots of key steps, and up-to-date counts.
-- The architecture diagram now shows the apps' names, reviews, the sales report, and the emailed bill.
-- The customer app's screenshots now use one consistent set of orders (the bill, the account page, and the pay dialog all show order 1045).
-- `manual_check.py` prints the end of a service's log when that service does not start (P-018).
-- The course report (`docs/07-report`): database design, the REST API with its JSON, every major screen, and the architecture and classes (client/server, three tiers, MVC), built to PDF by `tools/report/build_report.py`. Also the recording script for the acceptance-test videos, covering FR1 to FR14.
-- Six faults found by a repository audit, fixed (P-023): a test-data reset no longer leaves every rating pointing at deleted books; a manager's book edit can no longer undo an order placed while the form was open (`copiesBefore`, 409); book-service answers 503, not 500, when something else answers on user-service's port; the report build stops on a missing section or a link without `https://`; emails are lower-cased the same way on every computer. 340 tests.
-- A second audit (P-024): `stop-services` stops only its own java and python processes, never another program that has reused an id after a restart; a slow order now tells the customer to check Your account before ordering again. Unused diagram-script code removed (about 110 lines). 341 tests.
-- The apps start the services themselves (E-052): when Mooney's or Mooney's Manager opens and the services are not running, it starts them in the background and says so on the login screen (11 s here). No more start-services.cmd step. 346 tests.
-- The course report, after the owner read it: one clear table per database entity (column, type, key, meaning); the use-case, component, state-machine, and four sequence diagrams added; a "Sources" line under each section; "6. Accounts for testing" and "7. References"; the course and instructor on the cover and in every page footer. The student's details come from a git-ignored file. The state machine now shows that the customer can also pay.
-- The course report rewritten short, as proof rather than reference (75 pages to 25): the entities, attributes and relationships with the ER diagram; all 20 endpoints with their input and output, and real JSON for the main flows; the screens two to a page; the patterns, the main classes, and the class diagrams. One video instead of four.
-- The ER diagram redrawn with the `reviews` collection and every current field and type; `database-design.md` and `api-design.md` brought up to date with the code and marked final (P-021).
+Nothing yet.
+
+## v1.3.0 — 2026-11-20 — The apps start the services themselves
+
+No more start-services step: opening Mooney's or Mooney's Manager starts the three services when they are not running. Also the fixes from two code audits, and the course report. Asked for by the owner. Install: [INSTALL.md](INSTALL.md).
+
+| File | What it is |
+|---|---|
+| `Mooneys-Apps-Setup-1.3.0.exe` | Installs both apps for the current user (no administrator needed) |
+| `Mooneys-Apps-1.3.0-portable.zip` | The same two apps, to unzip and run |
+| `Mooneys-Server-1.3.0.zip` | The services and the whole source; run `setup.cmd` once, then just open an app |
+
+### Added
+- The apps start the services themselves (E-052): when an app opens and the services are not running, it starts them in the background and its login screen says "Starting the bookstore services" (11 s on the development computer). `setup.cmd` records where the server folder is. `stop-services.cmd` still stops them
+- The course report (`docs/07-report`, built to PDF by `tools/report/build_report.py`): the database (a table per entity, relationships, ER diagram), the REST API (all 20 endpoints, JSON for the main flows, four sequence diagrams), every major screen, the architecture (use cases, components, patterns, state machines, classes), test accounts, and references; the recording script for the acceptance-test video
+
+### Fixed
+- A manager's book edit can no longer undo an order placed while the form was open: it is refused with the reason (`copiesBefore`, 409) (P-023)
+- A test-data reset no longer leaves every rating pointing at deleted books (P-023)
+- book-service answers 503, not 500, when something else answers on user-service's port (P-023)
+- `stop-services` stops only its own java and python processes, never another program that reused an id after a restart (P-024)
+- A slow order tells the customer to check Your account before ordering again, rather than inviting a duplicate (P-024)
+- Emails are lower-cased the same way on every computer (P-023); `manual_check.py` shows a service's log when it does not start (P-018)
+
+### Changed
+- The front page and the instructor's handover redone, with screenshots and current figures
+- The ER, architecture, state-machine, and two class diagrams brought up to date; `database-design.md` and `api-design.md` match the code (P-021)
+- Unused diagram-script code removed (about 110 lines)
+- 346 automated tests
 
 ## v1.2.0 — 2026-11-18 — A full shop: 81 books and demo sales
 

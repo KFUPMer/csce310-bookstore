@@ -162,6 +162,7 @@ Commands for each are in the [requirements test report](docs/06-testing/requirem
 | 5. Testing and final release | M5 | v1.0.0 | 2026-11-17 |
 | 6. Extra credit (course section 6) | M6 | v1.1.0 | 2026-11-18 |
 | A full shop: 81 books and demo sales | — | v1.2.0 | 2026-11-18 |
+| The apps start the services themselves | — | v1.3.0 | 2026-11-20 |
 
 Every milestone is closed; the course deadline is 2026-12-04. Dates, tasks, and dated progress notes: [milestones.md](docs/04-planning/milestones.md).
 

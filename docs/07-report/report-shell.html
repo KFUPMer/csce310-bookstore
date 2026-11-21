@@ -47,6 +47,14 @@
       font-size: 8.5pt;
       color: #746A5F;
     }
+    /* The university logo, top right of every page. logo.png is not in git; without it nothing is drawn. */
+    @top-right {
+      content: "";
+      width: 13mm;
+      height: 10mm;
+      margin-top: 5mm;
+      background: url("logo.png") no-repeat right center / contain;
+    }
   }
   @page :first {
     @bottom-left { content: none; }

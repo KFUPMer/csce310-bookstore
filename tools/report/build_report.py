@@ -61,11 +61,12 @@ def latest_tag():
     return tag if result.returncode == 0 and tag else "unreleased"
 
 
-def video_rows():
+def video_rows(private_links):
+    """private_links: the links from student.json ("videos"), kept out of the public repository; they win over video-links.json."""
     videos = json.loads(VIDEOS_JSON.read_text(encoding="utf-8"))
     rows = []
     for number, video in enumerate(videos, start=1):
-        url = video.get("url", "").strip()
+        url = (private_links[number - 1] if number <= len(private_links) else video.get("url", "")).strip()
         if url.startswith("https://"):
             safe = html.escape(url, quote=True)
             link = f'<a href="{safe}">{safe}</a>'
@@ -96,7 +97,7 @@ def build_html():
     footer = " · ".join(x for x in (student.get("course") or "CSCE 310", f"Instructor: {student['instructor']}" if student.get("instructor") else "") if x)
     page = page.replace("{{FOOTER}}", footer.replace("\\", "\\\\").replace('"', '\\"'))
     page = page.replace("{{SECTIONS}}", sections_html())
-    page = page.replace("{{VIDEOS}}", video_rows())
+    page = page.replace("{{VIDEOS}}", video_rows(student.get("videos") or []))
     page = page.replace("{{DATE}}", datetime.date.today().strftime("%d %B %Y").lstrip("0"))
     page = page.replace("{{VERSION}}", latest_tag())
     OUT_HTML.write_text(page, encoding="utf-8")

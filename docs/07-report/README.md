@@ -28,7 +28,7 @@ Build it from the repository root (needs Python and Microsoft Edge):
 python tools/report/build_report.py
 ```
 
-It writes `report.html` and `report.pdf` here. Both are rebuilt, not stored in git: the PDF is about 13 MB because it holds the screenshots at full size. The student's name, ID, course, and instructor (on the cover and in each page's footer) come from `student.json` (`{"name": ..., "id": ..., "course": ..., "instructor": ...}`) in this folder, which git ignores so they stay out of the public repository; without it the cover has blank lines. The university logo at the top right of each page is `logo.png` in this folder, also ignored by git (a trademark; see REFERENCES.md, section 5); without it the pages simply have no logo.
+It writes `report.html` and `report.pdf` here. Both are rebuilt, not stored in git: the PDF is about 13 MB because it holds the screenshots at full size. The student's name, ID, course, and instructor (on the cover and in each page's footer) come from `student.json` (`{"name": ..., "id": ..., "course": ..., "instructor": ..., "videos": ["https://youtu.be/..."]}`; the video links there win over `video-links.json`, so an unlisted video stays out of the public repository) in this folder, which git ignores so they stay out of the public repository; without it the cover has blank lines. The university logo at the top right of each page is `logo.png` in this folder, also ignored by git (a trademark; see REFERENCES.md, section 5); without it the pages simply have no logo.
 
 ## Making the files to upload
 

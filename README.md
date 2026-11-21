@@ -132,7 +132,7 @@ Every service has the same four layers and one error shape, `{ "error": "…" }`
 | **Tests** | 333 automated tests, all passing, plus 41 checks against the three running services |
 | **Speed** | N1 allows 500 ms per call. In every recorded run of the 41 live checks, each started cold, the slowest order call took 176 ms or less |
 | **Design** | 23 diagrams in draw.io (UML, ER, architecture, wireframes), each as source and image |
-| **Process** | 6 milestones, 21 GitHub issues, 9 releases (7 versions and 2 betas), 20 problem-log entries, 51 enhancement-log entries |
+| **Process** | 6 milestones, 21 GitHub issues, 9 releases (7 versions and 2 betas), 22 problem-log entries, 51 enhancement-log entries |
 
 <details>
 <summary><b>Tests per part</b></summary>
@@ -175,6 +175,7 @@ Every milestone is closed; the course deadline is 2026-12-04. Dates, tasks, and 
 | [docs/04-planning](docs/04-planning/milestones.md) | [Milestones](docs/04-planning/milestones.md), tasks, deadlines, and [versioning rules](docs/04-planning/versioning.md) |
 | [docs/05-setup](docs/05-setup/environment.md) | The development environment: every tool, its version, and how to check it |
 | [docs/06-testing](docs/06-testing/requirements-test.md) | The requirements test report: every requirement and the tests that prove it |
+| [docs/07-report](docs/07-report/README.md) | The course report (database, API, screens, architecture and classes) and the script for the acceptance-test videos |
 | [services/](services/README.md) | The three web services, each with a README on how to run and test it |
 | [clients/](clients/README.md) | The two desktop apps and their shared package |
 | [database/](database/README.md) | MySQL schema, the books, the seed and demo-data scripts |

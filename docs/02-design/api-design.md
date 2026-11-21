@@ -1,6 +1,6 @@
 # Phase 2 — API specification
 
-> Status: **draft**. To be finalized in milestone M2.
+> Status: **final**. All 20 endpoints are built and tested, and this document matches the code (checked against it on 2026-11-20 for the course report, `docs/07-report`).
 
 ## Rules for every endpoint
 
@@ -28,6 +28,7 @@
 | 403 | Logged in, but this role is not allowed to do this |
 | 404 | The book, order, or review does not exist |
 | 409 | Conflict: username or email already used, or no copies available |
+| 413 | The body is over 16 KB (book-service and order-service; user-service answers 400 "The request is too large") |
 
 ## Overview
 
@@ -104,7 +105,7 @@ Request:
 { "username": "alice", "email": "alice@example.com", "password": "…" }
 ```
 
-Rules: username 3–50 characters, only letters, digits, dots, dashes, underscores · email must look like an email (stored in lower case) · password 8 to 72 characters. The password is hashed with bcrypt (N3). The new account always has role `CUSTOMER`.
+Rules: username 3–50 characters, only letters, digits, dots, dashes, underscores · email must look like an email (stored in lower case) · password at least 8 characters and at most 72 bytes in UTF-8 (bcrypt's limit; accented or non-Latin letters take more than one byte). The password is hashed with bcrypt (N3). The new account always has role `CUSTOMER`.
 
 Response `201`:
 
@@ -140,8 +141,8 @@ Response `200`:
 
 ```json
 [
-  { "id": "…", "title": "Effective Java", "author": "Joshua Bloch", "price": 50.00, "copiesAvailable": 4 },
-  { "id": "…", "title": "Head First Java", "author": "Kathy Sierra and Bert Bates", "price": 35.00, "copiesAvailable": 7 }
+  { "id": "…", "title": "Effective Java", "author": "Joshua Bloch", "price": 50.00, "copiesAvailable": 4, "coverUrl": "…", "category": "Technology", "ratingAverage": 4.5, "ratingCount": 2 },
+  { "id": "…", "title": "Head First Java", "author": "Kathy Sierra and Bert Bates", "price": 35.00, "copiesAvailable": 7, "coverUrl": "…", "category": "Technology", "ratingAverage": null, "ratingCount": 0 }
 ]
 ```
 
@@ -303,7 +304,7 @@ Added in M4, so the manager app can show an order's bill in the app (architectur
 Response `200`: the whole order, in the same shape as the answer to `POST /api/orders` but without `billHtml` and `emailQueued`:
 
 ```json
-{ "id": 1042, "username": "alice", "email": "alice@example.com", "createdAt": "2026-11-13T10:05:00", "paymentStatus": "PENDING", "items": [ … ], "total": 103.00 }
+{ "id": 1042, "username": "alice", "email": "alice@example.com", "createdAt": "2026-11-13T10:05:00", "paymentStatus": "PENDING", "items": [ … ], "total": 103.00, "billFile": "bills/bill-1042.html" }
 ```
 
 Errors: `401` · `403` a customer asking for someone else's order ("This order belongs to another customer") · `404`.

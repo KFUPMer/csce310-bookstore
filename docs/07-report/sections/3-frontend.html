@@ -1,0 +1,332 @@
+<h2>3. Frontend design</h2>
+
+<h3>3.0 Overview</h3>
+
+<p>There are two Flutter desktop apps for Windows. <b>Mooney's</b> (<code>clients/customer-app</code>) is for customers. <b>Mooney's Manager</b> (<code>clients/management-app</code>) is for store staff. Both are built on one shared package, <code>clients/bookstore-ui</code>, which holds the theme, the log-in form, the bill view, the API clients and the common widgets. So both apps look and behave the same.</p>
+
+<table class="data">
+  <thead><tr><th>Point</th><th>What the apps do</th></tr></thead>
+  <tbody>
+    <tr><td>Colors</td><td>Warm neutrals, plus one accent color (focus rings, selection, links) and one danger color (errors, late rentals). Book covers and the Mooney's sign carry the rest of the color. All values live in one file, <code>bookstore-ui/lib/src/tokens.dart</code>.</td></tr>
+    <tr><td>Light and dark</td><td>Two palettes with the same structure. One button in the top bar switches between them. In the customer app the choice is also a saved preference.</td></tr>
+    <tr><td>Type</td><td>Inter for interface text, Source Serif 4 for headings. Both are bundled with the app (SIL Open Font License).</td></tr>
+    <tr><td>Contrast</td><td>Text colors were chosen to meet WCAG AA (at least 4.5 : 1) in both modes; see <code>tokens.dart</code>. No test measures the ratios.</td></tr>
+    <tr><td>Color-blind users</td><td>No state is told by color alone. Errors, payment status, availability and ratings always have an icon and a word, or a shape.</td></tr>
+    <tr><td>Keyboard</td><td>Tab moves between controls, Enter activates, Esc goes back or closes, Ctrl+F jumps to the search field. Focus is shown with a 2 px outline.</td></tr>
+    <tr><td>Screen readers</td><td>Every icon-only button has a tooltip, which is also its name for screen readers.</td></tr>
+    <tr><td>Responsiveness (N2)</td><td>All calls to the services are asynchronous. Buttons show a spinner while a request runs, and are disabled so nothing is sent twice.</td></tr>
+  </tbody>
+</table>
+
+<p class="note">The screenshots below are drawn by Flutter from the apps' real widgets, with the real fonts and sample data, at 1440 x 900 (<code>clients/customer-app/test/screenshots_test.dart</code> and the manager app's equivalent). They are not photos of the running window. That the apps work against the real services is shown in the user acceptance test videos (see the video links) and recorded in <code>docs/06-testing/requirements-test.md</code>.</p>
+
+<h3>3.1 Mockups made before building</h3>
+
+<p>Before any screen was built, each app was drawn as a wireframe in draw.io (milestone M2). The wireframes fixed the core screens of the PRD and what is on each. Later milestones changed some of them and added more screens; the table after the figures lists the changes. Each window of the two wireframe sheets (<code>docs/02-design/diagrams/wireframes-customer-app.png</code> and <code>wireframes-manager-app.png</code>) is shown on its own, so its labels can be read on paper.</p>
+
+<figure class="diagram">
+  <div style="width:116mm;height:89mm;overflow:hidden;margin:0 auto;"><img src="../02-design/diagrams/wireframes-customer-app.png" alt="Customer app wireframe: log in" style="width:400mm;max-width:none;max-height:none;margin:-5mm 0 0 -3mm;"></div>
+  <figcaption>Figure 3.1a. Customer app wireframe 1: log in.</figcaption>
+</figure>
+
+<figure class="diagram">
+  <div style="width:115mm;height:89mm;overflow:hidden;margin:0 auto;"><img src="../02-design/diagrams/wireframes-customer-app.png" alt="Customer app wireframe: create an account" style="width:400mm;max-width:none;max-height:none;margin:-5mm 0 0 -130mm;"></div>
+  <figcaption>Figure 3.1b. Customer app wireframe 2: create an account.</figcaption>
+</figure>
+
+<figure class="diagram">
+  <div style="width:139mm;height:89mm;overflow:hidden;margin:0 auto;"><img src="../02-design/diagrams/wireframes-customer-app.png" alt="Customer app wireframe: search books" style="width:400mm;max-width:none;max-height:none;margin:-5mm 0 0 -257mm;"></div>
+  <figcaption>Figure 3.1c. Customer app wireframe 3: search books.</figcaption>
+</figure>
+
+<figure class="diagram">
+  <div style="width:159.4mm;height:89.4mm;overflow:hidden;margin:0 auto;"><img src="../02-design/diagrams/wireframes-customer-app.png" alt="Customer app wireframe: your order" style="width:400mm;max-width:none;max-height:none;margin:-107mm 0 0 -3mm;"></div>
+  <figcaption>Figure 3.1d. Customer app wireframe 4: your order.</figcaption>
+</figure>
+
+<figure class="diagram">
+  <div style="width:139.4mm;height:89.4mm;overflow:hidden;margin:0 auto;"><img src="../02-design/diagrams/wireframes-customer-app.png" alt="Customer app wireframe: bill" style="width:400mm;max-width:none;max-height:none;margin:-107mm 0 0 -173.6mm;"></div>
+  <figcaption>Figure 3.1e. Customer app wireframe 5: bill.</figcaption>
+</figure>
+
+<figure class="diagram">
+  <div style="width:111.6mm;height:86.8mm;overflow:hidden;margin:0 auto;"><img src="../02-design/diagrams/wireframes-manager-app.png" alt="Manager app wireframe: log in" style="width:310mm;max-width:none;max-height:none;margin:-4.65mm 0 0 -14.26mm;"></div>
+  <figcaption>Figure 3.2a. Manager app wireframe 1: manager log in.</figcaption>
+</figure>
+
+<figure class="diagram">
+  <div style="width:169.3mm;height:86.8mm;overflow:hidden;margin:0 auto;"><img src="../02-design/diagrams/wireframes-manager-app.png" alt="Manager app wireframe: Orders tab" style="width:310mm;max-width:none;max-height:none;margin:-4.65mm 0 0 -137.2mm;"></div>
+  <figcaption>Figure 3.2b. Manager app wireframe 2: Orders tab.</figcaption>
+</figure>
+
+<figure class="diagram">
+  <div style="width:169mm;height:87.1mm;overflow:hidden;margin:0 auto;"><img src="../02-design/diagrams/wireframes-manager-app.png" alt="Manager app wireframe: Books tab" style="width:310mm;max-width:none;max-height:none;margin:-104.2mm 0 0 -14.26mm;"></div>
+  <figcaption>Figure 3.2c. Manager app wireframe 3: Books tab.</figcaption>
+</figure>
+
+<figure class="diagram">
+  <div style="width:111.6mm;height:87.1mm;overflow:hidden;margin:0 auto;"><img src="../02-design/diagrams/wireframes-manager-app.png" alt="Manager app wireframe: add or edit book dialog" style="width:310mm;max-width:none;max-height:none;margin:-104.2mm 0 0 -194.5mm;"></div>
+  <figcaption>Figure 3.2d. Manager app wireframe 4: add / edit book dialog.</figcaption>
+</figure>
+
+<h4>3.1.1 Wireframe vs built</h4>
+
+<table class="data">
+  <thead><tr><th>Change</th><th>Why</th><th>Milestone</th></tr></thead>
+  <tbody>
+    <tr><td>Search results: the table became a cover grid, with a list view that keeps the table's columns</td><td>Covers are quicker to browse; the list is kept for scanning (FR5)</td><td>M4</td></tr>
+    <tr><td>Search runs as you type (250 ms after the last key) instead of on a Search button, in both apps</td><td>One step less; results follow the keyword</td><td>M4</td></tr>
+    <tr><td>A book opens in a detail panel, with its Buy and Rent buttons, instead of "Selected:" and two buttons under the table</td><td>Both prices are on the buttons; the results stay visible</td><td>M4</td></tr>
+    <tr><td>Light and dark mode, with a switch in the top bar</td><td>Part of the approved style guide</td><td>M4</td></tr>
+    <tr><td>Manager Orders tab: All / Pending / Paid filter, "Mark as paid" on each pending row, the bill opened from the row</td><td>Fewer clicks than "select a row, then a button"</td><td>M4</td></tr>
+    <tr><td>Manager log in: a customer is told "This app is for managers. Customers log in to the customer app." instead of "Access denied"</td><td>Says what to do next (<code>management-app/lib/screens/login_screen.dart</code>)</td><td>M4</td></tr>
+    <tr><td>Account page and pretend checkout (pay dialog) added</td><td>Asked for by the owner, beyond the PRD</td><td>M4</td></tr>
+    <tr><td>Shelves (categories) added to search, and a shelf and cover field to the book form</td><td>The store became Mooney's, with five shelves</td><td>M5</td></tr>
+    <tr><td>Reviews and ratings added</td><td>Course section-6 extra credit</td><td>M6</td></tr>
+    <tr><td>Manager Reports tab added (third tab)</td><td>Course section-6 extra credit</td><td>M6</td></tr>
+  </tbody>
+</table>
+
+<h3 class="pagebreak">3.2 Customer app: Mooney's</h3>
+
+<h4>3.2.1 Log in</h4>
+
+<figure class="shot">
+  <img src="../02-design/ui/customer-login-light.png" alt="Customer log in screen, light mode">
+  <figcaption>Figure 3.3. Log in. The customer enters a username and password and gets a session that lasts until they log out (FR1, FR2).</figcaption>
+</figure>
+<ul>
+  <li>The form is the shared log-in form from <code>bookstore-ui</code>; the manager app uses the same one.</li>
+  <li>The password field has a show/hide button.</li>
+  <li>"Create an account" is right under the main button, for new customers.</li>
+</ul>
+
+<h4>3.2.2 Create an account, with errors</h4>
+
+<figure class="shot">
+  <img src="../02-design/ui/customer-register-dark-errors.png" alt="Create an account screen with field errors, dark mode">
+  <figcaption>Figure 3.4. Create an account (dark mode). A new customer gives a username, an email and a password (FR3, extra credit). The password is hashed by user-service, never by the app.</figcaption>
+</figure>
+<ul>
+  <li>The app checks the fields before sending: username at least 3 characters, a valid-looking email, password at least 8 characters, and the two passwords the same (<code>account_rules.dart</code>).</li>
+  <li>Each problem is shown under its own field, with an icon and a sentence, not by a red border alone.</li>
+  <li>Problems are shown only after the first attempt, so the form does not scold the user while they type.</li>
+</ul>
+
+<h4>3.2.3 Search: cover grid</h4>
+
+<figure class="shot">
+  <img src="../02-design/ui/customer-search-light.png" alt="Search screen as a grid of covers">
+  <figcaption>Figure 3.5. Search. One keyword is matched against title and author; each card shows title, author, price and copies left (FR4, FR5).</figcaption>
+</figure>
+<ul>
+  <li>Search as you type: the app waits 250 ms after the last key, then asks book-service (<code>GET /api/books?keyword=...</code>). There is no Search button.</li>
+  <li>The shelves (All, Fiction, Nonfiction, Kids, Science, Technology) filter by category. The chosen one is bold and underlined, not only colored.</li>
+  <li>The heading always says what is shown, for example "81 books".</li>
+  <li>The top bar holds grid/list switch, light/dark, "Your order" with its item count, the account button and log out.</li>
+</ul>
+
+<h4>3.2.4 Search: list view</h4>
+
+<figure class="shot">
+  <img src="../02-design/ui/customer-search-dark-list.png" alt="Search results as a list, dark mode">
+  <figcaption>Figure 3.6. A search for "java" in the list view, dark mode. Title, author and price in columns: the "clear list" of FR5 (FR4, FR5).</figcaption>
+</figure>
+<ul>
+  <li>The grid is for browsing; the list is for scanning. Both show the same results.</li>
+  <li>The heading says how many books match: "3 of 81 books match in title or author".</li>
+  <li>The customer can make the list the default view in the account preferences.</li>
+</ul>
+
+<h4>3.2.5 Book detail, adding to the order</h4>
+
+<figure class="shot">
+  <img src="../02-design/ui/customer-search-light-detail.png" alt="Book detail panel after renting a book">
+  <figcaption>Figure 3.7. A book opened in the detail panel, just after it was added as a rental. The customer selects books to buy or rent (FR6).</figcaption>
+</figure>
+<ul>
+  <li>The detail panel slides in from the right and the grid makes room for it, so the results stay visible.</li>
+  <li>Both prices are on the buttons: "Buy $9.99" and "Rent for 7 days $1.00". The customer never has to work out the 10% rent price.</li>
+  <li>A book already in the order says so ("In your order") and cannot be added twice.</li>
+  <li>A toast confirms the action and offers Undo.</li>
+</ul>
+
+<h4>3.2.6 Book detail with reviews</h4>
+
+<figure class="shot">
+  <img src="../02-design/ui/customer-reviews-light.png" alt="Book detail panel with ratings and reviews">
+  <figcaption>Figure 3.8. Ratings on the cards and the Reviews section of the detail panel. Reviews are extra credit (course section 6), beyond FR1-FR14.</figcaption>
+</figure>
+<ul>
+  <li>Stars are drawn in the ink color, filled, half filled or outlined, so the rating is read by shape, and the number is written next to them ("4.0 · 3 reviews").</li>
+  <li>"Your review" comes first. Its Edit and Delete buttons are under the review text, below the bottom edge of this figure. Other reviews follow, newest first.</li>
+  <li>A customer writes one review per book, through <code>PUT /api/books/{id}/reviews/mine</code>.</li>
+</ul>
+
+<h4>3.2.7 Your order</h4>
+
+<figure class="shot">
+  <img src="../02-design/ui/customer-order-light.png" alt="Your order screen with buy and rent choices">
+  <figcaption>Figure 3.9. Your order. The customer chooses buy or rent for each book and places one order for all of them (FR6, FR7).</figcaption>
+</figure>
+<ul>
+  <li>Each row has a Buy / Rent switch with both prices, and a rented book shows its due date ("Due back 25 November 2026 if ordered today").</li>
+  <li>The summary on the right counts bought and rented books and shows the total before the order is placed.</li>
+  <li>"Place order" is the one main button. The line under it says the bill will be shown and emailed.</li>
+</ul>
+
+<h4>3.2.8 The bill</h4>
+
+<figure class="shot">
+  <img src="../02-design/ui/customer-bill-light.png" alt="Bill shown after placing an order">
+  <figcaption>Figure 3.10. The bill, shown right after the order is placed: order ID, date, customer, every item with its type and price, and the total due (FR8). The same bill is saved as an HTML file (FR9) and emailed to the customer (FR10).</figcaption>
+</figure>
+<ul>
+  <li>The bill on screen has the same parts, in the same order, as the HTML bill that is saved and emailed.</li>
+  <li>The line at the top says where the copy was sent.</li>
+  <li>Payment status is a chip with an icon and a word ("Payment pending"), not a color.</li>
+  <li>"Pay now" leads to the pretend checkout (3.2.10).</li>
+</ul>
+
+<h4>3.2.9 Your account</h4>
+
+<figure class="shot">
+  <img src="../02-design/ui/customer-account-light.png" alt="Customer account page">
+  <figcaption>Figure 3.11. Your account, opened from the customer's name in the top bar: profile, preferences, rentals due back, and the customer's own orders (<code>GET /api/orders/mine</code>). Beyond the PRD; it also shows N5: a customer sees only their own orders.</figcaption>
+</figure>
+<ul>
+  <li>Preferences (dark mode, open search as a list) are saved on this computer, per account, in <code>%APPDATA%\CSCE310 Bookstore\preferences.json</code>.</li>
+  <li>A late rental is told by a warning icon and the words "Was due back 2 days ago", not by color alone.</li>
+  <li>Paid and pending orders have the same row height, so the list reads as one column. Each order opens its bill.</li>
+</ul>
+
+<h4>3.2.10 Pay dialog</h4>
+
+<figure class="shot">
+  <img src="../02-design/ui/customer-pay-light.png" alt="Pretend checkout dialog">
+  <figcaption>Figure 3.12. The pretend checkout. Paying marks the order as paid (<code>POST /api/orders/{id}/pay</code>). Beyond the PRD, which leaves payment to the manager (FR13).</figcaption>
+</figure>
+<ul>
+  <li>It says plainly that it is a demonstration and charges nothing.</li>
+  <li>No card details are asked for or stored.</li>
+  <li>One main button, with the amount on it ("Pay $58.00").</li>
+</ul>
+
+<h4>3.2.11 Dark mode</h4>
+
+<figure class="shot">
+  <img src="../02-design/ui/customer-account-dark-paid.png" alt="Account page in dark mode after paying">
+  <figcaption>Figure 3.13. The account page after paying, with dark mode switched on from the preferences. The toast confirms "Order 1045 is paid. Thank you!"</figcaption>
+</figure>
+<ul>
+  <li>Dark mode uses a warm near-black and off-white, not pure black and white, and its text colors were also chosen to meet WCAG AA.</li>
+  <li>Order 1045 now shows the "Paid" chip with a check mark; order 1044 still has "Payment pending" and a Pay button.</li>
+  <li>The switch between modes is animated (380 ms).</li>
+</ul>
+
+<h3 class="pagebreak">3.3 Manager app: Mooney's Manager</h3>
+
+<h4>3.3.1 Log in</h4>
+
+<figure class="shot">
+  <img src="../02-design/ui/manager-login-light.png" alt="Manager log in screen">
+  <figcaption>Figure 3.14. Manager log in, a separate app for store staff only (FR1, FR11).</figcaption>
+</figure>
+<ul>
+  <li>It is the same shared log-in form as the customer app, asked to accept only the role <code>MANAGER</code>.</li>
+  <li>A customer who tries to log in is turned away with "This app is for managers. Customers log in to the customer app."</li>
+  <li>There is no "Create an account": managers are added by the store.</li>
+</ul>
+
+<h4>3.3.2 Orders</h4>
+
+<figure class="shot">
+  <img src="../02-design/ui/manager-orders-light.png" alt="Orders tab of the manager app">
+  <figcaption>Figure 3.15. Orders. Every order, newest first, with customer, date, total and payment status (FR12). Each pending row has "Mark as paid" (FR13).</figcaption>
+</figure>
+<ul>
+  <li>The heading says how many orders wait for payment. The filter (All, Pending, Paid) shows a count on each choice.</li>
+  <li>"Mark as paid" sends <code>PATCH /api/orders/{id}/payment-status</code>. The toast offers Undo, which sets the order back to pending.</li>
+  <li>Paid and Pending are a filled and an outlined chip, each with an icon and a word.</li>
+  <li>The three tabs (Orders, Books, Reports) sit in the top bar.</li>
+</ul>
+
+<figure class="shot">
+  <img src="../02-design/ui/manager-orders-dark.png" alt="Orders tab in dark mode">
+  <figcaption>Figure 3.16. The same Orders tab in dark mode.</figcaption>
+</figure>
+
+<h4>3.3.3 An order's bill</h4>
+
+<figure class="shot">
+  <img src="../02-design/ui/manager-order-bill-light.png" alt="An order's bill in the manager app">
+  <figcaption>Figure 3.17. One order opened: its bill, its payment status, "Mark as paid" and "Print bill" (FR8, FR9, FR13).</figcaption>
+</figure>
+<ul>
+  <li>The bill is drawn by the same shared <code>BillView</code> widget the customer sees, so both sides see the same bill.</li>
+  <li>"Print bill" gets the saved HTML bill from order-service (<code>GET /api/orders/{id}/bill</code>), saves it to a file and opens it with Windows (normally in the browser), from where the manager prints it to post to the customer (FR9).</li>
+</ul>
+
+<h4>3.3.4 Books</h4>
+
+<figure class="shot">
+  <img src="../02-design/ui/manager-books-light.png" alt="Books tab of the manager app">
+  <figcaption>Figure 3.18. Books. All books with title, author, shelf, price and copies; "Add book" adds a new one and clicking a row edits it (FR14).</figcaption>
+</figure>
+<ul>
+  <li>The same search as the customer app: as you type, by title or author, with Ctrl+F.</li>
+  <li>Low stock is written out with an icon ("Only 2 left"), not shown by color.</li>
+  <li>"Add book" is the one main button of the screen.</li>
+</ul>
+
+<h4>3.3.5 Book form, with validation</h4>
+
+<figure class="shot">
+  <img src="../02-design/ui/manager-book-form-light-error.png" alt="Edit book dialog with a price error">
+  <figcaption>Figure 3.19. Edit book, with the price left empty. The manager changes a book's details, including the number of copies (FR14).</figcaption>
+</figure>
+<ul>
+  <li>The form checks each field before saving (<code>book_rules.dart</code>), and the problem appears under its field ("Enter the price"), with an icon.</li>
+  <li>The shelf is chosen from five buttons, so it cannot be misspelled.</li>
+  <li>The cover image address is optional. Without it, the app draws a cover from the title.</li>
+  <li>The line at the top says changes reach the customers' search at once.</li>
+</ul>
+
+<h4>3.3.6 Reports</h4>
+
+<figure class="shot">
+  <img src="../02-design/ui/manager-reports-light.png" alt="Sales report, light mode">
+  <figcaption>Figure 3.20. Sales report (<code>GET /api/reports/sales</code>, managers only). Extra credit (course section 6), beyond FR1-FR14.</figcaption>
+</figure>
+<ul>
+  <li>Period buttons at the top: Today, Last 7 days, Last 30 days, This month, All time. The chosen one is filled and has a check.</li>
+  <li>Four tiles give orders, revenue, books sold and books rented, each with a line of detail.</li>
+  <li>Sales by day are bars in the ink color, with the day under each bar and the amount over it, so the chart can be read from its words.</li>
+  <li>Best sellers are a plain numbered table, most copies first.</li>
+</ul>
+
+<figure class="shot">
+  <img src="../02-design/ui/manager-reports-dark.png" alt="Sales report, dark mode">
+  <figcaption>Figure 3.21. The same report in dark mode.</figcaption>
+</figure>
+
+<h3>3.4 Screens and requirements</h3>
+
+<table class="data">
+  <thead><tr><th>Screen</th><th>App</th><th>Code (screen file, main class)</th><th>Requirements</th></tr></thead>
+  <tbody>
+    <tr><td>Log in</td><td>Customer</td><td><code>customer-app/lib/screens/login_screen.dart</code> (<code>LoginScreen</code>), using the shared <code>LoginForm</code> (<code>bookstore-ui/lib/src/login_form.dart</code>)</td><td>FR1, FR2</td></tr>
+    <tr><td>Create an account</td><td>Customer</td><td><code>register_screen.dart</code> (<code>RegisterScreen</code>); checks in <code>models/account_rules.dart</code></td><td>FR3</td></tr>
+    <tr><td>Search (grid and list)</td><td>Customer</td><td><code>search_screen.dart</code> (<code>SearchScreen</code>)</td><td>FR4, FR5</td></tr>
+    <tr><td>Book detail</td><td>Customer</td><td><code>search_screen.dart</code> (<code>_DetailPanel</code>); review form in <code>review_dialog.dart</code></td><td>FR6; reviews are extra credit</td></tr>
+    <tr><td>Your order</td><td>Customer</td><td><code>order_screen.dart</code> (<code>OrderScreen</code>)</td><td>FR6, FR7</td></tr>
+    <tr><td>Bill</td><td>Customer</td><td><code>bill_screen.dart</code> (<code>BillScreen</code>), drawing the shared <code>BillView</code> (<code>bookstore-ui/lib/src/bill_view.dart</code>)</td><td>FR8, FR9, FR10</td></tr>
+    <tr><td>Your account, pay dialog</td><td>Customer</td><td><code>account_screen.dart</code> (<code>AccountScreen</code>); <code>pay_dialog.dart</code> (<code>showPayDialog</code>)</td><td>Beyond the PRD; N5 (own orders only)</td></tr>
+    <tr><td>Log in</td><td>Manager</td><td><code>management-app/lib/screens/login_screen.dart</code> (<code>LoginScreen</code>), using the same <code>LoginForm</code></td><td>FR1, FR11</td></tr>
+    <tr><td>Orders</td><td>Manager</td><td><code>orders_view.dart</code> (<code>OrdersView</code>); tabs in <code>home_screen.dart</code> (<code>HomeScreen</code>)</td><td>FR12, FR13</td></tr>
+    <tr><td>An order's bill</td><td>Manager</td><td><code>orders_view.dart</code> (<code>_OrderDialog</code>), drawing the shared <code>BillView</code></td><td>FR8, FR9, FR13</td></tr>
+    <tr><td>Books, book form</td><td>Manager</td><td><code>books_view.dart</code> (<code>BooksView</code>); <code>book_form_dialog.dart</code> (<code>BookFormDialog</code>), checks in <code>models/book_rules.dart</code></td><td>FR14</td></tr>
+    <tr><td>Reports</td><td>Manager</td><td><code>reports_view.dart</code> (<code>ReportsView</code>)</td><td>Extra credit (course section 6)</td></tr>
+    <tr><td>Every screen</td><td>Both</td><td>Calls go through <code>ApiClient</code> (<code>bookstore-ui/lib/src/api/api_client.dart</code>)</td><td>N2 (calls are asynchronous; the window never waits)</td></tr>
+  </tbody>
+</table>

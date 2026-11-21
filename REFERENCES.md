@@ -71,7 +71,7 @@ Tools are used, not included: none of their code is in the repository. The licen
 | MongoDB Community Server 9.0 | Document database | Server Side Public License (SSPL) v1 |
 | Visual Studio 2022 Build Tools | Compiling Flutter Windows apps | Microsoft product license |
 | draw.io Desktop (diagrams.net) | Every diagram | Apache License 2.0 |
-| Microsoft Edge (headless) | Rendering the sample bill to an image | Microsoft product license |
+| Microsoft Edge (headless) | Rendering the sample bill to an image, and printing the course report to PDF (`tools/report/build_report.py`) | Microsoft product license |
 | Inno Setup 6.7.1 (Jordan Russell, Martijn Laan), preinstalled on GitHub's Windows machine; version read from the build log | Making the apps' installer, on GitHub Actions (`installer/bookstore.iss`) | Inno Setup License (free, including for commercial use) |
 | GitHub Actions: `actions/checkout@v4`, `actions/setup-java@v4`, `actions/setup-python@v5`, `actions/upload-artifact@v4` (GitHub), `subosito/flutter-action@v2` (Alif Rachmawadi) | The release build (`.github/workflows/windows-release.yml`) | MIT |
 | Windows PowerShell 5.1 with .NET System.Drawing, and the Segoe UI font that comes with Windows | Drawing the README's top picture (`tools/screenshots/make-hero.ps1`); Segoe UI writes the two window titles in it. The font file is not in the repository | Microsoft product license (part of Windows) |

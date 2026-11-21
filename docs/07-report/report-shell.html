@@ -1,0 +1,284 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Mooney's: an online bookstore. CSCE310 course project report</title>
+<!--
+  The shell of the course report. tools/report/build_report.py fills the placeholders
+  (DATE, VERSION, SECTIONS, VIDEOS, each in double braces) and prints the result to PDF with Edge.
+  Do not open this file directly; open report.html, which the build writes.
+-->
+<style>
+  /* Fonts: the same files the apps use, from the shared package. */
+  @font-face { font-family: "Inter"; src: url("../../clients/bookstore-ui/fonts/Inter-Regular.ttf"); font-weight: 400; }
+  @font-face { font-family: "Inter"; src: url("../../clients/bookstore-ui/fonts/Inter-Medium.ttf"); font-weight: 500; }
+  @font-face { font-family: "Inter"; src: url("../../clients/bookstore-ui/fonts/Inter-SemiBold.ttf"); font-weight: 600; }
+  @font-face { font-family: "Inter"; src: url("../../clients/bookstore-ui/fonts/Inter-Bold.ttf"); font-weight: 700; }
+  @font-face { font-family: "Source Serif 4"; src: url("../../clients/bookstore-ui/fonts/SourceSerif4-Regular.ttf"); font-weight: 400; }
+  @font-face { font-family: "Source Serif 4"; src: url("../../clients/bookstore-ui/fonts/SourceSerif4-Semibold.ttf"); font-weight: 600; }
+
+  /* Colors: the light tokens of docs/02-design/style-guide.md, plus the sign green for headings. */
+  :root {
+    --text: #1F1B17;
+    --text-2: #62594F;
+    --text-3: #746A5F;
+    --hairline: #E2DBD0;
+    --background: #F4F0E9;
+    --surface: #FFFCF7;
+    --accent: #8F4721;
+    --danger: #9E2A1F;
+    --green: #1D3B31;
+    --gold: #D9B871;
+  }
+
+  /* Page: A4, 18 mm margins, page number at the bottom (not on the cover). */
+  @page {
+    size: A4;
+    margin: 18mm 18mm 20mm 18mm;
+    @bottom-center {
+      content: counter(page);
+      font-family: "Inter", sans-serif;
+      font-size: 8.5pt;
+      color: #746A5F;
+    }
+  }
+  @page :first {
+    @bottom-center { content: none; }
+  }
+
+  html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  body {
+    margin: 0;
+    background: #FFFFFF;
+    color: var(--text);
+    font-family: "Inter", sans-serif;
+    font-size: 10pt;
+    line-height: 1.5;
+  }
+
+  h1, h2, h3, h4 { font-family: "Source Serif 4", serif; font-weight: 600; color: var(--green); line-height: 1.25; }
+  h2 {
+    break-before: page;
+    font-size: 20pt;
+    margin: 0 0 4mm 0;
+    padding-bottom: 2mm;
+    border-bottom: 1.5pt solid var(--green);
+  }
+  h3 { font-size: 13.5pt; margin: 7mm 0 2mm 0; break-after: avoid; }
+  h4 { font-size: 11pt; margin: 5mm 0 1.5mm 0; break-after: avoid; }
+  p { margin: 0 0 2.5mm 0; }
+  ul, ol { margin: 0 0 2.5mm 0; padding-left: 6mm; }
+  li { margin-bottom: 0.8mm; }
+  a { color: var(--green); }
+  code { font-family: Consolas, "Cascadia Mono", monospace; font-size: 0.92em; }
+  .pagebreak { break-before: page; }
+
+  /* A data table: bordered, header shaded, rows kept whole. */
+  table.data { width: 100%; border-collapse: collapse; margin: 2mm 0 4mm 0; font-size: 9pt; }
+  table.data th, table.data td { border: 0.6pt solid var(--hairline); padding: 1.4mm 2mm; text-align: left; vertical-align: top; }
+  table.data th { background: var(--background); color: var(--text); font-weight: 600; }
+  table.data tr { break-inside: avoid; }
+  table.data caption { caption-side: top; text-align: left; font-size: 8.5pt; color: var(--text-2); padding-bottom: 1mm; }
+
+  /* A JSON (or other code) block. */
+  pre.json {
+    font-family: Consolas, "Cascadia Mono", monospace;
+    font-size: 8pt;
+    line-height: 1.4;
+    background: var(--background);
+    border: 0.6pt solid var(--hairline);
+    border-radius: 2mm;
+    padding: 2mm 3mm;
+    margin: 1mm 0 3mm 0;
+    white-space: pre-wrap;
+    break-inside: avoid;
+  }
+
+  /* Figures: a screenshot or a diagram, full width, with a caption. */
+  figure.shot, figure.diagram { margin: 3mm 0 5mm 0; break-inside: avoid; }
+  figure.shot img, figure.diagram img { display: block; width: 100%; height: auto; }
+  figure.shot img { border: 0.6pt solid var(--hairline); border-radius: 1.5mm; }
+  figure.diagram img { max-height: 225mm; object-fit: contain; }
+  figcaption { font-size: 8.5pt; color: var(--text-2); margin-top: 1.5mm; }
+
+  /* A wide diagram (class, sequence, ER) gets a landscape page of its own, so its text is larger.
+     Wrap the heading with it in <div class="wide"> so the heading is not left behind. */
+  @page wide { size: A4 landscape; margin: 14mm 16mm 16mm 16mm; }
+  .wide { page: wide; }
+  .wide h3, .wide h4 { margin-top: 0; }
+  .wide figure.diagram { margin: 2mm 0 0 0; }
+  .wide figure.diagram img { width: auto; max-width: 100%; max-height: 158mm; margin: 0 auto; }
+
+  /* Keep a lead-in line ("Request:", "Response 200:") on the same page as what it introduces. */
+  p:has(+ pre.json), p:has(+ table.data) { break-after: avoid; }
+
+  /* A shaded aside. */
+  .note {
+    background: var(--background);
+    border-left: 2pt solid var(--green);
+    padding: 2mm 3mm;
+    margin: 2mm 0 4mm 0;
+    font-size: 9pt;
+    break-inside: avoid;
+  }
+  .note p:last-child { margin-bottom: 0; }
+
+  /* One endpoint: a method badge and its URL. */
+  .endpoint {
+    margin: 5mm 0 1.5mm 0;
+    padding: 1.5mm 2mm;
+    border-top: 0.6pt solid var(--hairline);
+    font-weight: 600;
+    break-after: avoid;
+  }
+  .endpoint code { font-size: 9.5pt; }
+  span.method {
+    display: inline-block;
+    min-width: 13mm;
+    padding: 0.3mm 1.5mm;
+    margin-right: 2mm;
+    border-radius: 1mm;
+    font-family: "Inter", sans-serif;
+    font-size: 7.5pt;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-align: center;
+    color: #FFFFFF;
+    background: var(--text-2);
+  }
+  span.method.get, span.method.GET { background: #2F5D8A; }
+  span.method.post, span.method.POST { background: #2E6B47; }
+  span.method.put, span.method.PUT { background: #8F6A1E; }
+  span.method.patch, span.method.PATCH { background: #6B4C8A; }
+  span.method.delete, span.method.DELETE { background: var(--danger); }
+
+  /* Key markers in the database tables. */
+  span.pk, span.fk {
+    display: inline-block;
+    padding: 0 1.2mm;
+    margin-left: 1mm;
+    border-radius: 0.8mm;
+    font-size: 7pt;
+    font-weight: 700;
+    vertical-align: 0.1em;
+  }
+  span.pk { background: var(--green); color: var(--gold); }
+  span.fk { border: 0.6pt solid var(--accent); color: var(--accent); }
+  span.pk:empty::before { content: "PK"; }
+  span.fk:empty::before { content: "FK"; }
+
+  /* Cover page. */
+  .cover { height: 255mm; display: flex; flex-direction: column; }
+  .cover .sign {
+    background: linear-gradient(160deg, #2A5141, #1D3B31);
+    border-radius: 3mm;
+    padding: 14mm 12mm;
+    margin-top: 30mm;
+  }
+  .cover h1 { color: var(--gold); font-size: 30pt; margin: 0 0 3mm 0; }
+  .cover .subtitle { color: #F2DDA2; font-family: "Source Serif 4", serif; font-size: 15pt; margin: 0; }
+  .cover .fields { margin-top: 22mm; font-size: 11.5pt; }
+  .cover .fields p { margin: 0 0 6mm 0; }
+  .cover .fields .label { display: inline-block; width: 34mm; color: var(--text-2); }
+  .cover .meta { margin-top: auto; font-size: 9.5pt; color: var(--text-2); border-top: 0.6pt solid var(--hairline); padding-top: 3mm; }
+  .cover .meta p { margin: 0 0 1mm 0; }
+
+  /* Table of contents and the opening page. */
+  .toc { margin-top: 4mm; }
+  .toc ol { list-style: none; padding: 0; font-size: 11pt; }
+  .toc li { padding: 2mm 0; border-bottom: 0.6pt solid var(--hairline); }
+  .toc a { color: var(--text); text-decoration: none; }
+  .toc .num { display: inline-block; width: 8mm; color: var(--green); font-weight: 600; }
+  .front h3 { margin-top: 10mm; }
+</style>
+</head>
+<body>
+
+<section class="cover">
+  <div class="sign">
+    <h1>Mooney's: an online bookstore</h1>
+    <p class="subtitle">CSCE310 course project report</p>
+  </div>
+  <div class="fields">
+    <p><span class="label">Student name:</span> ________________________________</p>
+    <p><span class="label">Student ID:</span> ________________________________</p>
+  </div>
+  <div class="meta">
+    <p>Date: {{DATE}}</p>
+    <p>Version: {{VERSION}}</p>
+    <p>Repository: <a href="https://github.com/KFUPMer/csce310-bookstore">https://github.com/KFUPMer/csce310-bookstore</a></p>
+  </div>
+</section>
+
+<section class="front">
+  <h2>Contents</h2>
+  <nav class="toc">
+    <ol>
+      <li><a href="#database"><span class="num">1.</span>Database design</a></li>
+      <li><a href="#backend"><span class="num">2.</span>Backend design</a></li>
+      <li><a href="#frontend"><span class="num">3.</span>Frontend design</a></li>
+      <li><a href="#architecture"><span class="num">4.</span>Architectural and class design</a></li>
+      <li><a href="#videos"><span class="num">5.</span>User acceptance test videos</a></li>
+    </ol>
+  </nav>
+
+  <h3>About this report</h3>
+  <p>Mooney's is an online bookstore built for the CSCE310 course project. It has three backend services and two Windows desktop apps.
+  The user-service (Java, MySQL) keeps accounts and logs people in. The book-service (Python Flask, MongoDB) keeps the books, the stock and the reviews.
+  The order-service (Python Flask, MySQL) takes orders and rentals, and emails the bill. Customers use the "Mooney's" app; managers use the "Mooney's Manager" app.</p>
+  <p>This report covers what the course asks for: the database design, the REST API, the main screens, and the architecture and classes.
+  Section 5 links the videos of the user acceptance tests. Every fact in it was taken from the code and the database schema as they are in the version on the cover.</p>
+  <p>The full process is in the repository: the idea and requirements in <code>docs/01-idea</code>, the design in <code>docs/02-design</code>,
+  the problems met and the improvements made in <code>docs/03-problems</code>, the plan in <code>docs/04-planning</code>, the setup in <code>docs/05-setup</code>,
+  and the requirement tests in <code>docs/06-testing</code>. <code>INSTALL.md</code> explains how to install and run everything.</p>
+
+  <h3>Source code</h3>
+  <p>All the source code is in the repository named on the cover. Each part's tests sit next to its code, in <code>tests</code> (Python), <code>src/test</code> (Java) or <code>test</code> (Dart).</p>
+  <table class="data">
+    <thead><tr><th style="width:34%">Part</th><th>Code</th></tr></thead>
+    <tbody>
+      <tr><td>user-service (Java)</td><td><code>services/user-service/src/main/java/com/bookstore/user</code></td></tr>
+      <tr><td>book-service, order-service (Python)</td><td><code>services/book-service/book_service</code>, <code>services/order-service/order_service</code></td></tr>
+      <tr><td>The two apps and their shared package (Dart)</td><td><code>clients/customer-app/lib</code>, <code>clients/management-app/lib</code>, <code>clients/bookstore-ui/lib</code></td></tr>
+      <tr><td>Databases</td><td><code>database/mysql/schema.sql</code>, <code>database/mongodb/books.json</code>, <code>database/seed.py</code>, <code>database/demo_data.py</code></td></tr>
+      <tr><td>Set-up and installer</td><td><code>setup.cmd</code>, <code>start-services.cmd</code>, <code>stop-services.cmd</code>, <code>scripts/</code>, <code>installer/</code></td></tr>
+    </tbody>
+  </table>
+</section>
+
+{{SECTIONS}}
+
+<section id="videos">
+  <h2>5. User acceptance test videos</h2>
+  <p>Each video shows the apps running against the real services, and walks through the requirements listed next to it.</p>
+  <table class="data">
+    <thead><tr><th style="width:6%">#</th><th style="width:38%">Video</th><th style="width:22%">Requirements covered</th><th>Link</th></tr></thead>
+    <tbody>
+{{VIDEOS}}
+    </tbody>
+  </table>
+
+  <p>Every functional requirement is shown in at least one video. The step numbers are those of the recording script, <code>docs/07-report/uat-video-script.md</code>, section 8.</p>
+  <table class="data">
+    <thead><tr><th style="width:8%">FR</th><th>Requirement</th><th style="width:10%">Video</th><th style="width:28%">Steps</th></tr></thead>
+    <tbody>
+      <tr><td>FR1</td><td>Log in with username and password</td><td>1</td><td>1.7 to 1.9</td></tr>
+      <tr><td>FR2</td><td>Stay logged in until logging out</td><td>1</td><td>1.10, 1.11</td></tr>
+      <tr><td>FR3</td><td>Create an account with a valid email; password hashed</td><td>1</td><td>1.2 to 1.6</td></tr>
+      <tr><td>FR4</td><td>Search by a keyword in title and author</td><td>2</td><td>2.2 to 2.4</td></tr>
+      <tr><td>FR5</td><td>Results as a list with title, author, price</td><td>2</td><td>2.5</td></tr>
+      <tr><td>FR6</td><td>Select one or more books</td><td>2</td><td>2.6 to 2.9</td></tr>
+      <tr><td>FR7</td><td>Buy and/or rent in a single order</td><td>2</td><td>2.8 to 2.11</td></tr>
+      <tr><td>FR8</td><td>Detailed bill: order ID, items, prices, total</td><td>2</td><td>2.12</td></tr>
+      <tr><td>FR9</td><td>Bill saved as an HTML file</td><td>2, 3</td><td>2.14, 3.8</td></tr>
+      <tr><td>FR10</td><td>Bill emailed to the customer</td><td>2</td><td>2.13, 2.15</td></tr>
+      <tr><td>FR11</td><td>Separate, secure management interface</td><td>3, 1</td><td>3.1 to 3.4, 1.12</td></tr>
+      <tr><td>FR12</td><td>Manager views all purchase orders</td><td>3</td><td>3.5, 3.6</td></tr>
+      <tr><td>FR13</td><td>Manager updates an order's payment status</td><td>3</td><td>3.7, 3.9 to 3.11</td></tr>
+      <tr><td>FR14</td><td>Manager adds books and updates them</td><td>3</td><td>3.12 to 3.16</td></tr>
+    </tbody>
+  </table>
+</section>
+
+</body>
+</html>

@@ -48,3 +48,10 @@ stage/
 
 # Cover photos downloaded for the screenshot tests (publishers' artwork; not stored in git)
 clients/build-cover-cache/
+
+# The course report, built by tools/report/build_report.py (16 MB with its screenshots; rebuilt, not stored)
+docs/07-report/report.html
+docs/07-report/report.pdf
+
+# The files to upload for the course (made from git, see docs/07-report/README.md)
+submission/

@@ -1,0 +1,668 @@
+<h2>2. Backend design: the REST API</h2>
+
+<p>The backend is three services. Each one owns its own data and answers HTTP requests with JSON. The two apps talk only to these services, never to a database. This section first gives the rules that every endpoint follows, then lists all 20 endpoints, then shows each one with a sample request and response.</p>
+
+<p>Everything here was read from the code as it is now: the user-service handlers (<code>AuthHandler</code>, <code>UserHandler</code>, <code>BaseHandler</code>, the request records), and the <code>routes.py</code>, <code>schemas.py</code>, <code>models.py</code>, <code>services.py</code>, <code>auth.py</code> and <code>errors.py</code> of book-service and order-service. The design document <code>docs/02-design/api-design.md</code> says the same.</p>
+
+<h3>2.1 Common rules</h3>
+
+<h4>2.1.1 The three services</h4>
+
+<table class="data">
+  <thead>
+    <tr><th>Service</th><th>Base URL</th><th>Built with</th><th>Owns</th><th>URL prefixes</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>user-service</td><td><code>http://localhost:8081</code></td><td>Java 21, <code>com.sun.net.httpserver.HttpServer</code></td><td>Users and sessions (MySQL)</td><td><code>/api/auth</code>, <code>/api/users</code></td></tr>
+    <tr><td>book-service</td><td><code>http://localhost:8082</code></td><td>Python, Flask, run by waitress</td><td>Books and reviews (MongoDB)</td><td><code>/api/books</code></td></tr>
+    <tr><td>order-service</td><td><code>http://localhost:8083</code></td><td>Python, Flask, run by waitress</td><td>Orders and order items (MySQL); bill files (<code>bills/</code> folder)</td><td><code>/api/orders</code>, <code>/api/reports</code></td></tr>
+  </tbody>
+</table>
+
+<p>Each service listens on this machine only, on both <code>127.0.0.1</code> and <code>::1</code>. The ports can be changed with the settings <code>USER_SERVICE_PORT</code>, <code>BOOK_SERVICE_PORT</code> and <code>ORDER_SERVICE_PORT</code>; the numbers above are the defaults.</p>
+
+<h4>2.1.2 Requests and responses</h4>
+
+<ul>
+  <li>Request bodies and responses are JSON. The one exception is the bill (<code>GET /api/orders/{id}/bill</code>), which is HTML.</li>
+  <li>Field names are in camelCase, for example <code>copiesAvailable</code> and <code>paymentStatus</code>.</li>
+  <li>Dates are <code>YYYY-MM-DD</code>. Times are <code>YYYY-MM-DDTHH:MM:SS</code>, in whole seconds.</li>
+  <li>Money is a JSON number. Python writes <code>40.00</code> as <code>40.0</code>, so the samples below show it that way.</li>
+  <li>A request body may be at most 16 KB.</li>
+</ul>
+
+<h4>2.1.3 Logging in and the token</h4>
+
+<p>A user logs in once with <code>POST /api/auth/login</code> and gets a session token: 64 random hexadecimal characters. Every other request, except register and the copies endpoint that only order-service calls (2.4.5), must carry it in this header (N4):</p>
+
+<pre class="json">Authorization: Bearer 3f9a1c0e7b2d4a6f8e1c3b5d7a9f0e2c4b6d8a1f3e5c7b9d0a2c4e6f8b1d3a5c</pre>
+
+<p>The token is kept in the <code>sessions</code> table of user-service. Logging out deletes it, so it stops working at once (FR2). Book-service and order-service do not keep sessions: they ask user-service about every token (2.1.6).</p>
+
+<h4>2.1.4 Roles</h4>
+
+<table class="data">
+  <thead><tr><th>Role</th><th>Who</th><th>Uses</th><th>May</th></tr></thead>
+  <tbody>
+    <tr><td><code>CUSTOMER</code></td><td>Anyone who registers</td><td>The customer app, "Mooney's"</td><td>Search books, place orders, see and pay their own orders, write reviews</td></tr>
+    <tr><td><code>MANAGER</code></td><td>Created by <code>database/seed.py</code> only</td><td>The management app, "Mooney's Manager"</td><td>Add and change books, see all orders, set the payment status, see the sales report</td></tr>
+  </tbody>
+</table>
+
+<p>Each service checks the role itself (N5). The apps hide what a role may not do, but that is only for comfort: the check that counts is in the service.</p>
+
+<h4>2.1.5 Errors</h4>
+
+<p>Every error from an API address (<code>/api/...</code>), in every service, has the same shape: one field, <code>error</code>, holding a message written for a person. The apps show this message as it is.</p>
+
+<pre class="json">{ "error": "Wrong username or password" }</pre>
+
+<p>In the code, routes and handlers never build an error response. They throw (Java) or raise (Python) an error class that carries its status. One place per service turns it into the response: <code>BaseHandler.handle</code> in user-service, <code>register_error_handlers</code> in <code>errors.py</code> in the other two. An unexpected failure is logged in full and answered with a plain 500, so no SQL or stack trace ever reaches a caller.</p>
+
+<p>A database failure is the one exception: <code>create_app</code> in <code>app.py</code> catches it (<code>PyMongoError</code> in book-service, <code>mysql.connector.Error</code> in order-service), logs it, and answers 503 in the same error shape. User-service has no such handler, so a MySQL failure there is a 500.</p>
+
+<table class="data">
+  <thead><tr><th>Status</th><th>Meaning</th><th>Error class</th></tr></thead>
+  <tbody>
+    <tr><td>200</td><td>OK</td><td></td></tr>
+    <tr><td>201</td><td>Created (register, add a book, place an order)</td><td></td></tr>
+    <tr><td>204</td><td>Done, empty body (delete a review)</td><td></td></tr>
+    <tr><td>400</td><td>A field is missing or not acceptable; the message names it. Also: the body is not valid JSON</td><td><code>ValidationException</code> / <code>ValidationError</code></td></tr>
+    <tr><td>401</td><td>No token, the token is not a current session, or wrong login details</td><td><code>UnauthorizedException</code> / <code>UnauthorizedError</code></td></tr>
+    <tr><td>403</td><td>Logged in, but this role may not do this, or it is someone else's order; a wrong service key</td><td><code>ForbiddenError</code></td></tr>
+    <tr><td>404</td><td>The book, order or review does not exist, or nothing is at this address</td><td><code>NotFoundError</code>, <code>ApiException.notFound</code>, Flask</td></tr>
+    <tr><td>405</td><td>The address exists, but not for this HTTP method</td><td><code>ApiException.methodNotAllowed</code>, Flask</td></tr>
+    <tr><td>409</td><td>Username or email already used; not enough copies; order already paid</td><td><code>ConflictException</code> / <code>ConflictError</code></td></tr>
+    <tr><td>413</td><td>Book-service and order-service only: the body is larger than 16 KB (user-service answers 400 "The request is too large")</td><td>Flask</td></tr>
+    <tr><td>500</td><td>A bug, or in user-service a failed database: "Something went wrong on the server. Please try again."</td><td>Anything else</td></tr>
+    <tr><td>503</td><td>Book-service and order-service only: something they depend on (user-service, book-service, MongoDB, MySQL) is not answering (user-service answers 500 when MySQL is down)</td><td><code>ServiceUnavailableError</code></td></tr>
+  </tbody>
+</table>
+
+<p>The checks run in a fixed order: the token first (401, or 503 if user-service is down), then the role (403), then the request body (400), then the data itself (404, 409). So a customer who sends a bad book to <code>POST /api/books</code> gets 403, not 400.</p>
+
+<h4>2.1.6 Calls between services</h4>
+
+<table class="data">
+  <thead><tr><th>Caller</th><th>Calls</th><th>When</th><th>How it proves who it is</th></tr></thead>
+  <tbody>
+    <tr><td>book-service, order-service</td><td><code>GET /api/auth/session</code> on user-service</td><td>On every request from an app, to learn who owns the token and their role</td><td>It passes on the app's own <code>Authorization</code> header</td></tr>
+    <tr><td>order-service</td><td><code>PATCH /api/books/{id}/copies</code> on book-service</td><td>Once per book when an order is placed, with a negative <code>change</code>; with a positive one to give copies back if the order fails</td><td>The header <code>X-Service-Key</code>, a secret shared by the services through their settings (<code>SERVICE_KEY</code>)</td></tr>
+  </tbody>
+</table>
+
+<p>Order-service does not ask book-service for the price in a separate call. The copies endpoint takes the copies in one atomic step and answers with the whole book, so one call gives both the copies and the title, author and price. Two customers can never both get the last copy. Each call waits at most 2 seconds to connect and 3 seconds for an answer; after that the caller answers 503.</p>
+
+<p>If no service key is set, the copies endpoint stays closed (403), and placing an order answers 503. The key is compared in constant time (<code>hmac.compare_digest</code>).</p>
+
+<div class="wide">
+<figure class="diagram">
+  <img src="../02-design/diagrams/sequence-place-order.png" alt="Sequence diagram: placing an order">
+  <figcaption>Figure 2.1: Placing an order. Order-service checks the token with user-service, takes the copies from book-service, saves the order in MySQL, writes the bill, answers, and emails the bill afterwards.</figcaption>
+</figure>
+</div>
+
+<h3 class="pagebreak">2.2 All endpoints at a glance</h3>
+
+<p>"Logged in" means any valid token, customer or manager. "Owner" means the customer who placed the order.</p>
+
+<table class="data">
+  <thead><tr><th>#</th><th>Method</th><th>URL</th><th>Who</th><th>Purpose</th></tr></thead>
+  <tbody>
+    <tr><th colspan="5">user-service (port 8081)</th></tr>
+    <tr><td>1</td><td>POST</td><td><code>/api/auth/login</code></td><td>Anyone</td><td>Log in, get a token (FR1)</td></tr>
+    <tr><td>2</td><td>POST</td><td><code>/api/auth/logout</code></td><td>Logged in</td><td>End the session (FR2)</td></tr>
+    <tr><td>3</td><td>GET</td><td><code>/api/auth/session</code></td><td>Logged in; called by the other services</td><td>Who owns this token (FR2, N4, N5)</td></tr>
+    <tr><td>4</td><td>POST</td><td><code>/api/users/register</code></td><td>Anyone</td><td>Create a customer account (FR3)</td></tr>
+    <tr><th colspan="5">book-service (port 8082)</th></tr>
+    <tr><td>5</td><td>GET</td><td><code>/api/books?keyword={text}&amp;category={shelf}</code></td><td>Logged in</td><td>Search by title or author (FR4, FR5)</td></tr>
+    <tr><td>6</td><td>GET</td><td><code>/api/books/{id}</code></td><td>Logged in</td><td>One book (FR6)</td></tr>
+    <tr><td>7</td><td>POST</td><td><code>/api/books</code></td><td>Manager</td><td>Add a book (FR14)</td></tr>
+    <tr><td>8</td><td>PUT</td><td><code>/api/books/{id}</code></td><td>Manager</td><td>Change a book, such as its copies (FR14)</td></tr>
+    <tr><td>9</td><td>PATCH</td><td><code>/api/books/{id}/copies</code></td><td>order-service only (service key)</td><td>Take or give back copies (FR7)</td></tr>
+    <tr><td>10</td><td>GET</td><td><code>/api/books/{id}/reviews</code></td><td>Logged in</td><td>A book's reviews (extra credit)</td></tr>
+    <tr><td>11</td><td>PUT</td><td><code>/api/books/{id}/reviews/mine</code></td><td>Customer</td><td>Write or replace my review (extra credit)</td></tr>
+    <tr><td>12</td><td>DELETE</td><td><code>/api/books/{id}/reviews/mine</code></td><td>Customer</td><td>Delete my review (extra credit)</td></tr>
+    <tr><th colspan="5">order-service (port 8083)</th></tr>
+    <tr><td>13</td><td>POST</td><td><code>/api/orders</code></td><td>Customer</td><td>Place an order, get the bill (FR6 to FR10)</td></tr>
+    <tr><td>14</td><td>GET</td><td><code>/api/orders</code></td><td>Manager</td><td>All orders (FR12)</td></tr>
+    <tr><td>15</td><td>GET</td><td><code>/api/orders/mine</code></td><td>Customer</td><td>My orders, for the account page (beyond the PRD)</td></tr>
+    <tr><td>16</td><td>GET</td><td><code>/api/orders/{id}</code></td><td>Owner or manager</td><td>One order with its items (FR12)</td></tr>
+    <tr><td>17</td><td>POST</td><td><code>/api/orders/{id}/pay</code></td><td>Owner</td><td>Pretend checkout: mark my order paid (beyond the PRD)</td></tr>
+    <tr><td>18</td><td>GET</td><td><code>/api/orders/{id}/bill</code></td><td>Owner or manager</td><td>The bill, as HTML (FR8, FR9)</td></tr>
+    <tr><td>19</td><td>PATCH</td><td><code>/api/orders/{id}/payment-status</code></td><td>Manager</td><td>Set PENDING or PAID (FR13)</td></tr>
+    <tr><td>20</td><td>GET</td><td><code>/api/reports/sales?from={date}&amp;to={date}&amp;top={n}</code></td><td>Manager</td><td>Sales report (extra credit)</td></tr>
+  </tbody>
+</table>
+
+<p>In the URLs, <code>{id}</code> of a book is its MongoDB id, 24 hexadecimal characters such as <code>655f1c2ab7e4a1d2c3f4a5b6</code>. <code>{id}</code> of an order is a whole number such as <code>1042</code>; anything else gives 404 "There is nothing at this address".</p>
+
+<p>The samples below follow one example customer, <strong>alice</strong> (user id 3, <code>alice@example.com</code>), and three books from the sample catalog:</p>
+
+<table class="data">
+  <thead><tr><th>Book id (example)</th><th>Title</th><th>Price</th></tr></thead>
+  <tbody>
+    <tr><td><code>655f1c2ab7e4a1d2c3f4a5b6</code></td><td>Clean Code</td><td>40.00</td></tr>
+    <tr><td><code>655f1c2ab7e4a1d2c3f4a5b7</code></td><td>Database System Concepts</td><td>55.00</td></tr>
+    <tr><td><code>655f1c2ab7e4a1d2c3f4a5b8</code></td><td>Java Concurrency in Practice</td><td>80.00</td></tr>
+  </tbody>
+</table>
+
+<h3 class="pagebreak">2.3 user-service</h3>
+
+<p>Two handler classes serve these endpoints: <code>AuthHandler</code> for <code>/api/auth/*</code> and <code>UserHandler</code> for <code>/api/users/*</code>. Both extend <code>BaseHandler</code>, which reads the body, reads the token and sends every error.</p>
+
+<p>A user always comes back in this shape (the record <code>UserResponse</code>). The password hash is never sent. <code>token</code> is only present in the answer to login; elsewhere it is <code>null</code>, and Gson leaves null fields out.</p>
+
+<table class="data">
+  <thead><tr><th>Field</th><th>Type</th><th>Notes</th></tr></thead>
+  <tbody>
+    <tr><td><code>token</code></td><td>string</td><td>Login only. 64 hexadecimal characters</td></tr>
+    <tr><td><code>userId</code></td><td>number</td><td>The id in the <code>users</code> table</td></tr>
+    <tr><td><code>username</code></td><td>string</td><td></td></tr>
+    <tr><td><code>email</code></td><td>string</td><td>Stored in lower case</td></tr>
+    <tr><td><code>role</code></td><td>string</td><td><code>CUSTOMER</code> or <code>MANAGER</code></td></tr>
+  </tbody>
+</table>
+
+<h4>2.3.1 Log in</h4>
+<div class="endpoint"><span class="method">POST</span> <code>/api/auth/login</code></div>
+<p>Anyone. Checks the username and password with bcrypt and starts a session (FR1).</p>
+<p>Request:</p>
+<pre class="json">{ "username": "alice", "password": "alice2026" }</pre>
+<p>Response <code>200</code>:</p>
+<pre class="json">{
+  "token": "3f9a1c0e7b2d4a6f8e1c3b5d7a9f0e2c4b6d8a1f3e5c7b9d0a2c4e6f8b1d3a5c",
+  "userId": 3,
+  "username": "alice",
+  "email": "alice@example.com",
+  "role": "CUSTOMER"
+}</pre>
+<table class="data">
+  <thead><tr><th>Status</th><th>When</th></tr></thead>
+  <tbody>
+    <tr><td>400</td><td>"Enter your username" or "Enter your password"; the body is not valid JSON or empty</td></tr>
+    <tr><td>401</td><td>"Wrong username or password". The same message whether the username or the password is wrong, so it does not tell which usernames exist</td></tr>
+  </tbody>
+</table>
+
+<h4>2.3.2 Log out</h4>
+<div class="endpoint"><span class="method">POST</span> <code>/api/auth/logout</code></div>
+<p>Logged in. No body. Deletes the session, so the token stops working (FR2).</p>
+<p>Response <code>200</code>:</p>
+<pre class="json">{ "message": "Logged out" }</pre>
+<table class="data">
+  <thead><tr><th>Status</th><th>When</th></tr></thead>
+  <tbody>
+    <tr><td>401</td><td>"You are not logged in": no token, or it is not a current session</td></tr>
+  </tbody>
+</table>
+
+<h4>2.3.3 Check a session</h4>
+<div class="endpoint"><span class="method">GET</span> <code>/api/auth/session</code></div>
+<p>Logged in. The apps do not call it: book-service and order-service call it to learn who owns a token and their role (N4, N5). No body.</p>
+<p>Response <code>200</code>:</p>
+<pre class="json">{ "userId": 3, "username": "alice", "email": "alice@example.com", "role": "CUSTOMER" }</pre>
+<table class="data">
+  <thead><tr><th>Status</th><th>When</th></tr></thead>
+  <tbody>
+    <tr><td>401</td><td>"You are not logged in" (no header) or "Your session has ended. Please log in again." (unknown token)</td></tr>
+  </tbody>
+</table>
+
+<h4>2.3.4 Register</h4>
+<div class="endpoint"><span class="method">POST</span> <code>/api/users/register</code></div>
+<p>Anyone. Creates a customer account (FR3). A new account is always a <code>CUSTOMER</code>. The password is hashed with bcrypt before it is stored (N3).</p>
+<p>Request:</p>
+<pre class="json">{ "username": "alice", "email": "alice@example.com", "password": "alice2026" }</pre>
+<p>Rules (the record <code>RegisterRequest</code>): username 3 to 50 characters, only letters, digits, dots, dashes and underscores; email shaped like <code>name@host.domain</code>, at most 255 characters; password 8 characters or more, and at most 72 bytes (bcrypt reads no further).</p>
+<p>Response <code>201</code>, with no token (the user logs in next):</p>
+<pre class="json">{ "userId": 3, "username": "alice", "email": "alice@example.com", "role": "CUSTOMER" }</pre>
+<table class="data">
+  <thead><tr><th>Status</th><th>When</th></tr></thead>
+  <tbody>
+    <tr><td>400</td><td>The first field that breaks a rule, for example "The username must be 3 to 50 characters long", "Enter a valid email address", "The password must be at least 8 characters long"</td></tr>
+    <tr><td>409</td><td>"Username or email already in use"</td></tr>
+  </tbody>
+</table>
+
+<h3 class="pagebreak">2.4 book-service</h3>
+
+<p>All endpoints are in <code>routes.py</code>. Every one that the apps use first checks the token with user-service. If user-service does not answer, the result is 503 "The login service is not answering. Please try again in a moment."; if MongoDB does not answer, 503 "The book catalog is not available right now. Please try again in a moment."</p>
+
+<p><strong>The book object.</strong> Every endpoint that returns a book uses this shape (<code>Book.to_json</code>):</p>
+<pre class="json">{
+  "id": "655f1c2ab7e4a1d2c3f4a5b6",
+  "title": "Clean Code",
+  "author": "Robert C. Martin",
+  "price": 40.0,
+  "copiesAvailable": 4,
+  "coverUrl": "https://covers.openlibrary.org/b/id/8065615-L.jpg",
+  "category": "Technology",
+  "ratingAverage": 4.5,
+  "ratingCount": 2
+}</pre>
+<table class="data">
+  <thead><tr><th>Field</th><th>Type</th><th>Notes</th></tr></thead>
+  <tbody>
+    <tr><td><code>id</code></td><td>string</td><td>The MongoDB <code>_id</code>, as text</td></tr>
+    <tr><td><code>title</code>, <code>author</code></td><td>string</td><td>1 to 255 characters</td></tr>
+    <tr><td><code>price</code></td><td>number</td><td>Greater than 0, at most 100,000, kept to two decimals</td></tr>
+    <tr><td><code>copiesAvailable</code></td><td>number</td><td>Whole number, 0 or more</td></tr>
+    <tr><td><code>coverUrl</code></td><td>string or null</td><td>Starts with <code>http://</code> or <code>https://</code>. Without it the apps draw a cover from the title</td></tr>
+    <tr><td><code>category</code></td><td>string or null</td><td>One of <code>Fiction</code>, <code>Nonfiction</code>, <code>Kids</code>, <code>Science</code>, <code>Technology</code></td></tr>
+    <tr><td><code>ratingAverage</code></td><td>number or null</td><td>Average stars to one decimal, a half rounded up; <code>null</code> with no reviews. Worked out from the reviews on every answer, never stored</td></tr>
+    <tr><td><code>ratingCount</code></td><td>number</td><td>How many reviews; 0 with none</td></tr>
+  </tbody>
+</table>
+
+<p><strong>The review object</strong> (<code>Review.to_json</code>). The user id stays inside the service; the apps show the username.</p>
+<pre class="json">{
+  "id": "6560a1f2c3d4e5f6a7b8c9d0",
+  "bookId": "655f1c2ab7e4a1d2c3f4a5b6",
+  "username": "alice",
+  "rating": 5,
+  "text": "Clear and practical.",
+  "createdAt": "2026-11-18T10:05:00",
+  "updatedAt": "2026-11-18T10:05:00"
+}</pre>
+
+<h4>2.4.1 Search books</h4>
+<div class="endpoint"><span class="method">GET</span> <code>/api/books?keyword={text}&amp;category={shelf}</code></div>
+<p>Logged in (FR4, FR5). Returns the books whose title or author contains <code>keyword</code>, ignoring upper and lower case, sorted by title. Without a keyword it returns every book. <code>category</code> is optional and keeps one shelf. No body.</p>
+<p>Example: <code>GET /api/books?keyword=clean&amp;category=Technology</code>. Response <code>200</code>, a list of books (<code>[]</code> when nothing matches):</p>
+<pre class="json">[
+  {
+    "id": "655f1c2ab7e4a1d2c3f4a5b6",
+    "title": "Clean Code",
+    "author": "Robert C. Martin",
+    "price": 40.0,
+    "copiesAvailable": 4,
+    "coverUrl": "https://covers.openlibrary.org/b/id/8065615-L.jpg",
+    "category": "Technology",
+    "ratingAverage": 4.5,
+    "ratingCount": 2
+  }
+]</pre>
+<table class="data">
+  <thead><tr><th>Status</th><th>When</th></tr></thead>
+  <tbody>
+    <tr><td>400</td><td>"Choose a category: Fiction, Nonfiction, Kids, Science, or Technology"</td></tr>
+    <tr><td>401</td><td>Not logged in, or the session has ended</td></tr>
+  </tbody>
+</table>
+
+<h4>2.4.2 Get one book</h4>
+<div class="endpoint"><span class="method">GET</span> <code>/api/books/{id}</code></div>
+<p>Logged in (FR6). No body. Response <code>200</code>: one book object, as above.</p>
+<table class="data">
+  <thead><tr><th>Status</th><th>When</th></tr></thead>
+  <tbody>
+    <tr><td>401</td><td>Not logged in</td></tr>
+    <tr><td>404</td><td>"This book does not exist" (also for an id in the wrong format)</td></tr>
+  </tbody>
+</table>
+
+<h4>2.4.3 Add a book</h4>
+<div class="endpoint"><span class="method">POST</span> <code>/api/books</code></div>
+<p>Manager (FR14). The body is checked by <code>BookInput.from_json</code>; <code>coverUrl</code> may be left out, every other field is required. The rating fields cannot be set.</p>
+<p>Request:</p>
+<pre class="json">{
+  "title": "Clean Architecture",
+  "author": "Robert C. Martin",
+  "price": 42.0,
+  "copiesAvailable": 3,
+  "coverUrl": null,
+  "category": "Technology"
+}</pre>
+<p>Response <code>201</code>: the new book, with its new id.</p>
+<pre class="json">{
+  "id": "6561b2c3d4e5f6a7b8c9d0e1",
+  "title": "Clean Architecture",
+  "author": "Robert C. Martin",
+  "price": 42.0,
+  "copiesAvailable": 3,
+  "coverUrl": null,
+  "category": "Technology",
+  "ratingAverage": null,
+  "ratingCount": 0
+}</pre>
+<table class="data">
+  <thead><tr><th>Status</th><th>When</th></tr></thead>
+  <tbody>
+    <tr><td>400</td><td>The first field that is wrong, for example "Enter the title", "The price must be greater than 0", "Enter the number of copies as a whole number", "The cover address must start with http:// or https://", or the category message</td></tr>
+    <tr><td>401</td><td>Not logged in</td></tr>
+    <tr><td>403</td><td>"Only a manager can do this"</td></tr>
+  </tbody>
+</table>
+
+<h4>2.4.4 Change a book</h4>
+<div class="endpoint"><span class="method">PUT</span> <code>/api/books/{id}</code></div>
+<p>Manager (FR14). The whole book is sent, with the same fields and rules as when adding it. This is how a manager changes the number of copies.</p>
+<p>Request:</p>
+<pre class="json">{
+  "title": "Clean Code",
+  "author": "Robert C. Martin",
+  "price": 40.0,
+  "copiesAvailable": 10,
+  "coverUrl": "https://covers.openlibrary.org/b/id/8065615-L.jpg",
+  "category": "Technology"
+}</pre>
+<p>Response <code>200</code>: the changed book object, now with <code>"copiesAvailable": 10</code>.</p>
+<table class="data">
+  <thead><tr><th>Status</th><th>When</th></tr></thead>
+  <tbody>
+    <tr><td>400</td><td>A field is wrong, as for adding</td></tr>
+    <tr><td>401</td><td>Not logged in</td></tr>
+    <tr><td>403</td><td>"Only a manager can do this"</td></tr>
+    <tr><td>404</td><td>"This book does not exist"</td></tr>
+  </tbody>
+</table>
+
+<h4>2.4.5 Take or give back copies</h4>
+<div class="endpoint"><span class="method">PATCH</span> <code>/api/books/{id}/copies</code></div>
+<p>order-service only. It needs the header <code>X-Service-Key</code> and no session token. A negative <code>change</code> takes copies when an order is placed; a positive one gives them back if the order fails. The change is one atomic MongoDB update that only succeeds if enough copies are left.</p>
+<p>Request:</p>
+<pre class="json">{ "change": -1 }</pre>
+<p>Response <code>200</code>: the changed book object, which order-service reads for the title, author and price.</p>
+<table class="data">
+  <thead><tr><th>Status</th><th>When</th></tr></thead>
+  <tbody>
+    <tr><td>400</td><td>"Enter the change as a whole number other than 0"</td></tr>
+    <tr><td>403</td><td>"This address is for the bookstore's own services only": the key is missing or wrong</td></tr>
+    <tr><td>404</td><td>"This book does not exist"</td></tr>
+    <tr><td>409</td><td><code>"Clean Code" is not available</code> (no copies) or <code>Only 2 of "Clean Code" left</code>; nothing is changed</td></tr>
+  </tbody>
+</table>
+
+<h4>2.4.6 List a book's reviews</h4>
+<div class="endpoint"><span class="method">GET</span> <code>/api/books/{id}/reviews</code></div>
+<p>Logged in, customer or manager (extra credit). No body. Response <code>200</code>: the reviews, the most recently written or changed first; <code>[]</code> when there are none.</p>
+<pre class="json">[
+  {
+    "id": "6560a1f2c3d4e5f6a7b8c9d0",
+    "bookId": "655f1c2ab7e4a1d2c3f4a5b6",
+    "username": "alice",
+    "rating": 5,
+    "text": "Clear and practical.",
+    "createdAt": "2026-11-18T10:05:00",
+    "updatedAt": "2026-11-18T10:05:00"
+  },
+  {
+    "id": "655f9e8d7c6b5a4f3e2d1c0b",
+    "bookId": "655f1c2ab7e4a1d2c3f4a5b6",
+    "username": "customer1",
+    "rating": 4,
+    "text": "",
+    "createdAt": "2026-11-16T09:12:40",
+    "updatedAt": "2026-11-16T09:12:40"
+  }
+]</pre>
+<table class="data">
+  <thead><tr><th>Status</th><th>When</th></tr></thead>
+  <tbody>
+    <tr><td>401</td><td>Not logged in</td></tr>
+    <tr><td>404</td><td>"This book does not exist"</td></tr>
+  </tbody>
+</table>
+
+<h4>2.4.7 Write or replace my review</h4>
+<div class="endpoint"><span class="method">PUT</span> <code>/api/books/{id}/reviews/mine</code></div>
+<p>Customer (extra credit). One review per customer per book: a second PUT replaces the first, keeps <code>createdAt</code> and changes <code>updatedAt</code>. <code>rating</code> is a whole number from 1 to 5. <code>text</code> is optional (missing or <code>null</code> means none), trimmed, at most 1000 characters.</p>
+<p>Request:</p>
+<pre class="json">{ "rating": 5, "text": "Clear and practical." }</pre>
+<p>Response <code>200</code>: the saved review object.</p>
+<pre class="json">{
+  "id": "6560a1f2c3d4e5f6a7b8c9d0",
+  "bookId": "655f1c2ab7e4a1d2c3f4a5b6",
+  "username": "alice",
+  "rating": 5,
+  "text": "Clear and practical.",
+  "createdAt": "2026-11-18T10:05:00",
+  "updatedAt": "2026-11-18T10:05:00"
+}</pre>
+<table class="data">
+  <thead><tr><th>Status</th><th>When</th></tr></thead>
+  <tbody>
+    <tr><td>400</td><td>"Choose a rating from 1 to 5 stars", "Write the review as text", "The review can be at most 1000 characters", or "Send the book as a JSON object" when the body is not an object</td></tr>
+    <tr><td>401</td><td>Not logged in</td></tr>
+    <tr><td>403</td><td>"Only a customer can review books"</td></tr>
+    <tr><td>404</td><td>"This book does not exist"</td></tr>
+  </tbody>
+</table>
+
+<h4>2.4.8 Delete my review</h4>
+<div class="endpoint"><span class="method">DELETE</span> <code>/api/books/{id}/reviews/mine</code></div>
+<p>Customer (extra credit). No body. Response <code>204</code> with an empty body.</p>
+<table class="data">
+  <thead><tr><th>Status</th><th>When</th></tr></thead>
+  <tbody>
+    <tr><td>401</td><td>Not logged in</td></tr>
+    <tr><td>403</td><td>"Only a customer can review books"</td></tr>
+    <tr><td>404</td><td>"This book does not exist" or "You have not reviewed this book"</td></tr>
+  </tbody>
+</table>
+
+<h3 class="pagebreak">2.5 order-service</h3>
+
+<p>The order endpoints are in <code>create_routes</code> and the report in <code>create_report_routes</code>, both in <code>routes.py</code>. Every endpoint checks the token with user-service first. If MySQL does not answer, the result is 503 "Orders are not available right now. Please try again in a moment."</p>
+
+<p><strong>The order object</strong> (<code>Order.to_json</code>). Title, author and price are copied into the order when it is placed, so an order and its bill stay correct if the book changes later.</p>
+<table class="data">
+  <thead><tr><th>Field</th><th>Type</th><th>Notes</th></tr></thead>
+  <tbody>
+    <tr><td><code>id</code></td><td>number</td><td>The order number</td></tr>
+    <tr><td><code>username</code>, <code>email</code></td><td>string</td><td>The customer who placed the order, read from the <code>users</code> table through <code>orders.user_id</code> each time the order is read, so it shows the account as it is now</td></tr>
+    <tr><td><code>createdAt</code></td><td>string</td><td>Date and time, whole seconds</td></tr>
+    <tr><td><code>paymentStatus</code></td><td>string</td><td><code>PENDING</code> or <code>PAID</code>. A new order is <code>PENDING</code></td></tr>
+    <tr><td><code>items</code></td><td>list</td><td>Each: <code>title</code>, <code>author</code>, <code>type</code> (<code>BUY</code> or <code>RENT</code>), <code>quantity</code>, <code>unitPrice</code> (what one copy cost: the price to buy, 10% of it to rent), <code>rentDueDate</code> (7 days after the order for <code>RENT</code>, <code>null</code> for <code>BUY</code>)</td></tr>
+    <tr><td><code>total</code></td><td>number</td><td>The sum of <code>unitPrice &times; quantity</code></td></tr>
+    <tr><td><code>billFile</code></td><td>string or null</td><td>Where the bill was saved, <code>bills/bill-{id}.html</code>; <code>null</code> if the file could not be written</td></tr>
+  </tbody>
+</table>
+<p>The <strong>order summary</strong> (<code>Order.to_summary_json</code>), used in lists for the manager, has only <code>id</code>, <code>username</code>, <code>createdAt</code>, <code>total</code> and <code>paymentStatus</code>.</p>
+
+<h4>2.5.1 Place an order</h4>
+<div class="endpoint"><span class="method">POST</span> <code>/api/orders</code></div>
+<p>Customer (FR6 to FR10). The body lists the chosen books, each bought or rented. Rules (<code>OrderInput.from_json</code>): 1 to 50 items; <code>bookId</code> is 24 hexadecimal characters; <code>type</code> is <code>BUY</code> or <code>RENT</code>. The same book with the same type chosen twice becomes one item with quantity 2.</p>
+<p>What happens: take the copies of each book from book-service (2.1.6), work out the charges, save the order as <code>PENDING</code>, write the bill file, answer, then email the bill in the background. If a book is missing or sold out, or the order cannot be saved, every copy already taken is given back and nothing is saved.</p>
+<p>Request:</p>
+<pre class="json">{
+  "items": [
+    { "bookId": "655f1c2ab7e4a1d2c3f4a5b6", "type": "BUY" },
+    { "bookId": "655f1c2ab7e4a1d2c3f4a5b7", "type": "BUY" },
+    { "bookId": "655f1c2ab7e4a1d2c3f4a5b8", "type": "RENT" }
+  ]
+}</pre>
+<p>Response <code>201</code>: the whole order, plus the bill and whether it is being emailed.</p>
+<pre class="json">{
+  "id": 1042,
+  "username": "alice",
+  "email": "alice@example.com",
+  "createdAt": "2026-11-18T10:05:00",
+  "paymentStatus": "PENDING",
+  "items": [
+    { "title": "Clean Code", "author": "Robert C. Martin", "type": "BUY",
+      "quantity": 1, "unitPrice": 40.0, "rentDueDate": null },
+    { "title": "Database System Concepts", "author": "Abraham Silberschatz", "type": "BUY",
+      "quantity": 1, "unitPrice": 55.0, "rentDueDate": null },
+    { "title": "Java Concurrency in Practice", "author": "Brian Goetz", "type": "RENT",
+      "quantity": 1, "unitPrice": 8.0, "rentDueDate": "2026-11-25" }
+  ],
+  "total": 103.0,
+  "billFile": "bills/bill-1042.html",
+  "billHtml": "&lt;!DOCTYPE html&gt;...",
+  "emailQueued": true
+}</pre>
+<p><code>emailQueued</code> is <code>true</code> when the bill was handed over for emailing and <code>false</code> when email is not set up. It does not mean the email has arrived: it is sent after the answer, so that it cannot slow the order down.</p>
+<table class="data">
+  <thead><tr><th>Status</th><th>When</th></tr></thead>
+  <tbody>
+    <tr><td>400</td><td>"Send the order as a JSON object", "Select at least one book", "An order can have at most 50 books", "Item 2: the book id is not valid", "Item 3: choose BUY or RENT"</td></tr>
+    <tr><td>401</td><td>Not logged in</td></tr>
+    <tr><td>403</td><td>"Only a customer can place an order"</td></tr>
+    <tr><td>404</td><td>"This book does not exist"</td></tr>
+    <tr><td>409</td><td>A book has too few copies, with book-service's message; nothing is saved</td></tr>
+    <tr><td>503</td><td>user-service, book-service or MySQL is not answering; nothing is saved</td></tr>
+  </tbody>
+</table>
+
+<h4>2.5.2 List all orders</h4>
+<div class="endpoint"><span class="method">GET</span> <code>/api/orders</code></div>
+<p>Manager (FR12). No body. Response <code>200</code>: every order as a summary, newest first.</p>
+<pre class="json">[
+  { "id": 1042, "username": "alice", "createdAt": "2026-11-18T10:05:00",
+    "total": 103.0, "paymentStatus": "PENDING" },
+  { "id": 1041, "username": "customer1", "createdAt": "2026-11-17T18:40:00",
+    "total": 55.0, "paymentStatus": "PAID" }
+]</pre>
+<table class="data">
+  <thead><tr><th>Status</th><th>When</th></tr></thead>
+  <tbody>
+    <tr><td>401</td><td>Not logged in</td></tr>
+    <tr><td>403</td><td>"Only a manager can do this"</td></tr>
+  </tbody>
+</table>
+
+<h4>2.5.3 List my orders</h4>
+<div class="endpoint"><span class="method">GET</span> <code>/api/orders/mine</code></div>
+<p>Customer. For the account page of the customer app (beyond the PRD). No body. Response <code>200</code>: the customer's own orders, newest first, each a whole order object with its items; <code>[]</code> if they have none.</p>
+<pre class="json">[
+  {
+    "id": 1042,
+    "username": "alice",
+    "email": "alice@example.com",
+    "createdAt": "2026-11-18T10:05:00",
+    "paymentStatus": "PENDING",
+    "items": [
+      { "title": "Clean Code", "author": "Robert C. Martin", "type": "BUY",
+        "quantity": 1, "unitPrice": 40.0, "rentDueDate": null }
+    ],
+    "total": 103.0,
+    "billFile": "bills/bill-1042.html"
+  }
+]</pre>
+<table class="data">
+  <thead><tr><th>Status</th><th>When</th></tr></thead>
+  <tbody>
+    <tr><td>401</td><td>Not logged in</td></tr>
+    <tr><td>403</td><td>"Only a customer can do this"</td></tr>
+  </tbody>
+</table>
+
+<h4>2.5.4 Get one order</h4>
+<div class="endpoint"><span class="method">GET</span> <code>/api/orders/{id}</code></div>
+<p>The owner or a manager (FR12). The manager app uses it to show an order's items. No body. Response <code>200</code>: the whole order object, in the shape of 2.5.1 without <code>billHtml</code> and <code>emailQueued</code>.</p>
+<table class="data">
+  <thead><tr><th>Status</th><th>When</th></tr></thead>
+  <tbody>
+    <tr><td>401</td><td>Not logged in</td></tr>
+    <tr><td>403</td><td>"This order belongs to another customer"</td></tr>
+    <tr><td>404</td><td>"This order does not exist"</td></tr>
+  </tbody>
+</table>
+
+<h4>2.5.5 Pay my order (pretend checkout)</h4>
+<div class="endpoint"><span class="method">POST</span> <code>/api/orders/{id}/pay</code></div>
+<p>The owner (beyond the PRD). No body: no card details are asked for, sent or kept. The order is only marked <code>PAID</code>, as a manager would mark it. Response <code>200</code>: the whole order object, now with <code>"paymentStatus": "PAID"</code>.</p>
+<table class="data">
+  <thead><tr><th>Status</th><th>When</th></tr></thead>
+  <tbody>
+    <tr><td>401</td><td>Not logged in</td></tr>
+    <tr><td>403</td><td>"Only a customer can do this" or "This order belongs to another customer"</td></tr>
+    <tr><td>404</td><td>"This order does not exist"</td></tr>
+    <tr><td>409</td><td>"This order is already paid"</td></tr>
+  </tbody>
+</table>
+
+<h4>2.5.6 Get the bill</h4>
+<div class="endpoint"><span class="method">GET</span> <code>/api/orders/{id}/bill</code></div>
+<p>The owner or a manager (FR8, FR9). No body. Response <code>200</code> with <code>Content-Type: text/html</code>: the saved bill. If the file is missing, it is made again from the saved order (it comes out the same) and saved. The answer carries <code>Content-Security-Policy: default-src 'none'; style-src 'unsafe-inline'</code>, so the bill page can use its own styles and nothing else.</p>
+<table class="data">
+  <thead><tr><th>Status</th><th>When</th></tr></thead>
+  <tbody>
+    <tr><td>401</td><td>Not logged in</td></tr>
+    <tr><td>403</td><td>"This bill belongs to another customer"</td></tr>
+    <tr><td>404</td><td>"This order does not exist"</td></tr>
+  </tbody>
+</table>
+
+<h4>2.5.7 Set the payment status</h4>
+<div class="endpoint"><span class="method">PATCH</span> <code>/api/orders/{id}/payment-status</code></div>
+<p>Manager (FR13). <code>PENDING</code> is accepted too, so a manager can undo a mistake.</p>
+<p>Request:</p>
+<pre class="json">{ "paymentStatus": "PAID" }</pre>
+<p>Response <code>200</code>: the changed order as a summary.</p>
+<pre class="json">{ "id": 1042, "username": "alice", "createdAt": "2026-11-18T10:05:00",
+  "total": 103.0, "paymentStatus": "PAID" }</pre>
+<table class="data">
+  <thead><tr><th>Status</th><th>When</th></tr></thead>
+  <tbody>
+    <tr><td>400</td><td>"The payment status must be PENDING or PAID"</td></tr>
+    <tr><td>401</td><td>Not logged in</td></tr>
+    <tr><td>403</td><td>"Only a manager can do this"</td></tr>
+    <tr><td>404</td><td>"This order does not exist"</td></tr>
+  </tbody>
+</table>
+
+<h4>2.5.8 Sales report</h4>
+<div class="endpoint"><span class="method">GET</span> <code>/api/reports/sales?from={YYYY-MM-DD}&amp;to={YYYY-MM-DD}&amp;top={n}</code></div>
+<p>Manager (extra credit). The orders of a period and what they add up to. No body. Every query part is optional:</p>
+<table class="data">
+  <thead><tr><th>Parameter</th><th>Meaning</th><th>When left out</th></tr></thead>
+  <tbody>
+    <tr><td><code>from</code></td><td>First day, included</td><td>No start</td></tr>
+    <tr><td><code>to</code></td><td>Last day, included (up to 23:59:59)</td><td>No end</td></tr>
+    <tr><td><code>top</code></td><td>How many best sellers, 1 to 50</td><td>10</td></tr>
+  </tbody>
+</table>
+<p>A parameter that is present but empty, such as <code>?from=</code>, is an error, not the default.</p>
+<p>Example: <code>GET /api/reports/sales?from=2026-11-17&amp;to=2026-11-18&amp;top=3</code>. Response <code>200</code>:</p>
+<pre class="json">{
+  "from": "2026-11-17",
+  "to": "2026-11-18",
+  "orderCount": 2,
+  "paidCount": 1,
+  "pendingCount": 1,
+  "revenue": 158.0,
+  "paidRevenue": 55.0,
+  "booksSold": 3,
+  "booksRented": 1,
+  "byDay": [
+    { "date": "2026-11-17", "orders": 1, "revenue": 55.0 },
+    { "date": "2026-11-18", "orders": 1, "revenue": 103.0 }
+  ],
+  "bestSellers": [
+    { "bookId": "655f1c2ab7e4a1d2c3f4a5b7", "title": "Database System Concepts",
+      "author": "Abraham Silberschatz", "bought": 2, "rented": 0, "copies": 2, "revenue": 110.0 },
+    { "bookId": "655f1c2ab7e4a1d2c3f4a5b6", "title": "Clean Code",
+      "author": "Robert C. Martin", "bought": 1, "rented": 0, "copies": 1, "revenue": 40.0 },
+    { "bookId": "655f1c2ab7e4a1d2c3f4a5b8", "title": "Java Concurrency in Practice",
+      "author": "Brian Goetz", "bought": 0, "rented": 1, "copies": 1, "revenue": 8.0 }
+  ],
+  "orders": [
+    { "id": 1042, "username": "alice", "createdAt": "2026-11-18T10:05:00",
+      "total": 103.0, "paymentStatus": "PENDING" },
+    { "id": 1041, "username": "customer1", "createdAt": "2026-11-17T18:40:00",
+      "total": 55.0, "paymentStatus": "PAID" }
+  ]
+}</pre>
+<table class="data">
+  <thead><tr><th>Field</th><th>Meaning</th></tr></thead>
+  <tbody>
+    <tr><td><code>from</code>, <code>to</code></td><td>The period asked for; <code>null</code> when left out</td></tr>
+    <tr><td><code>revenue</code>, <code>paidRevenue</code></td><td>Total of every order in the period; total of the paid ones only</td></tr>
+    <tr><td><code>booksSold</code>, <code>booksRented</code></td><td>Copies bought and copies rented</td></tr>
+    <tr><td><code>byDay</code></td><td>One entry per day that had orders, oldest first</td></tr>
+    <tr><td><code>bestSellers</code></td><td>Grouped by <code>bookId</code>; sorted by copies, then revenue (both highest first), then title A to Z</td></tr>
+    <tr><td><code>orders</code></td><td>The period's orders as summaries, newest first</td></tr>
+  </tbody>
+</table>
+<table class="data">
+  <thead><tr><th>Status</th><th>When</th></tr></thead>
+  <tbody>
+    <tr><td>400</td><td>"Enter the dates as YYYY-MM-DD" (wrong shape, not a real day, or empty), "The start date must be on or before the end date", "top must be a whole number from 1 to 50"</td></tr>
+    <tr><td>401</td><td>Not logged in</td></tr>
+    <tr><td>403</td><td>"Only a manager can do this"</td></tr>
+  </tbody>
+</table>

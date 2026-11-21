@@ -9,7 +9,8 @@ Everything needed to install, try, and grade it, and where the evidence for each
 <a href="https://github.com/KFUPMer/csce310-bookstore">Repository</a> ·
 <a href="https://github.com/KFUPMer/csce310-bookstore/releases/latest">Latest release</a> ·
 <a href="INSTALL.md">INSTALL.md</a> ·
-<a href="docs/06-testing/requirements-test.md">Requirements test report</a>
+<a href="docs/06-testing/requirements-test.md">Requirements test report</a> ·
+<a href="docs/07-report/README.md">Course report</a>
 </p>
 
 <p align="center">
@@ -137,6 +138,7 @@ N4 (a valid token on every request) and N5 (each role limited to its own data) a
 | You want | Look at |
 |---|---|
 | Each requirement and the evidence that it works | [docs/06-testing/requirements-test.md](docs/06-testing/requirements-test.md) |
+| The course report: database, REST API with its JSON, screens, architecture (client/server, 3-tier, MVC) and classes; and the acceptance-test videos | [docs/07-report](docs/07-report/README.md) |
 | The requirements as received, and the decisions about them | [docs/01-idea/project-idea.md](docs/01-idea/project-idea.md) |
 | Architecture, and the reason for each decision | [docs/02-design/architecture.md](docs/02-design/architecture.md) |
 | UML: use case, class (7: one per service and app, the shared package, and an overview), sequence (4), activity (3), state machine, component, object, profile, ER, plus the architecture diagram and wireframes. 23 diagrams, each a draw.io source with its image | [docs/02-design/uml-diagrams.md](docs/02-design/uml-diagrams.md), [class-diagrams.md](docs/02-design/class-diagrams.md) |
@@ -171,7 +173,7 @@ Asked for by the owner, and not needed for any grade:
 
 - **Six milestones**, each closed with a tagged GitHub release, most well before their deadlines: M1 Idea (v0.1.0), M2 Design (v0.2.0), M3 Backend (v0.3.0), M4 Clients (v0.4.0), M5 Testing and final release (two betas, the second installed from the published release on a fresh GitHub Windows machine, then v1.0.0), and M6, the section-6 extra credit (v1.1.0). Dated notes in [milestones.md](docs/04-planning/milestones.md).
 - **Tasks as GitHub issues**, each closed with a note of what was done.
-- **20 problem-log entries** (P-001 to P-020), including the assistant's own mistakes, and **51 enhancement-log entries** (E-001 to E-051), each with its reason and measured effect.
+- **22 problem-log entries** (P-001 to P-022), including the assistant's own mistakes, and **51 enhancement-log entries** (E-001 to E-051), each with its reason and measured effect.
 - **Tests with the code**: every service and app has its own tests, run again on GitHub before each release (the tests that need MySQL or MongoDB skip themselves there; they run on the development computer). order-service and the later app features were written test-first. A code review before committing found what the tests had not ([P-015](docs/03-problems/problem-log.md#p-015--order-service-passed-all-its-tests-with-faults-a-review-then-found)).
 
 | Part | Automated tests |

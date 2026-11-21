@@ -520,6 +520,35 @@ Smart App Control (as in P-002, P-003, P-017). `dart.exe` is unsigned, and it ha
 **Solution so far**
 No security setting was changed. The Flutter tests of this change were run on GitHub's Windows machine with a manual run of the release workflow, which runs every test suite and publishes nothing when it is not started by a tag.
 
+## P-021 — The ER diagram and two design documents were still the M2 drafts
+
+- **Date found:** 2026-11-20
+- **Phase / milestone:** course report
+- **Who:** assistant
+- **Status:** Fixed
+
+**What happened**
+While the course report was written from the code, its writers found that `database-er.png` had no `reviews` collection, no `category` or `coverUrl` on books, no `author` in `order_items`, and simplified column types. `database-design.md` and `api-design.md` still said "Status: draft. To be finalized in milestone M2", and `api-design.md` differed from the code in four small places (the search sample's fields, `billFile`, the 413 answer, and the password limit, which is 72 bytes, not 72 characters).
+
+**Cause**
+The code changed in M4 to M6 and its tests and class diagrams were updated, but these three were not on the list checked at each change.
+
+**Solution**
+The ER diagram was redrawn in draw.io from `schema.sql` and book-service, exported, and checked by eye (a line through the "MongoDB" label was moved). Both documents were brought up to date and marked final.
+
+## P-022 — The report's build put a second copy of the report inside a comment
+
+- **Date found:** 2026-11-20
+- **Phase / milestone:** course report
+- **Who:** assistant
+- **Status:** Fixed before it was committed
+
+**What happened**
+`report.html` held every section twice. The shell's opening comment named the placeholders, such as `{{SECTIONS}}`, and the build replaced them there too. The copy sat inside the comment, so the PDF was not affected, but the HTML was twice its size, and a section containing its own comment would have ended the outer one and printed the report twice.
+
+**Solution**
+The comment no longer spells the placeholders out. After the rebuild `report.html` has each heading once.
+
 ## Known gaps
 
 Things that are known to be unfinished or unverified, so nobody is surprised later.

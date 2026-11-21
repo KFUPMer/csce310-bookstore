@@ -9,6 +9,8 @@ All versions and patches of the project, newest first.
 - The architecture diagram now shows the apps' names, reviews, the sales report, and the emailed bill.
 - The customer app's screenshots now use one consistent set of orders (the bill, the account page, and the pay dialog all show order 1045).
 - `manual_check.py` prints the end of a service's log when that service does not start (P-018).
+- The course report (`docs/07-report`): database design, the REST API with its JSON, every major screen, and the architecture and classes (client/server, three tiers, MVC), built to PDF by `tools/report/build_report.py`. Also the recording script for the acceptance-test videos, covering FR1 to FR14.
+- The ER diagram redrawn with the `reviews` collection and every current field and type; `database-design.md` and `api-design.md` brought up to date with the code and marked final (P-021).
 
 ## v1.2.0 — 2026-11-18 — A full shop: 81 books and demo sales
 

@@ -31,6 +31,7 @@ REPORT_DIR = ROOT / "docs" / "07-report"
 SHELL = REPORT_DIR / "report-shell.html"
 SECTIONS_DIR = REPORT_DIR / "sections"
 VIDEOS_JSON = REPORT_DIR / "video-links.json"
+STUDENT_JSON = REPORT_DIR / "student.json"  # {"name": ..., "id": ...}; not in git
 OUT_HTML = REPORT_DIR / "report.html"
 OUT_PDF = REPORT_DIR / "report.pdf"
 EDGE = pathlib.Path(r"C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe")
@@ -84,6 +85,11 @@ def build_html():
     page = SHELL.read_text(encoding="utf-8")
     for placeholder in ("{{DATE}}", "{{VERSION}}", "{{SECTIONS}}", "{{VIDEOS}}"):
         assert placeholder in page, f"The shell has no {placeholder}"
+    # The student's name and ID: from student.json, which git ignores (the repository is public).
+    student = json.loads(STUDENT_JSON.read_text(encoding="utf-8")) if STUDENT_JSON.exists() else {}
+    blank = "_" * 32
+    page = page.replace("{{STUDENT_NAME}}", html.escape(student.get("name") or blank))
+    page = page.replace("{{STUDENT_ID}}", html.escape(student.get("id") or blank))
     page = page.replace("{{SECTIONS}}", sections_html())
     page = page.replace("{{VIDEOS}}", video_rows())
     page = page.replace("{{DATE}}", datetime.date.today().strftime("%d %B %Y").lstrip("0"))

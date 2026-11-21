@@ -55,3 +55,6 @@ docs/07-report/report.pdf
 
 # The files to upload for the course (made from git, see docs/07-report/README.md)
 submission/
+
+# The student's name and ID for the report's cover (kept out of the public repository)
+docs/07-report/student.json

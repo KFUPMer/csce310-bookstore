@@ -65,12 +65,17 @@ def seed_users():
 
 def seed_books():
     books = json.loads((Path(__file__).parent / "mongodb" / "books.json").read_text(encoding="utf-8"))
-    collection = MongoClient(os.getenv("MONGO_URL", "mongodb://localhost:27017"))["bookstore"]["books"]
+    database = MongoClient(os.getenv("MONGO_URL", "mongodb://localhost:27017"))["bookstore"]
+    collection = database["books"]
     collection.delete_many({})
+    # The reloaded books get new ids, so every review would point at a book that is gone and
+    # every rating would vanish (P-023). A reset clears them too.
+    reviews = database["reviews"].delete_many({}).deleted_count
     collection.insert_many(books)
     collection.create_index([("title", ASCENDING)])
     collection.create_index([("author", ASCENDING)])
-    print(f"MongoDB: {len(books)} books loaded")
+    print(f"MongoDB: {len(books)} books loaded; {reviews} reviews of the old books removed")
+    print("To load the demo sales and reviews again: python database/demo_data.py --reset")
 
 
 def upgrade_books():

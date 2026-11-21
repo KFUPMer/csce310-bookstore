@@ -10,6 +10,7 @@ All versions and patches of the project, newest first.
 - The customer app's screenshots now use one consistent set of orders (the bill, the account page, and the pay dialog all show order 1045).
 - `manual_check.py` prints the end of a service's log when that service does not start (P-018).
 - The course report (`docs/07-report`): database design, the REST API with its JSON, every major screen, and the architecture and classes (client/server, three tiers, MVC), built to PDF by `tools/report/build_report.py`. Also the recording script for the acceptance-test videos, covering FR1 to FR14.
+- Six faults found by a repository audit, fixed (P-023): a test-data reset no longer leaves every rating pointing at deleted books; a manager's book edit can no longer undo an order placed while the form was open (`copiesBefore`, 409); book-service answers 503, not 500, when something else answers on user-service's port; the report build stops on a missing section or a link without `https://`; emails are lower-cased the same way on every computer. 340 tests.
 - The ER diagram redrawn with the `reviews` collection and every current field and type; `database-design.md` and `api-design.md` brought up to date with the code and marked final (P-021).
 
 ## v1.2.0 — 2026-11-18 — A full shop: 81 books and demo sales

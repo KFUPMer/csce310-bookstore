@@ -7,6 +7,7 @@ import com.bookstore.user.model.User;
 import com.bookstore.user.service.AuthService;
 import com.sun.net.httpserver.HttpExchange;
 import java.io.IOException;
+import java.util.Locale;
 
 /** The endpoints under /api/users: registration (FR3). */
 public class UserHandler extends BaseHandler {
@@ -33,7 +34,8 @@ public class UserHandler extends BaseHandler {
         requireMethod(exchange, "POST");
         RegisterRequest request = readJson(exchange, RegisterRequest.class);
         request.validate();
-        User user = auth.register(request.username(), request.email().trim().toLowerCase(), request.password());
+        // Locale.ROOT: the same result on every computer. With a Turkish locale "I" would become a dotless "ı" (P-023).
+        User user = auth.register(request.username(), request.email().trim().toLowerCase(Locale.ROOT), request.password());
         sendJson(exchange, 201, UserResponse.of(user));
     }
 }

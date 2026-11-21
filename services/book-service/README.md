@@ -41,15 +41,16 @@ Listens on port 8082 (change with `BOOK_SERVICE_PORT`), on this machine only.
 python -m unittest discover -s tests -t .
 ```
 
-71 tests:
+76 tests:
 
 | File | Tests | What |
 |---|---|---|
-| `test_api.py` | 29 | Every book endpoint, success and each error, with in-memory repositories and a stand-in for user-service |
+| `test_api.py` | 32 | Every book endpoint, success and each error, with in-memory repositories and a stand-in for user-service |
 | `test_reviews_api.py` | 25 | The three review endpoints and the ratings on books, the same way |
-| `test_mongo_repository.py` | 17 | The book repository (9) and the review repository (8) against a real MongoDB; skipped if MongoDB is not running |
+| `test_mongo_repository.py` | 18 | The book repository (10) and the review repository (8) against a real MongoDB; skipped if MongoDB is not running |
+| `test_session_checker.py` | 1 | The real login check against a small web server that is not user-service: answers 503, not a crash (P-023) |
 
-The first two files need nothing running. The MongoDB tests use a separate `bookstore_test` database that is dropped afterwards.
+The other files need nothing running. The MongoDB tests use a separate `bookstore_test` database that is dropped afterwards.
 
 ## How it is built
 
@@ -101,7 +102,7 @@ Built and verified on 2026-11-16:
 
 Reviews and ratings, added 2026-11-18 (issue #20):
 
-- All 71 tests pass, with MongoDB running, so none was skipped.
+- All 76 tests pass, with MongoDB running, so none was skipped.
 - After restarting the services on the new code, the customer app's live check saved a review in 15 ms; it was listed first, and the book's `ratingCount` went up by one. The review was then deleted. Login took 158 ms, a search 14 ms. `manual_check.py` passed 41 of 41 checks, slowest 88 ms.
 - Afterwards the real `reviews` collection was empty, with the unique index present.
 - **Not verified:** `manual_check.py` does not call the review endpoints; on the running service they were checked only through the customer app's live check. Ratings with many reviews were tested only with the in-memory and test-database repositories.

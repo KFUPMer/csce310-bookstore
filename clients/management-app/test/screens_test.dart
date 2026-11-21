@@ -158,6 +158,27 @@ void main() {
     await finish(tester);
   });
 
+  testWidgets('an edit is refused, with the reason, when an order took a copy while the form was open', (tester) async {
+    await start(tester);
+    await logIn(tester);
+    await openBooks(tester);
+    await tester.ensureVisible(find.bySemanticsLabel(RegExp('^Clean Code by')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.bySemanticsLabel(RegExp('^Clean Code by')));
+    await tester.pumpAndSettle();
+    // A customer buys a copy while the manager is still typing (P-023).
+    final books = (services.books as FakeBooks).books;
+    final i = books.indexWhere((b) => b.title == 'Clean Code');
+    final before = books[i];
+    books[i] = Book(id: before.id, title: before.title, author: before.author, price: before.price, copiesAvailable: before.copiesAvailable - 1);
+    await tester.enterText(find.descendant(of: find.byType(Dialog), matching: find.byType(TextField)).at(2), '45');
+    await tester.tap(find.widgetWithText(AppButton, 'Save changes'));
+    await tester.pumpAndSettle();
+    expect(find.textContaining('The number of copies changed while you were editing'), findsOneWidget);
+    expect(books[i].price, before.price, reason: 'nothing was saved');
+    await finish(tester);
+  });
+
   FakeReports reports() => services.reports as FakeReports;
 
   Future<void> openReports(WidgetTester tester) async {

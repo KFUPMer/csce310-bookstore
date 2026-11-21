@@ -94,7 +94,7 @@ class _BookFormDialogState extends State<BookFormDialog> {
     final books = ManagerScope.of(context).services.books;
     setState(() => _saving = true);
     try {
-      final saved = _adding ? await books.add(book) : await books.update(book);
+      final saved = _adding ? await books.add(book) : await books.update(book, copiesBefore: widget.book!.copiesAvailable);
       if (mounted) Navigator.of(context).pop(saved);
     } on ApiException catch (e) {
       if (mounted) setState(() => _error = e.message);

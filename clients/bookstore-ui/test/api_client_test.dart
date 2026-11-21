@@ -170,6 +170,20 @@ void main() {
       expect(saved.rating, 3);
     });
 
+    test('changing a book sends the copies the form showed, so an order placed meanwhile is not undone', () async {
+      String? received;
+      answer = (r) async {
+        received = await utf8.decoder.bind(r).join();
+        await reply(r, 200, {'id': bookId, 'title': 'Clean Code', 'author': 'Robert C. Martin', 'price': 45.0, 'copiesAvailable': 6});
+      };
+      final books = BookApi(session, baseUrl: 'http://127.0.0.1:${server.port}');
+      const book = Book(id: bookId, title: 'Clean Code', author: 'Robert C. Martin', price: 45, copiesAvailable: 6);
+      await books.update(book, copiesBefore: 4);
+      expect(seen.single.method, 'PUT');
+      expect(jsonDecode(received!), containsPair('copiesBefore', 4));
+      expect(jsonDecode(received!), containsPair('copiesAvailable', 6));
+    });
+
     test('a refused review raises the message book-service gives', () async {
       answer = (r) => reply(r, 400, {'error': 'Choose a rating from 1 to 5 stars'});
       final books = BookApi(session, baseUrl: 'http://127.0.0.1:${server.port}');

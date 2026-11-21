@@ -16,11 +16,11 @@ The live plan is `docs/04-planning/milestones.md`; tasks are GitHub issues on `K
 |---|---|
 | M1 Idea, M2 Design, M3 Backend, M4 Clients | Closed. Released as v0.1.0, v0.2.0, v0.3.0, v0.4.0 |
 | user-service (Java HttpServer, MySQL) | Done, verified against MySQL |
-| book-service (Python Flask, MongoDB) | Done, verified on the running service. Reviews added in M6: `GET /api/books/{id}/reviews`, `PUT` and `DELETE /api/books/{id}/reviews/mine`; books carry `ratingAverage`, `ratingCount` (71 tests) |
+| book-service (Python Flask, MongoDB) | Done, verified on the running service. Reviews added in M6: `GET /api/books/{id}/reviews`, `PUT` and `DELETE /api/books/{id}/reviews/mine`; books carry `ratingAverage`, `ratingCount`; a manager's edit is refused (409) if an order changed the copies meanwhile (76 tests) |
 | order-service (Python Flask, MySQL) | Done, verified on the running service with the other two. A real bill email was sent through Gmail (`email_check.py`) and the owner confirmed it looks right in the inbox. `GET /api/orders/{id}`, `GET /api/orders/mine`, `POST /api/orders/{id}/pay` added in M4; `GET /api/reports/sales` (managers only) in M6 (117 tests) |
-| bookstore-ui (shared) | The look, plus the shared log-in form, `ApiClient`, `Session`, `UserApi`, `BookApi`, `Book`, `Order`, `Review`, `RatingStars`, `StarPicker` (40 tests) |
+| bookstore-ui (shared) | The look, plus the shared log-in form, `ApiClient`, `Session`, `UserApi`, `BookApi`, `Book`, `Order`, `Review`, `RatingStars`, `StarPicker` (41 tests) |
 | customer-app (Flutter) | Built on the real services (issues 11, 15), 46 tests. The owner ran it: it works. Account page and pretend checkout added after; the owner tried them too |
-| management-app (Flutter) | Built (issue 12), 33 tests, checked against the running services. The owner tried it: it works (`manager1` / `manager123`). Reports tab added in M6 |
+| management-app (Flutter) | Built (issue 12), 34 tests, checked against the running services. The owner tried it: it works (`manager1` / `manager123`). Reports tab added in M6 |
 | Reviews and ratings (M6, issue #20) | Built 2026-11-18, course section-6 extra credit. Any logged-in customer may review any book, once (no purchase check: book-service would have to call order-service, which already calls book-service); the writer edits or deletes it; no moderation, on purpose. MongoDB collection `reviews`, unique index `one_review_per_customer_per_book` on (bookId, userId). Ratings are one aggregation per search, never stored. Checked on the running services (review saved in 15 ms) |
 | Sales report (M6, issue #21) | Built 2026-11-18, course section-6 extra credit. Worked out in Python from the period's orders; best sellers grouped by bookId. Manager app Reports tab: Today / Last 7 days / Last 30 days / This month / All time. Checked on the running services (all-time report in 15 ms, matching the order list). Profiles with order history (issue #19) are the M4 account page |
 | Customer account page + pretend checkout | Built 2026-11-17, beyond the PRD (asked for by the owner). No card details are ever asked for or stored. Preferences in `%APPDATA%\CSCE310 Bookstore\preferences.json` |
@@ -90,7 +90,7 @@ These override any plugin or skill that says otherwise.
 | Shared package tests | `clients/bookstore-ui`: `flutter test` |
 | Owner's Terminal panel cannot read the pub cache | Build with `flutter build windows --debug`, run `build\windows\x64\runner\Debug\<app>.exe` |
 | Redraw the app screenshots | `clients/customer-app`: `set BOOKSTORE_SCREENSHOTS=1 && flutter test test/screenshots_test.dart` |
-| Reset test data | repo root: `python database/seed.py` |
+| Reset test data | repo root: `python database/seed.py` (also clears all reviews, P-023), then `python database/demo_data.py --reset` |
 | Demo data (14 customers, 100 past sales, reviews; password `demo12345`) | repo root: `python database/demo_data.py` (`--reset`, `--remove`); setup.cmd runs it |
 | Set up / start / stop the services, as a grader would | repo root: `setup.cmd`, `start-services.cmd`, `stop-services.cmd` (they pause at the end; from a script run `scripts\*.ps1` with `powershell -ExecutionPolicy Bypass -File`) |
 | Release build and installer | Pushing a tag `v*` runs `.github/workflows/windows-release.yml` on GitHub (release builds cannot be made on this machine, P-017) |

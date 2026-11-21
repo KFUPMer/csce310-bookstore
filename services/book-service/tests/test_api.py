@@ -171,6 +171,27 @@ class ApiTest(unittest.TestCase):
         self.assertEqual(response.get_json()["category"], "Science", "the shelf can be changed too")
         self.assertEqual(self.repository.find(self.clean_code.id).copies_available, 10)
 
+    def test_an_edit_made_while_an_order_took_a_copy_is_refused(self):
+        # The manager opened the form at 4 copies; then an order took one (P-023).
+        self.client.patch(f"/api/books/{self.clean_code.id}/copies", json={"change": -1}, headers=self.service())
+        body = {"title": "Clean Code", "author": "Robert C. Martin", "price": 45.0, "copiesAvailable": 4, "copiesBefore": 4, "category": "Technology"}
+        response = self.client.put(f"/api/books/{self.clean_code.id}", json=body, headers=as_manager())
+        self.assert_error(response, 409, "The number of copies changed while you were editing: there are now 3. Open the book again.")
+        book = self.repository.find(self.clean_code.id)
+        self.assertEqual((book.price, book.copies_available), (40.0, 3), "the sold copy did not come back, and nothing else changed")
+
+    def test_an_edit_made_on_the_current_number_of_copies_is_saved(self):
+        body = {"title": "Clean Code", "author": "Robert C. Martin", "price": 45.0, "copiesAvailable": 6, "copiesBefore": 4, "category": "Technology"}
+        response = self.client.put(f"/api/books/{self.clean_code.id}", json=body, headers=as_manager())
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(self.repository.find(self.clean_code.id).copies_available, 6)
+
+    def test_copies_before_must_be_a_whole_number(self):
+        for value in [-1, 1.5, "4", True]:
+            with self.subTest(value=value):
+                response = self.client.put(f"/api/books/{self.clean_code.id}", json={**NEW_BOOK, "copiesBefore": value}, headers=as_manager())
+                self.assert_error(response, 400, "copiesBefore must be a whole number, 0 or more")
+
     def test_updating_an_unknown_book_is_404_and_a_bad_field_is_400(self):
         self.assert_error(self.client.put("/api/books/ffffffffffffffffffffffff", json=NEW_BOOK, headers=as_manager()), 404, "This book does not exist")
         response = self.client.put(f"/api/books/{self.clean_code.id}", json={**NEW_BOOK, "price": 0}, headers=as_manager())

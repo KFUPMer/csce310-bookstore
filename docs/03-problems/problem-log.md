@@ -549,6 +549,35 @@ The ER diagram was redrawn in draw.io from `schema.sql` and book-service, export
 **Solution**
 The comment no longer spells the placeholders out. After the rebuild `report.html` has each heading once.
 
+## P-023 — A repository audit found six faults
+
+- **Date found:** 2026-11-20
+- **Phase / milestone:** after M6, before the submission
+- **Who:** assistant (all six were in code the assistant wrote)
+- **Status:** Fixed
+
+**What happened**
+An audit of the whole repository (asked for by the owner) read every path where a mistake costs the most: orders and money, stock, logins, the data scripts. It found:
+
+| # | Fault | Concrete case |
+|---|---|---|
+| 1 | `python database/seed.py` (the reset) deleted and reloaded every book with new ids | Every review then pointed at a book that was gone, and every rating vanished from the shop |
+| 2 | A manager's book edit wrote back the number of copies the form had opened with | The form opens at 4 copies; a customer buys one (3); the manager saves a new price; the count goes back to 4 and the sold copy can be sold again |
+| 3 | book-service's login check read user-service's answer without the guard order-service's copy has | Another program on port 8081 answering 200 with a web page made every book search fail with a vague 500 instead of a clear 503 |
+| 4 | The report build made a stand-in "To be written." for a missing section, and its self-check still passed | One renamed section file and the PDF would go out with a required section blank |
+| 5 | A video link not starting with `https://` was shown as "link to be added" without a word | A link pasted as `youtu.be/…` would vanish from the uploaded report |
+| 6 | user-service lower-cased emails with the computer's language rules | On a Turkish-language Windows, `ALICE@X.COM` became `alıce@x.com` (dotless ı) and the bill email would go nowhere |
+
+**Solution**
+1. A reset also clears the reviews and says how to load the demo data again.
+2. Mooney's Manager sends `copiesBefore`, the copies the form showed; book-service saves only if that is still the stored number (checked in the same atomic update) and otherwise answers 409 with the reason. New tests: three API tests, one against the real MongoDB, one in the shared package, one screen test. Checked on the running services: a stale edit got 409, a current one saved.
+3. The same guard as order-service; a test against a small real web server.
+4. The stand-in code was deleted (11 lines): a missing section stops the build. Tried: it stopped with "No such file".
+5. Such a link stops the build with a message. Tried: it stopped, and named the link.
+6. `toLowerCase(Locale.ROOT)`.
+
+All 340 automated tests and the 41 live checks pass afterwards.
+
 ## Known gaps
 
 Things that are known to be unfinished or unverified, so nobody is surprised later.

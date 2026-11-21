@@ -83,6 +83,14 @@ class MongoBookRepositoryTest(unittest.TestCase):
         self.assertEqual(self.books.find(self.clean_code.id), updated)
         self.assertIsNone(self.books.replace("ffffffffffffffffffffffff", BookInput("x", "y", 1.0, 1, None)))
 
+    def test_replace_with_an_old_number_of_copies_changes_nothing(self):
+        self.books.change_copies(self.clean_code.id, -1)  # an order took one: 4 -> 3
+        stale = BookInput("Clean Code", "Robert C. Martin", 45.0, 4, None, copies_before=4)
+        self.assertIsNone(self.books.replace(self.clean_code.id, stale))
+        self.assertEqual((self.books.find(self.clean_code.id).price, self.books.find(self.clean_code.id).copies_available), (40.0, 3))
+        current = BookInput("Clean Code", "Robert C. Martin", 45.0, 5, None, copies_before=3)
+        self.assertEqual(self.books.replace(self.clean_code.id, current).copies_available, 5)
+
     def test_copies_change_but_never_go_below_zero(self):
         self.assertEqual(self.books.change_copies(self.clean_code.id, -3).copies_available, 1)
         self.assertEqual(self.books.change_copies(self.clean_code.id, -1).copies_available, 0)

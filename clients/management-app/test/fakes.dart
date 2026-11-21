@@ -173,8 +173,13 @@ class FakeBooks extends BookApi {
   }
 
   @override
-  Future<Book> update(Book book) async {
-    books[books.indexWhere((b) => b.id == book.id)] = book;
+  Future<Book> update(Book book, {int? copiesBefore}) async {
+    final i = books.indexWhere((b) => b.id == book.id);
+    // As book-service does: the change is refused if an order changed the copies meanwhile.
+    if (copiesBefore != null && books[i].copiesAvailable != copiesBefore) {
+      throw ApiException('The number of copies changed while you were editing: there are now ${books[i].copiesAvailable}. Open the book again.', 409);
+    }
+    books[i] = book;
     return book;
   }
 }

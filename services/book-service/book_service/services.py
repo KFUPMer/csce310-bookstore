@@ -39,9 +39,11 @@ class BookService:
     def update(self, book_id: str, book: BookInput) -> Book:
         """FR14: change a book's details, such as the number of available copies."""
         updated = self._books.replace(book_id, book)
-        if updated is None:
-            raise NotFoundError(NOT_FOUND)
-        return self._with_rating(updated)
+        if updated is not None:
+            return self._with_rating(updated)
+        # It failed: either there is no such book, or an order changed its copies since the form was opened.
+        current = self._find(book_id)
+        raise ConflictError(f"The number of copies changed while you were editing: there are now {current.copies_available}. Open the book again.")
 
     def change_copies(self, book_id: str, change: int) -> Book:
         """Take copies when a book is ordered (negative change) or give them back.

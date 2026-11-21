@@ -31,7 +31,7 @@ Or, in VS Code: Run and Debug, "Management app", F5. Release builds are blocked 
 flutter test
 ```
 
-33 tests, no server needed: the book rules, the report data and its periods, and every screen driven the way a manager uses it with stand-in services, including one test in a 1024 x 700 window and the top bar with a 50-character username at four widths. `test/home_bar_test.dart` measures the bar with the real typefaces. Two more are skipped unless asked for:
+34 tests, no server needed: the book rules, the report data and its periods, and every screen driven the way a manager uses it with stand-in services, including one test in a 1024 x 700 window and the top bar with a 50-character username at four widths. `test/home_bar_test.dart` measures the bar with the real typefaces. Two more are skipped unless asked for:
 
 | Command | Does |
 |---|---|

@@ -338,7 +338,7 @@
 
 <h4>2.4.4 Change a book</h4>
 <div class="endpoint"><span class="method">PUT</span> <code>/api/books/{id}</code></div>
-<p>Manager (FR14). The whole book is sent, with the same fields and rules as when adding it. This is how a manager changes the number of copies.</p>
+<p>Manager (FR14). The whole book is sent, with the same fields and rules as when adding it. This is how a manager changes the number of copies. <code>copiesBefore</code> (optional) is the number of copies the form showed: the change is saved only if that is still the number stored, checked in the same atomic MongoDB update, so an order placed while the form was open is never undone. Mooney's Manager always sends it.</p>
 <p>Request:</p>
 <pre class="json">{
   "title": "Clean Code",
@@ -346,7 +346,8 @@
   "price": 40.0,
   "copiesAvailable": 10,
   "coverUrl": "https://covers.openlibrary.org/b/id/8065615-L.jpg",
-  "category": "Technology"
+  "category": "Technology",
+  "copiesBefore": 4
 }</pre>
 <p>Response <code>200</code>: the changed book object, now with <code>"copiesAvailable": 10</code>.</p>
 <table class="data">
@@ -356,6 +357,7 @@
     <tr><td>401</td><td>Not logged in</td></tr>
     <tr><td>403</td><td>"Only a manager can do this"</td></tr>
     <tr><td>404</td><td>"This book does not exist"</td></tr>
+    <tr><td>409</td><td>"The number of copies changed while you were editing: there are now 3. Open the book again."</td></tr>
   </tbody>
 </table>
 

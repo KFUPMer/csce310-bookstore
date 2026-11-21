@@ -59,7 +59,11 @@ class BookApi extends ApiClient {
   Future<Book> add(Book book) async => Book.fromJson(await post('/api/books', book.toJson()) as Map<String, dynamic>);
 
   /// FR14: changes a book's details, including its number of copies.
-  Future<Book> update(Book book) async => Book.fromJson(await put('/api/books/${book.id}', book.toJson()) as Map<String, dynamic>);
+  ///
+  /// [copiesBefore] is the number of copies the form showed. book-service then refuses the change
+  /// (409) if an order took or gave back copies meanwhile, rather than undo that order (P-023).
+  Future<Book> update(Book book, {int? copiesBefore}) async =>
+      Book.fromJson(await put('/api/books/${book.id}', {...book.toJson(), 'copiesBefore': ?copiesBefore}) as Map<String, dynamic>);
 
   /// A book's reviews, newest first. Extra credit, beyond the PRD.
   Future<List<Review>> reviews(String bookId) async => [

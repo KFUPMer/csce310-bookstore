@@ -46,6 +46,9 @@ class BookInput:
     copies_available: int
     cover_url: Optional[str]
     category: Optional[str] = None  # required in a request (from_json); optional for books stored before categories
+    # PUT only, optional: the copies the manager's form showed. The change is saved only if that is
+    # still the number stored, so an order placed meanwhile is not undone (P-023).
+    copies_before: Optional[int] = None
 
     @staticmethod
     def from_json(body: Any) -> "BookInput":
@@ -81,8 +84,12 @@ class BookInput:
         if category not in CATEGORIES:
             raise ValidationError(CATEGORY_PROBLEM)
 
+        copies_before = body.get("copiesBefore")
+        if copies_before is not None and (not isinstance(copies_before, int) or isinstance(copies_before, bool) or copies_before < 0):
+            raise ValidationError("copiesBefore must be a whole number, 0 or more")
+
         # Prices are money: keep two decimals.
-        return BookInput(title, author, round(float(price), 2), copies, cover_url, category)
+        return BookInput(title, author, round(float(price), 2), copies, cover_url, category, copies_before)
 
 
 def category_filter(value: Optional[str]) -> Optional[str]:

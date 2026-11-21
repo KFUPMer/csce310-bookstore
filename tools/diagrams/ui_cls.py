@@ -34,7 +34,7 @@ c = [
  F.cls('info', 'InfoNote', COL[4], R[4], ['+ text : String'], [B, '(a neutral message with an icon)'], F.BLUE, 'widget'),
  # Talking to the services, shared by both apps (moved here from the customer app in M4).
  F.cls('uapi', 'UserApi', COL[0], R[5], ['(user-service, port 8081)'], ['+ login(username, password)', '+ logout({reason})', '+ register(username, email, password)'], F.GREEN),
- F.cls('bapi', 'BookApi', COL[1], R[5], ['(book-service, port 8082)'], ['+ search(keyword, {category})', '+ reviews(bookId), deleteMyReview(bookId)', '+ saveMyReview(bookId, rating, text)', '+ add(book), update(book) : Future<Book>'], F.GREEN),
+ F.cls('bapi', 'BookApi', COL[1], R[5], ['(book-service, port 8082)'], ['+ search(keyword, {category})', '+ reviews(bookId), deleteMyReview(bookId)', '+ saveMyReview(bookId, rating, text)', '+ add(book) : Future<Book>', '+ update(book, {copiesBefore}) : Future<Book>'], F.GREEN),
  F.cls('exc', 'ApiException', COL[0], R[6], ['+ message : String', '+ status : int  (0 = not answering)'], None, F.GREEN),
  F.cls('api', 'ApiClient', COL[1], R[6], ['+ baseUrl : String', '+ session : Session', '+ serviceName : String', '+ timeout : Duration  (8 s)'], ['+ get(path) : Future<dynamic>', '+ post(path, body)', '+ put(path, body)', '+ patch(path, body)'], F.GREEN),
  F.cls('sess', 'Session', COL[2], R[6], ['- token : String?', '+ userId, username, email, role', '+ endedMessage : String?'], ['+ isLoggedIn : bool', '+ start(...), clear({message})'], F.GREY, 'ChangeNotifier'),

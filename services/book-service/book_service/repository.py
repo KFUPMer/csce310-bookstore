@@ -35,7 +35,8 @@ class BookRepository(ABC):
 
     @abstractmethod
     def replace(self, book_id: str, book: BookInput) -> Optional[Book]:
-        """Overwrite a book's details. Returns the updated book, or None if it does not exist."""
+        """Overwrite a book's details. Returns the updated book, or None if it does not exist or
+        `book.copies_before` is given and is not the number of copies stored now."""
 
     @abstractmethod
     def change_copies(self, book_id: str, change: int) -> Optional[Book]:
@@ -75,7 +76,11 @@ class MongoBookRepository(BookRepository):
         oid = self._object_id(book_id)
         if not oid:
             return None
-        doc = self._books.find_one_and_update({"_id": oid}, {"$set": self._to_document(book)}, return_document=ReturnDocument.AFTER)
+        query = {"_id": oid}
+        if book.copies_before is not None:
+            # In the same atomic step as the change, like change_copies: no order can slip in between.
+            query["copiesAvailable"] = book.copies_before
+        doc = self._books.find_one_and_update(query, {"$set": self._to_document(book)}, return_document=ReturnDocument.AFTER)
         return self._to_book(doc) if doc else None
 
     def change_copies(self, book_id: str, change: int) -> Optional[Book]:
@@ -149,6 +154,8 @@ class InMemoryBookRepository(BookRepository):
     def replace(self, book_id: str, book: BookInput) -> Optional[Book]:
         book_id = self._key(book_id)
         if book_id not in self._books:
+            return None
+        if book.copies_before is not None and self._books[book_id].copies_available != book.copies_before:
             return None
         self._books[book_id] = Book(book_id, book.title, book.author, book.price, book.copies_available, book.cover_url, book.category)
         return self._books[book_id]

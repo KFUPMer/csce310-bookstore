@@ -26,7 +26,7 @@ c = [
  F.cls('checker', 'SessionChecker', C[0], R[1], ['(abstract)'], ['+ check(token) : CurrentUser'], F.GREEN, 'interface'),
  F.cls('routes', 'routes.py', C[1], R[1], ['create_routes(books, reviews, sessions, key)'], ['GET /api/books?keyword=&category=', 'GET /api/books/<id>', 'POST /api/books  (manager)', 'PUT /api/books/<id>  (manager)', 'PATCH /api/books/<id>/copies  (services)', 'GET /api/books/<id>/reviews', 'PUT /api/books/<id>/reviews/mine  (customer)', 'DELETE .../reviews/mine  (customer)'], F.BLUE, 'module'),
  F.cls('authf', 'auth.py', C[2], R[1], ['TIMEOUT = (2 s, 3 s)'], ['token_from(header) : str', 'require_manager(user)', 'require_customer(user)', 'require_service_key(given, expected)'], F.GREEN, 'module'),
- F.cls('input', 'BookInput', C[3], R[1], ['+ title, author : str', '+ price : float', '+ copies_available : int', '+ cover_url : str | None', '+ category : str  (one of 5)'], ['+ from_json(body) : BookInput', 'category_filter(value)  (module)'], PURPLE, 'dataclass'),
+ F.cls('input', 'BookInput', C[3], R[1], ['+ title, author : str', '+ price : float', '+ copies_available : int', '+ cover_url : str | None', '+ category : str  (one of 5)', '+ copies_before : int | None  (PUT)'], ['+ from_json(body) : BookInput', 'category_filter(value)  (module)'], PURPLE, 'dataclass'),
  F.cls('rinput', 'ReviewInput', C[4], R[1], ['+ rating : int  (1 to 5)', '+ text : str  (trimmed, at most 1000)'], ['+ from_json(body) : ReviewInput'], PURPLE, 'dataclass'),
  # the rules
  F.cls('realchecker', 'UserServiceSessionChecker', C[0], R[2], ['- url : str', '- http : requests.Session'], ['+ check(token) : CurrentUser', '(asks user-service; 503 if it is down)'], F.GREEN),

@@ -119,7 +119,7 @@ Errors: `400` a field is missing or invalid · `409` username or email already u
 
 ## book-service — `http://localhost:8082`
 
-**Status: built, tested (71 tests), and verified on the running service.** Requests answer in 3–38 ms. Reviews (added 2026-11-18): on the running service a review was saved in 15 ms. Also answers `503` when user-service or MongoDB is not available, and `404` / `405` for an unknown address or a wrong method.
+**Status: built, tested (76 tests), and verified on the running service.** Requests answer in 3–38 ms. Reviews (added 2026-11-18): on the running service a review was saved in 15 ms. Also answers `503` when user-service or MongoDB is not available, and `404` / `405` for an unknown address or a wrong method.
 
 A book looks like this everywhere:
 
@@ -166,9 +166,9 @@ Response `201`: the new book, with its `id`. Errors: `400` · `401` · `403` not
 
 ### PUT `/api/books/{id}` — manager
 
-Request: the same fields as POST. Response `200`: the updated book.
+Request: the same fields as POST, and optionally `copiesBefore`: the number of copies the manager's form showed. When it is given, the change is saved only if that is still the number stored, in one atomic step; Mooney's Manager always sends it. Response `200`: the updated book.
 
-Errors: `400` · `401` · `403` · `404`.
+Errors: `400` · `401` · `403` · `404` · `409` "The number of copies changed while you were editing: there are now 3. Open the book again." (an order took or gave back copies after the form was opened, so saving would undo it; P-023).
 
 ### PATCH `/api/books/{id}/copies` — order-service only
 

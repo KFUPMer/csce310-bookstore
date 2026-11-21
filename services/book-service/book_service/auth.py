@@ -44,8 +44,12 @@ class UserServiceSessionChecker(SessionChecker):
             raise UnauthorizedError(self._message(response, "Your session has ended. Please log in again."))
         if response.status_code != 200:
             raise ServiceUnavailableError("The login service is not answering. Please try again in a moment.")
-        body = response.json()
-        return CurrentUser(user_id=body["userId"], username=body["username"], email=body["email"], role=body["role"])
+        try:
+            body = response.json()
+            return CurrentUser(user_id=body["userId"], username=body["username"], email=body["email"], role=body["role"])
+        except (ValueError, KeyError, TypeError) as error:
+            # Something answered on user-service's port, but not with what user-service says (P-023).
+            raise ServiceUnavailableError("The login service is not answering. Please try again in a moment.") from error
 
     @staticmethod
     def _message(response: requests.Response, fallback: str) -> str:

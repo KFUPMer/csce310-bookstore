@@ -4,10 +4,10 @@ What it does:
   1. Reads the shell, docs/07-report/report-shell.html.
   2. Puts in the section fragments, docs/07-report/sections/1-*.html to 4-*.html, in order.
      Each is wrapped in <section id="..."> so the table of contents can link to it.
-     A missing fragment is created first as a placeholder holding only its <h2>;
-     an existing fragment is never overwritten.
+     A missing fragment stops the build: the report must never go out with a section left out.
   3. Fills {{DATE}} (today), {{VERSION}} (the latest git tag) and {{VIDEOS}}
-     (rows made from docs/07-report/video-links.json; an empty url shows "link to be added").
+     (rows made from docs/07-report/video-links.json; an empty url shows "link to be added",
+     and a url that does not start with https:// stops the build).
   4. Writes docs/07-report/report.html.
   5. Prints it to docs/07-report/report.pdf with Microsoft Edge headless, and prints the PDF size.
   6. Checks itself: the PDF exists and is over 50 KB, and the HTML has all four section headings.
@@ -35,28 +35,18 @@ OUT_HTML = REPORT_DIR / "report.html"
 OUT_PDF = REPORT_DIR / "report.pdf"
 EDGE = pathlib.Path(r"C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe")
 
-# File name, anchor id (used by the table of contents), and the heading a placeholder gets.
+# File name, and anchor id (used by the table of contents).
 SECTIONS = [
-    ("1-database.html", "database", "1. Database design"),
-    ("2-backend.html", "backend", "2. Backend design"),
-    ("3-frontend.html", "frontend", "3. Frontend design"),
-    ("4-architecture.html", "architecture", "4. Architectural and class design"),
+    ("1-database.html", "database"),
+    ("2-backend.html", "backend"),
+    ("3-frontend.html", "frontend"),
+    ("4-architecture.html", "architecture"),
 ]
-
-
-def make_missing_sections():
-    """Create a placeholder for each section file that does not exist yet. Never overwrites."""
-    SECTIONS_DIR.mkdir(parents=True, exist_ok=True)
-    for name, _, heading in SECTIONS:
-        path = SECTIONS_DIR / name
-        if not path.exists():
-            path.write_text(f"<h2>{heading}</h2>\n<p>To be written.</p>\n", encoding="utf-8")
-            print(f"Created placeholder {path.relative_to(ROOT)}")
 
 
 def sections_html():
     parts = []
-    for name, anchor, _ in SECTIONS:
+    for name, anchor in SECTIONS:
         body = (SECTIONS_DIR / name).read_text(encoding="utf-8")
         parts.append(f'<section id="{anchor}">\n{body.strip()}\n</section>')
     return "\n\n".join(parts)
@@ -78,6 +68,9 @@ def video_rows():
         if url.startswith("https://"):
             safe = html.escape(url, quote=True)
             link = f'<a href="{safe}">{safe}</a>'
+        elif url:
+            # Not silently shown as "link to be added": the uploaded report would look untested (P-023).
+            sys.exit(f"Video {number}: the link must start with https:// (it is {url!r}). Copy it from YouTube's Share button.")
         else:
             link = "<em>link to be added</em>"
         rows.append(
@@ -123,14 +116,13 @@ def print_pdf():
 
 
 def main():
-    make_missing_sections()
     page = build_html()
     print_pdf()
 
     # Self-check.
     assert OUT_PDF.exists(), "report.pdf was not written"
     assert OUT_PDF.stat().st_size > 50 * 1024, f"report.pdf is only {OUT_PDF.stat().st_size} bytes"
-    for name, anchor, _ in SECTIONS:
+    for name, anchor in SECTIONS:
         start = page.index(f'<section id="{anchor}">')
         end = page.index("</section>", start)
         assert "<h2" in page[start:end], f"Section {anchor} ({name}) has no <h2> heading"

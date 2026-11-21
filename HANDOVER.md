@@ -36,7 +36,7 @@ Everything needed to install, try, and grade it, and where the evidence for each
 | **Extra credit** | Every item claimed: FR3, FR10, a modern GUI framework, and the three in section 6 of the course document ([below](#extra-credit-claimed)) |
 | **Tests** | 346 automated tests, 41 live checks, all passing ([by part](#process)) |
 | **Latest version** | [v1.3.0](https://github.com/KFUPMer/csce310-bookstore/releases/latest): the apps start the services themselves; 81 books, and demo customers with past sales and reviews |
-| **Fresh-machine test** | v1.2.0, installed from the published release on a clean GitHub Windows machine by following INSTALL.md: setup, all 41 service checks, and both apps passed. (An earlier run stopped once when user-service did not start and could not be reproduced: [P-018](docs/03-problems/problem-log.md#p-018--user-service-once-did-not-start-in-the-fresh-machine-test-of-v120).) |
+| **Fresh-machine test** | v1.3.0, installed from the published release on a clean GitHub Windows machine by following INSTALL.md: setup, all 41 service checks (slowest 85 ms), and both apps passed on the first run. The apps starting the services themselves was checked on the development computer (11 s, [E-052](docs/03-problems/enhancement-log.md)) |
 
 | Part | Built with | Does |
 |---|---|---|

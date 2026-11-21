@@ -34,7 +34,7 @@ Everything needed to install, try, and grade it, and where the evidence for each
 |---|---|
 | **Requirements** | All 14 functional (FR1 to FR14) and 5 non-functional (N1 to N5) met, each with evidence in the [test report](docs/06-testing/requirements-test.md) |
 | **Extra credit** | Every item claimed: FR3, FR10, a modern GUI framework, and the three in section 6 of the course document ([below](#extra-credit-claimed)) |
-| **Tests** | 341 automated tests, 41 live checks, all passing ([by part](#process)) |
+| **Tests** | 346 automated tests, 41 live checks, all passing ([by part](#process)) |
 | **Latest version** | [v1.2.0](https://github.com/KFUPMer/csce310-bookstore/releases/latest): 81 books, and demo customers with past sales and reviews |
 | **Fresh-machine test** | v1.2.0, installed from the published release on a clean GitHub Windows machine by following INSTALL.md: setup, all 41 service checks, and both apps passed. (An earlier run stopped once when user-service did not start and could not be reproduced: [P-018](docs/03-problems/problem-log.md#p-018--user-service-once-did-not-start-in-the-fresh-machine-test-of-v120).) |
 
@@ -53,8 +53,8 @@ Windows 10 or 11, 64-bit. The full steps, and what to do if something goes wrong
 1. Install **MySQL Server 8** if it is not there yet. It is the only thing installed by hand.
 2. From the [latest release](https://github.com/KFUPMer/csce310-bookstore/releases/latest), download `Mooneys-Server-<version>.zip` and `Mooneys-Apps-Setup-<version>.exe`.
 3. Unzip the server and double-click **`setup.cmd`**. It installs what is missing (Java 21, Python 3.12, MongoDB) and creates the data. It asks one thing: the MySQL root password, once, typed into MySQL itself.
-4. Double-click **`start-services.cmd`**. Three minimized windows open, one per service.
-5. Run the apps installer. It adds **Mooney's** and **Mooney's Manager** to the Start menu.
+4. Run the apps installer. It adds **Mooney's** and **Mooney's Manager** to the Start menu.
+5. Open either app. It starts the three services itself if they are not running (about 10 seconds the first time); `stop-services.cmd` stops them.
 
 | Role | App | Username | Password |
 |---|---|---|---|
@@ -173,7 +173,7 @@ Asked for by the owner, and not needed for any grade:
 
 - **Six milestones**, each closed with a tagged GitHub release, most well before their deadlines: M1 Idea (v0.1.0), M2 Design (v0.2.0), M3 Backend (v0.3.0), M4 Clients (v0.4.0), M5 Testing and final release (two betas, the second installed from the published release on a fresh GitHub Windows machine, then v1.0.0), and M6, the section-6 extra credit (v1.1.0). Dated notes in [milestones.md](docs/04-planning/milestones.md).
 - **Tasks as GitHub issues**, each closed with a note of what was done.
-- **23 problem-log entries** (P-001 to P-023), including the assistant's own mistakes, and **51 enhancement-log entries** (E-001 to E-051), each with its reason and measured effect.
+- **23 problem-log entries** (P-001 to P-023), including the assistant's own mistakes, and **52 enhancement-log entries** (E-001 to E-052), each with its reason and measured effect.
 - **Tests with the code**: every service and app has its own tests, run again on GitHub before each release (the tests that need MySQL or MongoDB skip themselves there; they run on the development computer). order-service and the later app features were written test-first. A code review before committing found what the tests had not ([P-015](docs/03-problems/problem-log.md#p-015--order-service-passed-all-its-tests-with-faults-a-review-then-found)).
 
 | Part | Automated tests |
@@ -181,10 +181,10 @@ Asked for by the owner, and not needed for any grade:
 | user-service | 26 |
 | book-service | 76 |
 | order-service | 117 |
-| Shared package `bookstore-ui` | 41 |
+| Shared package `bookstore-ui` | 46 |
 | Mooney's (customer app) | 47 |
 | Mooney's Manager | 34 |
-| **Total** | **341**, plus 41 checks on the running services (`manual_check.py`) |
+| **Total** | **346**, plus 41 checks on the running services (`manual_check.py`) |
 
 ## Known limits
 

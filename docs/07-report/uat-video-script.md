@@ -24,7 +24,7 @@ Record the videos in order. Video 2 uses the account made in video 1, video 3 us
 
 | Check | How |
 |---|---|
-| The three services are running | Double-click `start-services.cmd` in the repo root. Wait until it says all three are running (ports 8081, 8082, 8083). |
+| The three services are running | Nothing to do: opening either app starts them (the login screen says "Starting the bookstore services" for about 10 seconds). Or double-click `start-services.cmd` in the repo root first. |
 | The test accounts exist | `customer1` / `customer123` and `manager1` / `manager123` (made by `python database/seed.py`). |
 | The demo data is there | `python database/demo_data.py`. It keeps the demo data if it is already there (14 customers, 100 past sales, reviews). Needed for video 4's sales report. |
 | The apps are ready | **Mooney's** and **Mooney's Manager** from the Start menu (after the installer), or `flutter run -d windows` in `clients/customer-app` and `clients/management-app`. |

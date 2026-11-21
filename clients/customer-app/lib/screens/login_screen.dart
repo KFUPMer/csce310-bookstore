@@ -60,6 +60,7 @@ class _LoginScreenState extends State<LoginScreen> {
         wrongRoleMessage: 'This app is for customers. Managers log in to the management app.',
         note: _accountNote ?? services.session.endedMessage,
         initialUsername: _newUsername,
+        localServices: services.localServices,
         onLoggedIn: () => Navigator.of(context).pushReplacement(fadeRoute(const SearchScreen())),
         // Wraps rather than overflows if the text is larger (e.g. Windows text scaling).
         footer: Wrap(

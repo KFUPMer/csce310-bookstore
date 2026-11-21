@@ -11,6 +11,7 @@ export 'src/models/book.dart';
 export 'src/models/order.dart';
 export 'src/models/review.dart';
 export 'src/api/apis.dart';
+export 'src/api/local_services.dart';
 
 export 'src/tokens.dart';
 export 'src/theme.dart';

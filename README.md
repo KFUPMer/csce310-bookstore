@@ -91,7 +91,7 @@ On Windows 10 or 11 (64-bit), in about 15 minutes. Full steps: [INSTALL.md](INST
 1. **Install MySQL Server 8**, if it is not there yet. It is the only thing installed by hand.
 2. **Download** `Mooneys-Server-<version>.zip` and `Mooneys-Apps-Setup-<version>.exe` from the [latest release](https://github.com/KFUPMer/csce310-bookstore/releases/latest).
 3. **Unzip the server and run `setup.cmd`.** It installs what is missing (Java, Python, MongoDB), then creates the database, the books, and the demo data. It asks once for your MySQL root password, typed into MySQL itself.
-4. **Run `start-services.cmd`**, then run the apps installer.
+4. **Run the apps installer and open an app.** It starts the services itself, in the background (about 10 seconds the first time).
 5. **Log in:**
 
    | App | Username | Password |
@@ -129,10 +129,10 @@ Every service has the same four layers and one error shape, `{ "error": "…" }`
 |---|---|
 | **Requirements** | All 14 functional (FR1–FR14) and 5 non-functional (N1–N5) met, each with evidence: [requirements test report](docs/06-testing/requirements-test.md) |
 | **Extra credit** | All 6 items: registration, emailed bills, a modern GUI framework (Flutter), and the three of the course's section 6: profiles with order history, book reviews and ratings, a sales report |
-| **Tests** | 341 automated tests, all passing, plus 41 checks against the three running services |
+| **Tests** | 346 automated tests, all passing, plus 41 checks against the three running services |
 | **Speed** | N1 allows 500 ms per call. In every recorded run of the 41 live checks, each started cold, the slowest order call took 176 ms or less |
 | **Design** | 23 diagrams in draw.io (UML, ER, architecture, wireframes), each as source and image |
-| **Process** | 6 milestones, 21 GitHub issues, 9 releases (7 versions and 2 betas), 23 problem-log entries, 51 enhancement-log entries |
+| **Process** | 6 milestones, 21 GitHub issues, 9 releases (7 versions and 2 betas), 23 problem-log entries, 52 enhancement-log entries |
 
 <details>
 <summary><b>Tests per part</b></summary>
@@ -142,10 +142,10 @@ Every service has the same four layers and one error shape, `{ "error": "…" }`
 | user-service | 26 |
 | book-service | 76 |
 | order-service | 117 |
-| Shared package `bookstore-ui` | 41 |
+| Shared package `bookstore-ui` | 46 |
 | Customer app (Mooney's) | 47 |
 | Management app (Mooney's Manager) | 34 |
-| **Total** | **341** |
+| **Total** | **346** |
 
 Commands for each are in the [requirements test report](docs/06-testing/requirements-test.md). The release build on GitHub runs every suite before it builds.
 

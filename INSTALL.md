@@ -37,7 +37,9 @@ It checks each part and installs what is missing: Java 21, Python 3.12, and Mong
 
 ## 3. Start the services
 
-Double-click **`start-services.cmd`**. Three minimized windows open, one per service. Leave them open while you use the apps. **`stop-services.cmd`** stops them.
+Nothing to do: **the apps start the services themselves.** When Mooney's or Mooney's Manager opens and the services are not running, it starts them in the background and says "Starting the bookstore services" for about 10 seconds. They keep running after the app closes. **`stop-services.cmd`** stops them.
+
+To start them by hand instead (for example to see their messages), double-click **`start-services.cmd`**: three minimized windows open, one per service.
 
 ## 4. Install the apps
 

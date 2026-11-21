@@ -154,8 +154,14 @@ if (-not (Test-Path $jar)) {
 }
 Ok $jar
 
+# Where this server folder is, so the apps can start the services themselves (LocalServices in bookstore-ui).
+$appFolder = Join-Path $env:APPDATA 'CSCE310 Bookstore'
+New-Item -ItemType Directory -Force $appFolder | Out-Null
+[IO.File]::WriteAllText((Join-Path $appFolder 'server-folder.txt'), $root)
+
 Write-Host ""
 Write-Host "Setup is complete." -ForegroundColor Green
-Write-Host "Next: double-click start-services.cmd, then open Mooney's from the Start menu."
+Write-Host "Next: open Mooney's or Mooney's Manager from the Start menu. They start the services themselves (about 10 seconds the first time)."
+Write-Host "To stop the services: stop-services.cmd."
 Write-Host "Bills are saved, but not emailed until a Gmail app password is put in services\.env (INSTALL.md, optional)."
 exit 0

@@ -2,6 +2,7 @@ import 'package:material_ui/material_ui.dart';
 
 import 'api/api_client.dart';
 import 'api/apis.dart';
+import 'api/local_services.dart';
 import 'app_button.dart';
 import 'app_text_field.dart';
 import 'tokens.dart';
@@ -22,6 +23,7 @@ class LoginForm extends StatefulWidget {
     this.note,
     this.initialUsername,
     this.footer,
+    this.localServices,
   });
 
   final UserApi users;
@@ -41,6 +43,9 @@ class LoginForm extends StatefulWidget {
   /// Under the button, e.g. "Create an account".
   final Widget? footer;
 
+  /// When given, the form first makes sure the services on this computer are running, and starts them if not.
+  final LocalServices? localServices;
+
   @override
   State<LoginForm> createState() => _LoginFormState();
 }
@@ -51,6 +56,7 @@ class _LoginFormState extends State<LoginForm> {
   final _passwordFocus = FocusNode();
 
   bool _loading = false;
+  bool _starting = false;
   String? _error;
   String? _usernameError;
   String? _passwordError;
@@ -59,6 +65,20 @@ class _LoginFormState extends State<LoginForm> {
   void initState() {
     super.initState();
     if (widget.initialUsername != null) WidgetsBinding.instance.addPostFrameCallback((_) => _passwordFocus.requestFocus());
+    if (widget.localServices != null) _startServices();
+  }
+
+  Future<void> _startServices() async {
+    setState(() {
+      _starting = true;
+      _error = null;
+    });
+    final problem = await widget.localServices!.ensureRunning();
+    if (!mounted) return;
+    setState(() {
+      _starting = false;
+      _error = problem;
+    });
   }
 
   @override
@@ -111,6 +131,10 @@ class _LoginFormState extends State<LoginForm> {
           const SizedBox(height: Space.xs),
           Text(widget.subtitle, style: t.bodyMedium!.copyWith(color: c.textSecondary)),
           if (widget.note != null) ...[const SizedBox(height: Space.lg), InfoNote(widget.note!)],
+          if (_starting) ...[
+            const SizedBox(height: Space.lg),
+            const InfoNote('Starting the bookstore services. The first start takes about 10 seconds.'),
+          ],
           const SizedBox(height: Space.xl),
           AppTextField(
             label: 'Username',
@@ -133,7 +157,12 @@ class _LoginFormState extends State<LoginForm> {
           ),
           if (_error != null) ...[const SizedBox(height: Space.lg), ErrorMessage(_error!)],
           const SizedBox(height: Space.xl),
-          AppButton(label: _loading ? 'Logging in…' : 'Log in', expand: true, loading: _loading, onPressed: _onLogin),
+          AppButton(
+            label: _starting ? 'Starting the services…' : (_loading ? 'Logging in…' : 'Log in'),
+            expand: true,
+            loading: _loading || _starting,
+            onPressed: _starting ? null : _onLogin,
+          ),
           if (widget.footer != null) ...[const SizedBox(height: Space.lg), widget.footer!],
         ],
       ),

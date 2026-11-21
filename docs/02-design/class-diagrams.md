@@ -98,6 +98,7 @@ Every source file that exists so far, and the classes in it. Updated in the same
 | `lib/src/mooneys_sign.dart` | `MooneysSign` | The store's sign: MOONEY'S in gold on deep green, in both apps |
 | `lib/src/api/api_client.dart` | `ApiClient`, `ApiException` | Sends a request with the token, reads the answer, turns every failure into a readable message; uses dart:io, so no plugin is needed. `delete` since v1.1.0; an empty 204 answer is accepted |
 | `lib/src/api/session.dart` | `Session` | Who is logged in |
+| `lib/src/api/local_services.dart` | `LocalServices` | Starts the three services on this computer when an app opens and they are not running (`scripts/start-services.ps1 -Hidden`); the login form shows "Starting the bookstore services" meanwhile |
 | `lib/src/api/apis.dart` | `UserApi`, `BookApi`, the services' addresses | user-service and book-service, as both apps use them. Since v1.1.0 `BookApi` also lists a book's reviews and saves or deletes the customer's own (`reviews`, `saveMyReview`, `deleteMyReview`) |
 | `lib/src/models/book.dart` | `Book`, `ItemType`, `rentPercent`, `rentDays`, `categories` | A book, with its shelf and its rent price (10%, in whole cents); the five shelves. Since v1.1.0 also `ratingAverage`, `ratingCount`, and `isRated`, read from book-service and never sent back |
 | `lib/src/models/review.dart` | `Review` | A customer's review as book-service returns it; missing text becomes empty |

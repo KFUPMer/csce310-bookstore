@@ -89,6 +89,7 @@ class AppServices {
     required this.orders,
     required this.preferences,
     this.now = DateTime.now,
+    this.localServices,
   });
 
   factory AppServices.real() {
@@ -100,6 +101,7 @@ class AppServices {
       books: BookApi(session),
       orders: OrderApi(session),
       preferences: Preferences.onThisComputer(),
+      localServices: LocalServices(),
     );
   }
 
@@ -112,6 +114,9 @@ class AppServices {
 
   /// Today's date and time; tests fix it, so "due back in 7 days" does not depend on the day they run.
   final DateTime Function() now;
+
+  /// Starts the services on this computer if they are not running; null in tests.
+  final LocalServices? localServices;
 }
 
 /// Gives every screen the [AppServices] and the light/dark switch.

@@ -18,7 +18,7 @@ The live plan is `docs/04-planning/milestones.md`; tasks are GitHub issues on `K
 | user-service (Java HttpServer, MySQL) | Done, verified against MySQL |
 | book-service (Python Flask, MongoDB) | Done, verified on the running service. Reviews added in M6: `GET /api/books/{id}/reviews`, `PUT` and `DELETE /api/books/{id}/reviews/mine`; books carry `ratingAverage`, `ratingCount`; a manager's edit is refused (409) if an order changed the copies meanwhile (76 tests) |
 | order-service (Python Flask, MySQL) | Done, verified on the running service with the other two. A real bill email was sent through Gmail (`email_check.py`) and the owner confirmed it looks right in the inbox. `GET /api/orders/{id}`, `GET /api/orders/mine`, `POST /api/orders/{id}/pay` added in M4; `GET /api/reports/sales` (managers only) in M6 (117 tests) |
-| bookstore-ui (shared) | The look, plus the shared log-in form, `ApiClient`, `Session`, `UserApi`, `BookApi`, `Book`, `Order`, `Review`, `RatingStars`, `StarPicker` (41 tests) |
+| bookstore-ui (shared) | The look, plus the shared log-in form, `ApiClient`, `Session`, `UserApi`, `BookApi`, `Book`, `Order`, `Review`, `RatingStars`, `StarPicker`, `LocalServices` (starts the services when an app opens) (46 tests) |
 | customer-app (Flutter) | Built on the real services (issues 11, 15), 47 tests. The owner ran it: it works. Account page and pretend checkout added after; the owner tried them too |
 | management-app (Flutter) | Built (issue 12), 34 tests, checked against the running services. The owner tried it: it works (`manager1` / `manager123`). Reports tab added in M6 |
 | Reviews and ratings (M6, issue #20) | Built 2026-11-18, course section-6 extra credit. Any logged-in customer may review any book, once (no purchase check: book-service would have to call order-service, which already calls book-service); the writer edits or deletes it; no moderation, on purpose. MongoDB collection `reviews`, unique index `one_review_per_customer_per_book` on (bookId, userId). Ratings are one aggregation per search, never stored. Checked on the running services (review saved in 15 ms) |
@@ -92,6 +92,7 @@ These override any plugin or skill that says otherwise.
 | Redraw the app screenshots | `clients/customer-app`: `set BOOKSTORE_SCREENSHOTS=1 && flutter test test/screenshots_test.dart` |
 | Reset test data | repo root: `python database/seed.py` (also clears all reviews, P-023), then `python database/demo_data.py --reset` |
 | Demo data (14 customers, 100 past sales, reviews; password `demo12345`) | repo root: `python database/demo_data.py` (`--reset`, `--remove`); setup.cmd runs it |
+| The apps start the services themselves | `LocalServices` (bookstore-ui) runs `scripts/start-services.ps1 -Hidden` when an app opens and they are down (E-052) |
 | Set up / start / stop the services, as a grader would | repo root: `setup.cmd`, `start-services.cmd`, `stop-services.cmd` (they pause at the end; from a script run `scripts\*.ps1` with `powershell -ExecutionPolicy Bypass -File`) |
 | Release build and installer | Pushing a tag `v*` runs `.github/workflows/windows-release.yml` on GitHub (release builds cannot be made on this machine, P-017) |
 

@@ -30,4 +30,4 @@ The reasoning behind every visual value is in [docs/02-design/style-guide.md](..
 flutter test
 ```
 
-41 tests: the book's rent price, money, and rating, a review and an order read from JSON, the cover colors, the stars and the star picker, the multi-line text field, and the service client (including the review calls) against a small real web server.
+46 tests: the book's rent price, money, and rating, a review and an order read from JSON, the cover colors, the stars and the star picker, the multi-line text field, and the service client (including the review calls) against a small real web server.

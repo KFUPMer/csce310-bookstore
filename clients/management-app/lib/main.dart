@@ -86,6 +86,7 @@ class ManagerServices {
     required this.reports,
     this.openFile = _openWithWindows,
     this.now = DateTime.now,
+    this.localServices,
   });
 
   factory ManagerServices.real() {
@@ -96,6 +97,7 @@ class ManagerServices {
       books: BookApi(session),
       orders: OrderApi(session),
       reports: ReportApi(session),
+      localServices: LocalServices(),
     );
   }
 
@@ -105,6 +107,9 @@ class ManagerServices {
   final OrderApi orders;
   final ReportApi reports;
   final FileOpener openFile;
+
+  /// Starts the services on this computer if they are not running; null in tests.
+  final LocalServices? localServices;
 
   /// Today, for the report's periods; tests give a fixed day.
   final DateTime Function() now;

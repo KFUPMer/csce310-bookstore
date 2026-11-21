@@ -359,3 +359,9 @@ At the owner's request ("ultracode"), E-048 and E-049 were built by a multi-agen
 54 more books, each with a real cover checked by eye, so the shelves look like a shop's (81 in all). `database/demo_data.py` adds 14 invented customers with random names, 100 orders at random dates and times over the last 60 days, and reviews by customers of books they ordered. It is run by setup.cmd, does nothing if the data is already there, and `--remove` takes it all away; real orders and the test accounts are never touched.
 **Why:** the owner asked for it, so the sales report, the best sellers, and the star ratings show something real on the first day.
 **Verified on the running services:** 82 books, 47 of them rated (96 reviews); the all-time report shows 103 orders on 51 different days, $4,127.87, best sellers led by two books at 10 copies; a demo customer logs in with the demo password and sees their own 9 orders.
+
+### E-052 — The apps start the services themselves
+
+Opening Mooney's or Mooney's Manager now checks whether the three services answer, and if not, starts them in the background (the same `start-services.ps1`, with a new `-Hidden` switch). Meanwhile the login form says "Starting the bookstore services" and its button waits. The services keep running after the app closes, so the other app finds them ready; `stop-services.cmd` still stops them. `setup.cmd` records where the server folder is (`%APPDATA%\CSCE310 Bookstore\server-folder.txt`); an app built inside the repository finds it above its own program. Class `LocalServices` in bookstore-ui, 5 tests.
+**Why:** the owner asked for it: starting the services by hand was the step users forgot, and after a restart the apps only said "not answering".
+**Measured on this computer:** with the services stopped, opening the customer app started all three in 11.1 s, with no window shown; a real login then worked; `stop-services.cmd` stopped them as before.

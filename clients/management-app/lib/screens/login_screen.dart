@@ -34,6 +34,7 @@ class LoginScreen extends StatelessWidget {
         wrongRoleMessage: 'This app is for managers. Customers log in to the customer app.',
         subtitle: 'Management. For store staff only.',
         note: scope.services.session.endedMessage,
+        localServices: scope.services.localServices,
         onLoggedIn: () => Navigator.of(context).pushReplacement(fadeRoute(const HomeScreen())),
       ),
     );

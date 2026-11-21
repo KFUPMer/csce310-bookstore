@@ -1,12 +1,23 @@
 <h2>4. Architectural and class design</h2>
 
-<h3>4.1 Components</h3>
+<h3>4.1 Use cases</h3>
 <figure class="diagram">
-  <img src="../02-design/diagrams/architecture.png" alt="Architecture: two Flutter apps call three services over HTTP and JSON; user-service and order-service use MySQL, book-service uses MongoDB; order-service saves and emails the bill">
-  <figcaption>Figure 4.1. The two apps call the three services over HTTP with JSON. order-service asks user-service who is logged in and asks book-service for the books; it saves each bill as an HTML file and emails it through Gmail.</figcaption>
+  <img src="../02-design/diagrams/use-case.png" alt="Use-case diagram: Customer, Manager, and the mail server, with the bookstore's use cases">
+  <figcaption>Figure 4.1. What each actor can do, from the PRD: both log in, log out, and search; the customer selects books, orders, views the bill, and registers; the manager views all orders, updates payment status, and adds or updates books. Placing an order includes generating, saving, and emailing the bill.</figcaption>
 </figure>
 
-<h3>4.2 The patterns it follows</h3>
+<h3>4.2 Components</h3>
+<figure class="diagram">
+  <img src="../02-design/diagrams/architecture.png" alt="Architecture: two Flutter apps call three services over HTTP and JSON; user-service and order-service use MySQL, book-service uses MongoDB; order-service saves and emails the bill">
+  <figcaption>Figure 4.2. The two apps call the three services over HTTP with JSON. order-service asks user-service who is logged in and asks book-service for the books; it saves each bill as an HTML file and emails it through Gmail.</figcaption>
+</figure>
+
+<figure class="diagram">
+  <img src="../02-design/diagrams/component.png" alt="Component diagram: the two apps use the REST interfaces of the three services, which use MySQL, MongoDB, and the bills folder">
+  <figcaption>Figure 4.3. The same parts as UML components: each service offers one REST interface (the circles) on its own port.</figcaption>
+</figure>
+
+<h3>4.3 The patterns it follows</h3>
 
 <table class="data">
   <thead><tr><th>Pattern</th><th>How it is followed here</th></tr></thead>
@@ -18,10 +29,18 @@
   </tbody>
 </table>
 
-<h3 class="pagebreak">4.3 Classes and their roles</h3>
-<p>The main classes of each part. Every class, with its fields and methods, is in the class diagrams in 4.4.</p>
+<div class="wide">
+<h3>4.4 State machines</h3>
+<figure class="diagram">
+  <img src="../02-design/diagrams/state-machine.png" alt="State machines of an order and of a user session">
+  <figcaption>Figure 4.4. An order goes from being selected to Pending when it is placed, and to Paid when a manager marks it or the customer pays. A session goes from logged out to logged in and back.</figcaption>
+</figure>
+</div>
 
-<h4>4.3.1 user-service (Java)</h4>
+<h3 class="pagebreak">4.5 Classes and their roles</h3>
+<p>The main classes of each part. Every class, with its fields and methods, is in the class diagrams in 4.6.</p>
+
+<h4>4.5.1 user-service (Java)</h4>
 <table class="data">
   <thead><tr><th>Class</th><th>Layer</th><th>Role</th></tr></thead>
   <tbody>
@@ -35,7 +54,7 @@
   </tbody>
 </table>
 
-<h4>4.3.2 book-service (Python)</h4>
+<h4>4.5.2 book-service (Python)</h4>
 <table class="data">
   <thead><tr><th>Class or module</th><th>Layer</th><th>Role</th></tr></thead>
   <tbody>
@@ -47,7 +66,7 @@
   </tbody>
 </table>
 
-<h4>4.3.3 order-service (Python)</h4>
+<h4>4.5.3 order-service (Python)</h4>
 <table class="data">
   <thead><tr><th>Class or module</th><th>Layer</th><th>Role</th></tr></thead>
   <tbody>
@@ -61,7 +80,7 @@
   </tbody>
 </table>
 
-<h4>4.3.4 bookstore-ui (shared by both apps)</h4>
+<h4>4.5.4 bookstore-ui (shared by both apps)</h4>
 <table class="data">
   <thead><tr><th>Class</th><th>Role</th></tr></thead>
   <tbody>
@@ -72,7 +91,7 @@
   </tbody>
 </table>
 
-<h4>4.3.5 Mooney's (customer app)</h4>
+<h4>4.5.5 Mooney's (customer app)</h4>
 <table class="data">
   <thead><tr><th>Class</th><th>Role</th></tr></thead>
   <tbody>
@@ -85,7 +104,7 @@
   </tbody>
 </table>
 
-<h4>4.3.6 Mooney's Manager</h4>
+<h4>4.5.6 Mooney's Manager</h4>
 <table class="data">
   <thead><tr><th>Class</th><th>Role</th></tr></thead>
   <tbody>
@@ -97,35 +116,37 @@
   </tbody>
 </table>
 
-<h3>4.4 Class diagrams</h3>
+<p class="sources">Sources: <code>docs/02-design/architecture.md</code>, <code>docs/02-design/class-diagrams.md</code>, <code>docs/02-design/engineering-rules.md</code>, the code in <code>services/</code> and <code>clients/</code>, and the diagrams' <code>.drawio</code> files in <code>docs/02-design/diagrams</code>.</p>
+
+<h3>4.6 Class diagrams</h3>
 <p>One per part, drawn in draw.io. Colors mark the layers.</p>
 
 <div class="wide">
-<h4>4.4.1 user-service (Java)</h4>
+<h4>4.6.1 user-service (Java)</h4>
 <figure class="diagram"><img src="../02-design/diagrams/class-user-service.png" alt="user-service class diagram"></figure>
 </div>
 
 <div class="wide">
-<h4>4.4.2 book-service (Python)</h4>
+<h4>4.6.2 book-service (Python)</h4>
 <figure class="diagram"><img src="../02-design/diagrams/class-book-service.png" alt="book-service class diagram"></figure>
 </div>
 
 <div class="wide">
-<h4>4.4.3 order-service (Python)</h4>
+<h4>4.6.3 order-service (Python)</h4>
 <figure class="diagram"><img src="../02-design/diagrams/class-order-service.png" alt="order-service class diagram"></figure>
 </div>
 
 <div class="wide">
-<h4>4.4.4 bookstore-ui (shared by both apps)</h4>
+<h4>4.6.4 bookstore-ui (shared by both apps)</h4>
 <figure class="diagram"><img src="../02-design/diagrams/class-bookstore-ui.png" alt="bookstore-ui class diagram"></figure>
 </div>
 
 <div class="wide">
-<h4>4.4.5 Mooney's (customer app)</h4>
+<h4>4.6.5 Mooney's (customer app)</h4>
 <figure class="diagram"><img src="../02-design/diagrams/class-customer-app.png" alt="customer-app class diagram"></figure>
 </div>
 
 <div class="wide">
-<h4>4.4.6 Mooney's Manager</h4>
+<h4>4.6.6 Mooney's Manager</h4>
 <figure class="diagram"><img src="../02-design/diagrams/class-manager-app.png" alt="management-app class diagram"></figure>
 </div>

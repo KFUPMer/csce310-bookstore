@@ -83,3 +83,34 @@
   "byDay": [ { "date": "2026-11-17", "orders": 1, "revenue": 55.0 },
              { "date": "2026-11-18", "orders": 1, "revenue": 103.0 } ],
   "bestSellers": [ { "title": "Database System Concepts", "bought": 2, "rented": 0, "copies": 2, "revenue": 110.0 }, ... ] }</pre>
+
+<h3 class="pagebreak">2.4 Sequence diagrams</h3>
+<p>How the services call each other for the main flows. Each shows the success path and the main failure.</p>
+
+<p class="sources">Sources: <code>services/*/routes.py</code> and <code>schemas.py</code>, <code>services/user-service/src/main/java/com/bookstore/user/http</code>, <code>docs/02-design/api-design.md</code>, <code>docs/02-design/diagrams/sequence-*.drawio</code>.</p>
+
+<figure class="diagram tall">
+  <img src="../02-design/diagrams/sequence-login.png" alt="Sequence diagram: log in">
+  <figcaption>Figure 2.1. Log in (FR1, FR2, FR11). A wrong username or password gets 401; the manager app refuses a customer account.</figcaption>
+</figure>
+
+<figure class="diagram tall">
+  <img src="../02-design/diagrams/sequence-register.png" alt="Sequence diagram: create an account">
+  <figcaption>Figure 2.2. Create an account (FR3). The password is hashed with bcrypt; a used username or email gets 409.</figcaption>
+</figure>
+
+<div class="wide">
+<h4>Place an order</h4>
+<figure class="diagram">
+  <img src="../02-design/diagrams/sequence-place-order.png" alt="Sequence diagram: place an order">
+  <figcaption>Figure 2.3. Place an order (FR6–FR10): the login check, the copies taken from book-service, the order saved, the bill written and emailed.</figcaption>
+</figure>
+</div>
+
+<div class="wide">
+<h4>Update the payment status</h4>
+<figure class="diagram">
+  <img src="../02-design/diagrams/sequence-update-payment.png" alt="Sequence diagram: update the payment status">
+  <figcaption>Figure 2.4. A manager lists the orders and marks one as paid (FR12, FR13). A customer's token gets 403.</figcaption>
+</figure>
+</div>

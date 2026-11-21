@@ -90,6 +90,11 @@ def build_html():
     blank = "_" * 32
     page = page.replace("{{STUDENT_NAME}}", html.escape(student.get("name") or blank))
     page = page.replace("{{STUDENT_ID}}", html.escape(student.get("id") or blank))
+    page = page.replace("{{COURSE}}", html.escape(student.get("course") or "CSCE 310"))
+    page = page.replace("{{INSTRUCTOR}}", html.escape(student.get("instructor") or blank))
+    # The footer of every page after the cover; it sits inside a CSS string, so quotes and backslashes are escaped.
+    footer = " · ".join(x for x in (student.get("course") or "CSCE 310", f"Instructor: {student['instructor']}" if student.get("instructor") else "") if x)
+    page = page.replace("{{FOOTER}}", footer.replace("\\", "\\\\").replace('"', '\\"'))
     page = page.replace("{{SECTIONS}}", sections_html())
     page = page.replace("{{VIDEOS}}", video_rows())
     page = page.replace("{{DATE}}", datetime.date.today().strftime("%d %B %Y").lstrip("0"))

@@ -28,7 +28,7 @@ Build it from the repository root (needs Python and Microsoft Edge):
 python tools/report/build_report.py
 ```
 
-It writes `report.html` and `report.pdf` here. Both are rebuilt, not stored in git: the PDF is about 13 MB because it holds the screenshots at full size. The student's name and ID on the cover come from `student.json` (`{"name": ..., "id": ...}`) in this folder, which git ignores so they stay out of the public repository; without it the cover has blank lines.
+It writes `report.html` and `report.pdf` here. Both are rebuilt, not stored in git: the PDF is about 13 MB because it holds the screenshots at full size. The student's name, ID, course, and instructor (on the cover and in each page's footer) come from `student.json` (`{"name": ..., "id": ..., "course": ..., "instructor": ...}`) in this folder, which git ignores so they stay out of the public repository; without it the cover has blank lines.
 
 ## Making the files to upload
 

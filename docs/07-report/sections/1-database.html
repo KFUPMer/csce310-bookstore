@@ -1,39 +1,121 @@
 <h2>1. Database design</h2>
 
-<p>Two databases, as the PRD asks. <strong>MySQL</strong> keeps the fixed, related data: users, their sessions, and orders. <strong>MongoDB</strong> keeps the book catalog and its reviews, which are searched far more often than changed. Each service owns its own data and no app touches a database.</p>
+<p>Two databases, as the PRD asks. <strong>MySQL</strong> keeps the fixed, related data: users, their sessions, and orders. <strong>MongoDB</strong> keeps the book catalog and its reviews, which are searched far more often than changed. Each service owns its own data, and no app touches a database.</p>
 
-<h3>1.1 Entities and attributes</h3>
-
+<h3>1.1 Entities</h3>
 <table class="data">
-  <thead><tr><th>Entity</th><th>Database, owner</th><th>Attributes (<span class="pk">PK</span> primary key, <span class="fk">FK</span> foreign key, UQ unique)</th></tr></thead>
+  <thead><tr><th>Entity</th><th>Database</th><th>Owned by</th><th>One row is</th></tr></thead>
   <tbody>
-    <tr><td><code>users</code><br>an account</td><td>MySQL, user-service</td><td><span class="pk">PK</span> id INT · username VARCHAR(50) UQ · email VARCHAR(255) UQ · password_hash CHAR(60) (bcrypt, never the password) · role CUSTOMER or MANAGER · created_at</td></tr>
-    <tr><td><code>sessions</code><br>a login</td><td>MySQL, user-service</td><td><span class="pk">PK</span> token CHAR(64) (random) · <span class="fk">FK</span> user_id · created_at. Deleted at log out (FR2)</td></tr>
-    <tr><td><code>orders</code><br>an order</td><td>MySQL, order-service</td><td><span class="pk">PK</span> id INT, from 1001, printed on the bill · <span class="fk">FK</span> user_id · payment_status PENDING or PAID · total DECIMAL(10,2) · bill_file · created_at</td></tr>
-    <tr><td><code>order_items</code><br>one book in an order</td><td>MySQL, order-service</td><td><span class="pk">PK</span> id · <span class="fk">FK</span> order_id · book_id CHAR(24) (a MongoDB id) · title, author (copied, so the bill never changes) · type BUY or RENT · quantity &gt; 0 · unit_price DECIMAL(10,2) · rent_due_date (RENT only)</td></tr>
-    <tr><td><code>books</code><br>a book</td><td>MongoDB, book-service</td><td>_id ObjectId · title · author · price · copiesAvailable · coverUrl (optional) · category (one of 5 shelves). The rating is worked out from the reviews on each search, never stored</td></tr>
-    <tr><td><code>reviews</code><br>a customer's review</td><td>MongoDB, book-service</td><td>_id · bookId · userId (a MySQL user id) · username · rating 1 to 5 · text (up to 1000) · createdAt · updatedAt. UQ (bookId, userId): one review per customer per book</td></tr>
+    <tr><td><code>users</code></td><td>MySQL</td><td>user-service</td><td>an account (customer or manager)</td></tr>
+    <tr><td><code>sessions</code></td><td>MySQL</td><td>user-service</td><td>a login</td></tr>
+    <tr><td><code>orders</code></td><td>MySQL</td><td>order-service</td><td>an order</td></tr>
+    <tr><td><code>order_items</code></td><td>MySQL</td><td>order-service</td><td>one book in an order</td></tr>
+    <tr><td><code>books</code></td><td>MongoDB</td><td>book-service</td><td>a book</td></tr>
+    <tr><td><code>reviews</code></td><td>MongoDB</td><td>book-service</td><td>one customer's review of one book</td></tr>
   </tbody>
 </table>
 
-<h3>1.2 Relationships</h3>
+<h3>1.2 Attributes of each entity</h3>
+<p>Key: <span class="pk">PK</span> primary key, <span class="fk">FK</span> foreign key, <b>UQ</b> unique.</p>
 
-<table class="data">
-  <thead><tr><th>From → to</th><th>Cardinality</th><th>Held by</th></tr></thead>
+<h4>users</h4>
+<table class="data cols">
+  <thead><tr><th>Column</th><th>Type</th><th>Key</th><th>Meaning</th></tr></thead>
   <tbody>
-    <tr><td>users → sessions</td><td>1 to 0..*</td><td>MySQL foreign key, deleted with the user</td></tr>
-    <tr><td>users → orders</td><td>1 to 0..*</td><td>MySQL foreign key</td></tr>
-    <tr><td>orders → order_items</td><td>1 to 1..*</td><td>MySQL foreign key; an order and its items are saved in one transaction</td></tr>
-    <tr><td>order_items → books</td><td>0..* to 1</td><td>Across databases. order-service takes each book's copies from book-service before saving, so an item always names a real book</td></tr>
-    <tr><td>books → reviews</td><td>1 to 0..*</td><td>Inside MongoDB. book-service checks the book exists before any review action</td></tr>
-    <tr><td>users → reviews</td><td>1 to 0..*</td><td>Across databases. The user id comes from user-service's answer about the session token, never from the request</td></tr>
+    <tr><td>id</td><td>INT</td><td><span class="pk">PK</span></td><td>The user's number</td></tr>
+    <tr><td>username</td><td>VARCHAR(50)</td><td><b>UQ</b></td><td>Name used to log in</td></tr>
+    <tr><td>email</td><td>VARCHAR(255)</td><td><b>UQ</b></td><td>Where the bill is emailed</td></tr>
+    <tr><td>password_hash</td><td>CHAR(60)</td><td></td><td>bcrypt hash; the password itself is never stored</td></tr>
+    <tr><td>role</td><td>ENUM</td><td></td><td>CUSTOMER or MANAGER</td></tr>
+    <tr><td>created_at</td><td>DATETIME</td><td></td><td>When the account was made</td></tr>
   </tbody>
 </table>
+
+<h4>sessions</h4>
+<table class="data cols">
+  <thead><tr><th>Column</th><th>Type</th><th>Key</th><th>Meaning</th></tr></thead>
+  <tbody>
+    <tr><td>token</td><td>CHAR(64)</td><td><span class="pk">PK</span></td><td>Random token sent with every request; deleted at log out</td></tr>
+    <tr><td>user_id</td><td>INT</td><td><span class="fk">FK</span> → users.id</td><td>Who is logged in</td></tr>
+    <tr><td>created_at</td><td>DATETIME</td><td></td><td>When they logged in</td></tr>
+  </tbody>
+</table>
+
+<h4>orders</h4>
+<table class="data cols">
+  <thead><tr><th>Column</th><th>Type</th><th>Key</th><th>Meaning</th></tr></thead>
+  <tbody>
+    <tr><td>id</td><td>INT (from 1001)</td><td><span class="pk">PK</span></td><td>The order ID printed on the bill</td></tr>
+    <tr><td>user_id</td><td>INT</td><td><span class="fk">FK</span> → users.id</td><td>The customer</td></tr>
+    <tr><td>payment_status</td><td>ENUM</td><td></td><td>PENDING or PAID</td></tr>
+    <tr><td>total</td><td>DECIMAL(10,2)</td><td></td><td>Sum of the items, exact to the cent</td></tr>
+    <tr><td>bill_file</td><td>VARCHAR(255)</td><td></td><td>Where the HTML bill is saved</td></tr>
+    <tr><td>created_at</td><td>DATETIME</td><td></td><td>When the order was placed</td></tr>
+  </tbody>
+</table>
+
+<h4>order_items</h4>
+<table class="data cols">
+  <thead><tr><th>Column</th><th>Type</th><th>Key</th><th>Meaning</th></tr></thead>
+  <tbody>
+    <tr><td>id</td><td>INT</td><td><span class="pk">PK</span></td><td>The item's number</td></tr>
+    <tr><td>order_id</td><td>INT</td><td><span class="fk">FK</span> → orders.id</td><td>The order it belongs to</td></tr>
+    <tr><td>book_id</td><td>CHAR(24)</td><td>(refers to books._id)</td><td>The book, in MongoDB</td></tr>
+    <tr><td>title, author</td><td>VARCHAR(255)</td><td></td><td>Copied, so the bill never changes</td></tr>
+    <tr><td>type</td><td>ENUM</td><td></td><td>BUY or RENT</td></tr>
+    <tr><td>quantity</td><td>INT</td><td></td><td>How many copies, more than 0</td></tr>
+    <tr><td>unit_price</td><td>DECIMAL(10,2)</td><td></td><td>The price, or 10% of it for a rental</td></tr>
+    <tr><td>rent_due_date</td><td>DATE</td><td></td><td>Order date + 7 days; only for RENT</td></tr>
+  </tbody>
+</table>
+
+<h4>books (MongoDB collection)</h4>
+<table class="data cols">
+  <thead><tr><th>Field</th><th>Type</th><th>Key</th><th>Meaning</th></tr></thead>
+  <tbody>
+    <tr><td>_id</td><td>ObjectId</td><td><span class="pk">PK</span></td><td>The book's id</td></tr>
+    <tr><td>title, author</td><td>String</td><td></td><td>Searched by keyword (FR4)</td></tr>
+    <tr><td>price</td><td>Number</td><td></td><td>The price to buy</td></tr>
+    <tr><td>copiesAvailable</td><td>Number</td><td></td><td>Copies left; never below 0</td></tr>
+    <tr><td>coverUrl</td><td>String</td><td></td><td>Cover photo address (optional)</td></tr>
+    <tr><td>category</td><td>String</td><td></td><td>One of the 5 shelves</td></tr>
+  </tbody>
+</table>
+
+<h4>reviews (MongoDB collection)</h4>
+<table class="data cols">
+  <thead><tr><th>Field</th><th>Type</th><th>Key</th><th>Meaning</th></tr></thead>
+  <tbody>
+    <tr><td>_id</td><td>ObjectId</td><td><span class="pk">PK</span></td><td>The review's id</td></tr>
+    <tr><td>bookId</td><td>String</td><td>(refers to books._id); <b>UQ</b> with userId</td><td>The book reviewed</td></tr>
+    <tr><td>userId</td><td>Number</td><td>(refers to users.id)</td><td>The writer; one review per customer per book</td></tr>
+    <tr><td>username</td><td>String</td><td></td><td>Shown with the review</td></tr>
+    <tr><td>rating</td><td>Number</td><td></td><td>1 to 5 stars</td></tr>
+    <tr><td>text</td><td>String</td><td></td><td>Up to 1000 characters</td></tr>
+    <tr><td>createdAt, updatedAt</td><td>Date</td><td></td><td>When written and last changed</td></tr>
+  </tbody>
+</table>
+<p>A book's rating (average and count) is worked out from its reviews on each search, never stored.</p>
+
+<h3>1.3 Relationships</h3>
+<table class="data">
+  <thead><tr><th>From</th><th>To</th><th>Cardinality</th><th>Held by</th></tr></thead>
+  <tbody>
+    <tr><td>users</td><td>sessions</td><td>1 to 0..*</td><td>MySQL foreign key</td></tr>
+    <tr><td>users</td><td>orders</td><td>1 to 0..*</td><td>MySQL foreign key</td></tr>
+    <tr><td>orders</td><td>order_items</td><td>1 to 1..*</td><td>MySQL foreign key; saved together in one transaction</td></tr>
+    <tr><td>order_items</td><td>books</td><td>0..* to 1</td><td>Across databases: kept correct by order-service</td></tr>
+    <tr><td>books</td><td>reviews</td><td>1 to 0..*</td><td>Inside MongoDB: kept correct by book-service</td></tr>
+    <tr><td>users</td><td>reviews</td><td>1 to 0..*</td><td>Across databases: the id comes from the login check</td></tr>
+  </tbody>
+</table>
+
+<p class="sources">Sources: <code>database/mysql/schema.sql</code>, <code>database/mongodb/books.json</code>, <code>services/book-service/book_service/repository.py</code>, <code>docs/02-design/database-design.md</code>, <code>docs/02-design/diagrams/database-er.drawio</code>.</p>
 
 <div class="wide">
-<h3>1.3 Entity–relationship diagram</h3>
+<h3>1.4 Entity–relationship diagram</h3>
 <figure class="diagram">
   <img src="../02-design/diagrams/database-er.png" alt="ER diagram: USERS, SESSIONS, ORDERS, ORDER_ITEMS in MySQL, and the books and reviews collections in MongoDB, with the links between them">
-  <figcaption>Figure 1.1. Solid lines are MySQL foreign keys. Dashed lines are links no database can enforce (across the two databases, and inside MongoDB); the services keep them correct.</figcaption>
+  <figcaption>Figure 1.1. Solid lines are MySQL foreign keys. Dashed lines are links no database can enforce; the services keep them correct.</figcaption>
 </figure>
 </div>
